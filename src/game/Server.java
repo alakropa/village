@@ -22,23 +22,20 @@ public class Server {
         this.serverSocket = new ServerSocket(port);
         this.service = Executors.newCachedThreadPool();
 
+        int number = 0;
         while (true) {
-            acceptConnection();
+            acceptConnection(number);
+            number++;
         }
     }
 
-    public void acceptConnection() throws IOException {
+    public void acceptConnection(int number) throws IOException {
         //O método .accept() só pode ser utilizado se:
         //  - Se houver 12 jogadores
         //  - Se o jogo já estiver a decorrer
         //Opcional: Haver dois ou mais jogos em simultâneo
         Socket playerSocket = this.serverSocket.accept();
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-        BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-        out.write("Write your name");
-        out.newLine();
-        out.flush();
-        addPlayer(new PlayerHandler(playerSocket, in.readLine()));
+        addPlayer(new PlayerHandler(playerSocket, "CLIENT " + number));
     }
 
     private void addPlayer(PlayerHandler playerHandler) {

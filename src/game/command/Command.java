@@ -24,8 +24,6 @@ public enum Command {
         return null;
     }
 
-
-
     public String getDESCRIPTION() {
         return this.DESCRIPTION;
     }
