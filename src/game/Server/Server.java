@@ -221,7 +221,7 @@ public class Server {
             return this.message;
         }
 
-        private void killPlayer() {
+        public void killPlayer() {
             this.alive = false;
         }
 
