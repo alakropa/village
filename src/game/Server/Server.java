@@ -107,6 +107,14 @@ public class Server {
         this.players.remove(playerHandler);
     }
 
+    public void sendPrivateMessage(String name, String message) {
+        for (PlayerHandler client : this.players) {
+            if (client.name.equals(name)) {
+                client.send(message);
+            }
+        }
+    }
+
     public void startGame() {
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
@@ -120,7 +128,7 @@ public class Server {
 
         List<PlayerHandler> playersList = new ArrayList<>(this.players);
         for (int i = 0; i < playersList.size(); i++) {
-            chat("your role is", roles.get(i).toString());
+            sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
         }
         play();
     }
