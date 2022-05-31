@@ -45,13 +45,20 @@ public class Server {
                     out.newLine();
                     out.flush();
                     String playerName = in.readLine(); //fica à espera do nome
-                    addPlayer(new PlayerHandler(playerSocket, playerName));
+                    if (!this.gameInProgress && this.players.size() < 12) {
+                        addPlayer(new PlayerHandler(playerSocket, playerName));
 
-                    System.out.println(playerName + " entered the chat"); //consola do servidor
+                        System.out.println(playerName + " entered the chat"); //consola do servidor
 
-                    out.write(Command.getCommandList());
-                    out.newLine();
-                    out.flush();
+                        out.write(Command.getCommandList());
+                        out.newLine();
+                        out.flush();
+                    } else {
+                        out.write("The game is unavailable");
+                        out.newLine();
+                        out.flush();
+                        playerSocket.close();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -202,6 +209,10 @@ public class Server {
         return night;
     }
 
+    private boolean gameContinues() {
+        return true;
+    }
+
     public class PlayerHandler implements Runnable {
         private String name;
         private final Socket PLAYER_SOCKET;
@@ -273,14 +284,14 @@ public class Server {
             }
         }
 
-        public void close() {
+       /* public void close() {
             try {
                 this.PLAYER_SOCKET.close();
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        } */
 
         private void dealWithCommand(String message) throws IOException {
             Command command = Command.getCommandFromDescription(message.split(" ")[0]);
