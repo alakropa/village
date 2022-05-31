@@ -131,13 +131,6 @@ public class Server {
                 .forEach(x -> x.send(message));
     }
 
-    public void sendPrivateMessage(String name, String message) {
-        for (PlayerHandler client : this.players.values()) {
-            if (client.name.equals(name)) {
-                client.send(message);
-            }
-        }
-    }
 
     public String playersInGame() {
         return this.players.values().stream()
@@ -156,7 +149,7 @@ public class Server {
     }
 
     public void sendPrivateMessage(String name, String message) {
-        for (PlayerHandler client : this.players) {
+        for (PlayerHandler client : this.players.values()) {
             if (client.name.equals(name)) {
                 client.send(message);
             }
