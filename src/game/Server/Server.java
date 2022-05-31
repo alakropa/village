@@ -175,6 +175,13 @@ public class Server {
         }).start();
     }
 
+    public void sendUpdateOfVotes(){
+        chat("Current score: ", players.stream()
+                .filter(player -> player.alive)
+                .map(player -> player.name + " " + player.numberOfVotes)
+                .reduce("", (a, b) -> a + "\n" + b));
+    }
+
     public boolean isGameInProgress() {
         return gameInProgress;
     }
