@@ -118,10 +118,10 @@ public class Server {
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
-        this.players.stream().map(x -> x.name).forEach(x -> x.);
-        for (int i = 0; i < this.players.size(); i++) {
-            sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
-        }
+//        this.players.stream().map(x -> x.name).forEach(x -> x.);
+//        for (int i = 0; i < this.players.size(); i++) {
+//            sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
+//        }
 
     }
 
@@ -132,7 +132,7 @@ public class Server {
                 case 0:
                 case 6:
                 case 11:
-                    roles.add(i, EnumRole.WOLF);
+                    roles.add(i, EnumRole.WOLF); //index, element
                     break;
                 case 1:
                 case 9:
