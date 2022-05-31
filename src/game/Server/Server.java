@@ -132,7 +132,7 @@ public class Server {
                 case 0:
                 case 6:
                 case 11:
-                    roles.add(i, EnumRole.WOLF);
+                    roles.add(i, EnumRole.WOLF); //index, element
                     break;
                 case 1:
                 case 9:
