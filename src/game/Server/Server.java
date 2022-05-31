@@ -44,12 +44,13 @@ public class Server {
                     out.write("Write your name");
                     out.newLine();
                     out.flush();
-                    String playerName = verifyIsNameIsAvailable(playerSocket, out, in);
-                    addPlayer(new PlayerHandler(playerSocket, playerName));
-                    System.out.println(playerName + " entered the chat"); //consola do servidor
+
+                    //addPlayer(new PlayerHandler(playerSocket, playerName));
+                    //System.out.println(playerName + " entered the chat"); //consola do servidor
                     //String playerName = in.readLine(); //fica à espera do nome
+
                     if (!this.gameInProgress && this.players.size() < 12) {
-                        addPlayer(new PlayerHandler(playerSocket, playerName));
+                        String playerName = verifyIsNameIsAvailable(playerSocket, out, in); //add no HashMap
 
                         System.out.println(playerName + " entered the chat"); //consola do servidor
 
@@ -72,15 +73,19 @@ public class Server {
 
     }
 
+    private String verifyIsNameIsAvailable(){
+return "";
+    }
+
     private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
-        if(!checkIfNameIsAvailable(playerName)){ //false
+        while(!checkIfNameIsAvailable(playerName)){ //false
             out.write("This name already exists, try another name");
             out.newLine();
             out.flush();
-            verifyIsNameIsAvailable(playerSocket, out, new BufferedReader(new InputStreamReader(playerSocket.getInputStream())));
+            playerName = in.readLine();
         }
-
+        addPlayer(new PlayerHandler(playerSocket, playerName));
         return playerName;
     }
 
