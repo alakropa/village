@@ -205,6 +205,8 @@ public class Server {
         private EnumRole role;
         private int numberOfVotes;
         private PlayerHandler vote;
+        //private HashMap<String, Boolean> visions;
+        //Lista especial para o vidente com "is wolf" e "isn't wolf"
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
