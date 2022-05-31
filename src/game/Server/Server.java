@@ -87,7 +87,6 @@ public class Server {
     }
 
     public void startGame() {
-        EnumRole[] roles = EnumRole.values();
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
         //lista dos jogadores
