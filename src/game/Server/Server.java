@@ -7,10 +7,7 @@ import game.command.Command;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -118,11 +115,11 @@ public class Server {
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
-        this.players.stream().map(x -> x.name).forEach(x -> x.);
-        for (int i = 0; i < this.players.size(); i++) {
-            sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
+        List<PlayerHandler> playersList = new ArrayList<>(this.players);
+        for (int i = 0; i < playersList.size(); i++) {
+            sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
         }
-
+        //awec
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
