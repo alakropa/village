@@ -72,16 +72,15 @@ public class Server {
         } else {
             playerSocket.close();
         }
-
     }
 
-    private String verifyIsNameIsAvailable(){
-return "";
+    private String verifyIsNameIsAvailable() {
+        return "";
     }
 
     private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
-        while(!checkIfNameIsAvailable(playerName)){ //false
+        while (!checkIfNameIsAvailable(playerName)) { //false
             out.write("This name already exists, try another name");
             out.newLine();
             out.flush();
@@ -92,11 +91,11 @@ return "";
     }
 
 
-    private boolean checkIfNameIsAvailable(String playerName){
-       // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-       // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-        for (PlayerHandler player: this.players.values()) {
-            if(player.name.equals(playerName)){
+    private boolean checkIfNameIsAvailable(String playerName) {
+        // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+        for (PlayerHandler player : this.players.values()) {
+            if (player.name.equals(playerName)) {
                 return false;
             }
         }
@@ -153,7 +152,7 @@ return "";
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.players.remove(playerHandler);
+        this.players.remove(playerHandler.name, playerHandler);
     }
 
 
@@ -358,7 +357,7 @@ return "";
             try {
                 chat(this.name, " disconnected");
                 this.PLAYER_SOCKET.close();
-                Server.this.players.remove(this);
+                Server.this.players.remove(this.name, this);
                 Thread.currentThread().interrupt();
             } catch (IOException ex) {
                 ex.printStackTrace();
