@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -101,7 +102,17 @@ public class Server {
         chat("Welcome to a new game", "SPOOKY VILLAGE!");
         chat("A list of players starting the game", playersInGame());
 
-        ArrayList<EnumRole> roles = new ArrayList<>(players.size());
+        ArrayList<EnumRole> roles = generateEnumCards();
+        Collections.shuffle(roles);
+
+        for (int i = 0; i < this.players.size(); i++) {
+            chat("Here's your role", roles.get(i).toString());
+        }
+
+        }
+
+    private ArrayList<EnumRole> generateEnumCards() {
+        ArrayList <EnumRole> roles = new ArrayList <> (players.size());
         for (int i = 0; i < roles.size(); i++) {
             switch (i) {
                 case 0:
@@ -116,13 +127,8 @@ public class Server {
                 default:
                     roles.add(i, EnumRole.VILLAGER);
             }
-        }
-        Collections.shuffle(roles);
-
-        for (int i = 0; i < this.players.size(); i++) {
-            chat("Here's your role", roles.get(i).toString());
-        }
-
+            }
+        return roles;
     }
 
 
