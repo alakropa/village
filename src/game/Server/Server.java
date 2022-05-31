@@ -149,13 +149,6 @@ public class Server {
         this.players.remove(playerHandler);
     }
 
-    public void sendPrivateMessage(String name, String message) {
-        for (PlayerHandler client : this.players) {
-            if (client.name.equals(name)) {
-                client.send(message);
-            }
-        }
-    }
 
     public void startGame() {
         // Só um dos jogadores faz /start e o jogo começa
