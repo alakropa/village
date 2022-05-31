@@ -7,7 +7,8 @@ public enum Command {
     LIST("/list", new ListHandler(), "Lists the players in game"),
     VOTE("/vote", new VoteHandler(), "Vote the player that you want to eliminate"),
     KILL("/kill", new KillHandler(), "Choose the player that you want to kill (available to Wolfs only)"),
-    VISION("/vision", new VisionHandler(), "Choose a player to check it's role (available to Furtune Teller only)");
+    VISION("/vision", new VisionHandler(), "Choose a player to check it's role (available to Furtune Teller only)"),
+    QUIT("/quit", new QuitHandler(), "Quit from the game");
 
     private final String COMMAND;
     private final CommandHandler HANDLER;

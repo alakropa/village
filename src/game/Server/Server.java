@@ -245,7 +245,7 @@ public class Server {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                playerDisconnected();
             }
         }
 
@@ -304,6 +304,17 @@ public class Server {
 
         public void setVote(PlayerHandler vote) {
             this.vote = vote;
+        }
+
+        public void playerDisconnected() {
+            try {
+                chat(this.name, " disconnected");
+                this.PLAYER_SOCKET.close();
+                Server.this.players.remove(this);
+                Thread.currentThread().interrupt();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
