@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server implements Runnable {
+public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
     private HashSet<PlayerHandler> players;
@@ -90,11 +90,6 @@ public class Server implements Runnable {
         //Chama as funções todas (como startGame, removePlayer, etc.)
     }
 
-    public void run () {
-        HashSet<PlayerHandler> gamePlayers = this.players;
-        this.players = new HashSet<>();
-    }
-
     /*
         public Optional<ClientConnectionHandler> getClientByName(String name) {
             return this.clients.stream()
@@ -102,6 +97,11 @@ public class Server implements Runnable {
                     .findFirst();
         }
     */
+
+
+
+
+
     public class PlayerHandler implements Runnable {
         private final String NAME;
         private final Socket CLIENT_SOCKET;
