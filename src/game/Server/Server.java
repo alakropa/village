@@ -56,17 +56,23 @@ public class Server {
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
-        if (this.players.add(playerHandler)) {
-            this.service.submit(playerHandler);
-            chat(playerHandler.NAME, "joined the chat");
-        } else {
-            playerHandler.send("Player name is already taken");
+        while (!this.players.add(playerHandler)) {
+            try {
+                playerHandler.send("Player name is already taken\nWrite a new name: ");
+                BufferedReader in = new BufferedReader(new InputStreamReader(playerHandler.PLAYER_SOCKET.getInputStream()));
+                playerHandler.name = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
+        this.service.submit(playerHandler);
+        chat(playerHandler.name, "joined the chat");
     }
 
     public void chat(String name, String message) {
         for (PlayerHandler client : this.players) {
-            if (!client.NAME.equals(name)) {
+            if (!client.name.equals(name)) {
                 client.send(name + ": " + message);
             }
         }
@@ -74,7 +80,7 @@ public class Server {
 
     public String playersInGame() {
         return this.players.stream()
-                .map(x -> x.NAME + " - " + (x.alive ? "Alive" : "Dead"))
+                .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("", (a, b) -> a + "\n" + b);
         //Adicionar estado (alive ou dead)
     }
@@ -139,7 +145,7 @@ public class Server {
 
     public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.players.stream()
-                .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
+                .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
                 .findFirst();
     }
 
@@ -148,7 +154,7 @@ public class Server {
     }
 
     public class PlayerHandler implements Runnable {
-        private final String NAME;
+        private String name;
         private final Socket PLAYER_SOCKET;
         private final BufferedWriter OUT;
         private final BufferedReader IN;
@@ -159,7 +165,7 @@ public class Server {
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
-            this.NAME = name;
+            this.name = name;
             this.OUT = new BufferedWriter(new OutputStreamWriter(this.PLAYER_SOCKET.getOutputStream()));
             this.IN = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
             this.alive = true;
@@ -216,8 +222,8 @@ public class Server {
 
         }
 
-        public String getNAME() {
-            return this.NAME;
+        public String getName() {
+            return this.name;
         }
 
         public String getMessage() {
