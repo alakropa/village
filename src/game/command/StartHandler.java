@@ -5,6 +5,9 @@ import game.Server.Server;
 public class StartHandler implements CommandHandler{
     @Override
     public void command(Server server, Server.PlayerHandler player) {
-        server.startGame();
+        if(!server.isGameInProgress()) {
+            server.startGame();
+            server.setGameInProgress(true);
+        }
     }
 }
