@@ -1,6 +1,6 @@
 package game.command;
 
-import game.Server;
+import game.Server.Server;
 
 public class KillHandler implements CommandHandler {
     @Override
