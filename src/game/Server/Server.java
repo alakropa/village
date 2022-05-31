@@ -184,9 +184,9 @@ public class Server {
     }
 
     public void sendUpdateOfVotes(){
-        chat("Current score: ", players.stream()
+        chat("Current score", players.stream()
                 .filter(player -> player.alive)
-                .map(player -> player.name + " " + player.numberOfVotes)
+                .map(player -> player.name + ": " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
     }
 
@@ -212,6 +212,9 @@ public class Server {
         private EnumRole role;
         private int numberOfVotes;
         private PlayerHandler vote;
+
+        private PlayerHandler previousVote;
+
         //private HashMap<String, Boolean> visions;
         //Lista especial para o vidente com "is wolf" e "isn't wolf"
 
@@ -322,6 +325,18 @@ public class Server {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        }
+
+        public PlayerHandler getPreviousVote() {
+            return previousVote;
+        }
+
+        public void setPreviousVote(PlayerHandler previousVote) {
+            this.previousVote = previousVote;
+        }
+
+        public void decreaseNumberOfVotes() {
+            this.numberOfVotes--;
         }
     }
 }

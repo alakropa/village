@@ -15,17 +15,27 @@ public class VoteHandler implements CommandHandler {
         String votedPlayerName = Helpers.removeCommand(player.getMessage());
 
         if (votedPlayerName == null) {
-            player.send("Unvailble command");
+            player.send("Unavailable command");
             return;
         }
         Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPlayerName);
 
+        if (votedPlayerName.equals(player.getName())) {
+            player.send("You can't vote on yourself!");
+            return;
+        }
+
         if (votedPlayer.isPresent()) {
+            if (player.getPreviousVote() != null) {
+                player.getPreviousVote().decreaseNumberOfVotes();
+            }
+            player.setPreviousVote(votedPlayer.get());
             votedPlayer.get().increaseNumberOfVotes();
             player.setVote(votedPlayer.get());
             server.chat(player.getName(), " voted for " + votedPlayerName);
             server.sendUpdateOfVotes();
+        } else {
+            player.send("Player is unavailable.");
         }
-        player.send("Player is unavailable.");
     }
 }
