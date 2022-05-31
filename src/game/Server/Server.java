@@ -283,6 +283,7 @@ public class Server {
         public EnumRole getRole() {
             return role;
         }
+        //
     }
 }
 
