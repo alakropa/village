@@ -6,7 +6,7 @@ public class Helpers {
     }
 
     private static String removeSpaces(String word) {
-        return String.join("", (word.split(" ")));
+        return String.join("", (word.split(" "))).trim();
     }
 
     public static String removeCommand(String message) {

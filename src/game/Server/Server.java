@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private HashMap<String, PlayerHandler> players; //HashSet<PlayerHandler> players
+    private HashMap<String, PlayerHandler> players;
     private boolean gameInProgress;
     private boolean timesUp;
     private boolean night;
@@ -22,6 +22,8 @@ public class Server {
     public Server() {
         this.players = new HashMap<>();
         this.gameInProgress = false;
+        this.timesUp = false;
+        this.night = false;
     }
 
     public void start(int port) throws IOException {
@@ -168,7 +170,9 @@ return "";
 
         List<PlayerHandler> playersList = new ArrayList<>(this.players.values());
         for (int i = 0; i < playersList.size(); i++) {
-            sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
+            EnumRole newRole = roles.get(i);
+            sendPrivateMessage(playersList.get(i).name, "Your role is " + newRole.toString());
+            playersList.get(i).role = newRole;
         }
         play();
     }
@@ -224,7 +228,7 @@ return "";
     }
 
     public void sendUpdateOfVotes() {
-        chat("Current score: ", players.values().stream()
+        chat("Current score", players.values().stream()
                 .filter(player -> player.alive)
                 .map(player -> player.name + " " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
@@ -257,7 +261,6 @@ return "";
         private int numberOfVotes;
         private PlayerHandler vote;
         //private HashMap<String, Boolean> visions;
-        //Lista especial para o vidente com "is wolf" e "isn't wolf"
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
@@ -316,7 +319,10 @@ return "";
 
         private void dealWithCommand(String message) throws IOException {
             Command command = Command.getCommandFromDescription(message.split(" ")[0]);
-            if (command == null) return;
+            if (command == null) {
+                send("Command unavailable");
+                return;
+            }
             command.getHANDLER().command(Server.this, this);
         }
 

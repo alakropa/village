@@ -1,5 +1,7 @@
 package game;
 
+import java.util.HashMap;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -19,5 +21,16 @@ public class Main {
 
 
          */
+
+
+        String[] words = "/vision".split(" ", 2);
+        if (words.length >= 2) System.out.println(words[1]);
+
+        HashMap<String, Integer> sdgv = new HashMap<>();
+
+        System.out.println(sdgv.put("asd", 1));
+        System.out.println(sdgv.put("asd", 1));
+        System.out.println(sdgv.put("asd", 2));
+        System.out.println(sdgv);
     }
 }
