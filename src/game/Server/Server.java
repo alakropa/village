@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,41 +18,45 @@ public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
     private HashSet<PlayerHandler> players;
+    private boolean gameInProgress;
+    private boolean timesUp;
 
     public Server() {
         this.players = new HashSet<>();
+        this.gameInProgress = false;
     }
 
     public void start(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
         this.service = Executors.newCachedThreadPool();
 
-        int number = 0;
         while (true) {
-            acceptConnection(number);
-            number++;
+            if (this.players.size() < 12 || !this.gameInProgress) acceptConnection();
         }
     }
 
-    public void acceptConnection(int number) throws IOException {
-        //O método .accept() só pode ser utilizado se:
-        //  - Se houver 12 jogadores
-        //  - Se o jogo já estiver a decorrer
+    public void acceptConnection() throws IOException {
         //Opcional: Haver dois ou mais jogos em simultâneo
         Socket playerSocket = this.serverSocket.accept();
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-        BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-        out.write("Write your name");
-        out.newLine();
-        out.flush();
-        String playerName = in.readLine(); //fica à espera do nome
-        addPlayer(new PlayerHandler(playerSocket, playerName));
+        new Thread(() -> {
+            try {
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+                out.write("Write your name");
+                out.newLine();
+                out.flush();
+                String playerName = in.readLine(); //fica à espera do nome
+                addPlayer(new PlayerHandler(playerSocket, playerName));
 
-        System.out.println(playerName + " entered the chat"); //consola do servidor
+                System.out.println(playerName + " entered the chat"); //consola do servidor
 
-        out.write(Command.getCommandList());
-        out.newLine();
-        out.flush();
+                out.write(Command.getCommandList());
+                out.newLine();
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
@@ -109,10 +112,10 @@ public class Server {
             chat("Here's your role", roles.get(i).toString());
         }
 
-        }
+    }
 
     private ArrayList<EnumRole> generateEnumCards() {
-        ArrayList <EnumRole> roles = new ArrayList <> (players.size());
+        ArrayList<EnumRole> roles = new ArrayList<>(players.size());
         for (int i = 0; i < roles.size(); i++) {
             switch (i) {
                 case 0:
@@ -127,7 +130,7 @@ public class Server {
                 default:
                     roles.add(i, EnumRole.VILLAGER);
             }
-            }
+        }
         return roles;
     }
 
@@ -159,6 +162,17 @@ public class Server {
         this.players.forEach(x -> x.numberOfVotes = 0);
     }
 
+    private void timer() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(30000);
+                this.timesUp = true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
     public class PlayerHandler implements Runnable {
         private String name;
         private final Socket PLAYER_SOCKET;
@@ -180,22 +194,21 @@ public class Server {
         @Override
         public void run() {
             //play?
-            /*
             BufferedReader in;
             try {
-                in = new BufferedReader(new InputStreamReader(this.CLIENT_SOCKET.getInputStream()));
-                while (!this.CLIENT_SOCKET.isClosed()) {
+                in = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
+                while (!this.PLAYER_SOCKET.isClosed()) {
                     this.message = in.readLine();
 
                     if (isCommand(message.trim())) {
                         dealWithCommand(this.message);
                     } else {
-                        chat(this.NAME, this.message);
+                        chat(this.name, this.message);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
         private boolean isCommand(String message) {
