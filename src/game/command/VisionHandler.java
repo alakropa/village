@@ -1,4 +1,4 @@
-package command;
+package game.command;
 
 public class VisionHandler {
 }

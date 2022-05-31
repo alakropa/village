@@ -1,3 +1,5 @@
+package game;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -145,9 +147,9 @@ public class Server {
         private void dealWithCommand(String message) throws IOException {
             /*
             String commandReader = message.split(" ")[0];
-            command.Command command = command.Command.getCommandFromDescription(commandReader);
+            game.command.Command game.command = game.command.Command.getCommandFromDescription(commandReader);
             this.message = message;
-            if (command != null) command.getHANDLER().command(Server.this, this);
+            if (game.command != null) game.command.getHANDLER().game.command(game.Server.this, this);
             else chat(this.NAME, message);
             */
         }

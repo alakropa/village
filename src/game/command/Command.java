@@ -1,4 +1,4 @@
-package command;
+package game.command;
 
 public enum Command {
     LIST("/list", new ListHandler()),
@@ -8,9 +8,9 @@ public enum Command {
     VOTE("/vote", new VoteHandler());
 
     private final String DESCRIPTION;
-    private final CommandHandler HANDLER;
+    private final StartHandler.CommandHandler HANDLER;
 
-    Command(String description, CommandHandler handler) {
+    Command(String description, StartHandler.CommandHandler handler) {
         this.DESCRIPTION = description;
         this.HANDLER = handler;
     }
@@ -28,7 +28,7 @@ public enum Command {
         return this.DESCRIPTION;
     }
 
-    public CommandHandler getHANDLER() {
+    public StartHandler.CommandHandler getHANDLER() {
         return this.HANDLER;
     }
 }
