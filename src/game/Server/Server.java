@@ -31,7 +31,7 @@ public class Server {
         this.service = Executors.newCachedThreadPool();
 
         while (true) {
-            if (this.players.size() < 12 || !this.gameInProgress) acceptConnection();
+            if (this.players.size() < 12 && !this.gameInProgress) acceptConnection();
         }
     }
 
@@ -118,10 +118,10 @@ public class Server {
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
-//        this.players.stream().map(x -> x.name).forEach(x -> x.);
-//        for (int i = 0; i < this.players.size(); i++) {
-//            sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
-//        }
+       // this.players.stream().map(x -> x.name).forEach(x -> x);
+       /* for (int i = 0; i < this.players.size(); i++) {
+            sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
+        }*/
 
     }
 
@@ -182,6 +182,14 @@ public class Server {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public boolean isGameInProgress() {
+        return gameInProgress;
+    }
+
+    public void setGameInProgress(boolean gameInProgress) {
+        this.gameInProgress = gameInProgress;
     }
 
     public class PlayerHandler implements Runnable {
@@ -275,6 +283,7 @@ public class Server {
         public EnumRole getRole() {
             return role;
         }
+        //
     }
 }
 
