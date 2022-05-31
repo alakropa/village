@@ -17,12 +17,12 @@ import java.util.concurrent.Executors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private ArrayList<PlayerHandler> players;
+    private HashSet<PlayerHandler> players;
     private boolean gameInProgress;
     private boolean timesUp;
 
     public Server() {
-        this.players = new ArrayList<>();
+        this.players = new HashSet<>();
         this.gameInProgress = false;
     }
 
@@ -118,6 +118,7 @@ public class Server {
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
+        this.players.stream().map(x -> x.name).forEach(x -> x.);
         for (int i = 0; i < this.players.size(); i++) {
             sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
         }
