@@ -8,4 +8,8 @@ public class Helpers {
     private static String removeSpaces(String word) {
         return String.join("", (word.split(" ")));
     }
+
+    public static String removeCommand(String message) {
+        return message.split(" ", 2)[1];
+    }
 }

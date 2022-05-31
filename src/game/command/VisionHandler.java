@@ -1,6 +1,7 @@
 package game.command;
 
 import game.EnumRole;
+import game.Helpers;
 import game.Server.Server;
 
 import java.util.Optional;
@@ -12,7 +13,7 @@ public class VisionHandler implements CommandHandler {
             player.send("You must be a Fortune Teller to use this command");
             return;
         }
-        String chosenPName = player.getMessage().split(" ")[1];
+        String chosenPName = Helpers.removeCommand(player.getMessage());
         Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
 
         if (chosenPlayer.isPresent()) {
