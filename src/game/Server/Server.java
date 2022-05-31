@@ -17,12 +17,12 @@ import java.util.concurrent.Executors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private HashSet<PlayerHandler> players;
+    private ArrayList<PlayerHandler> players;
     private boolean gameInProgress;
     private boolean timesUp;
 
     public Server() {
-        this.players = new HashSet<>();
+        this.players = new ArrayList<>();
         this.gameInProgress = false;
     }
 
@@ -82,6 +82,15 @@ public class Server {
         }
     }
 
+    public void sendPrivateMessage(String name, String message) {
+        for (PlayerHandler client : this.players) {
+            if (client.name.equals(name)) {
+                client.send(message);
+            }
+        }
+    }
+
+
     public String playersInGame() {
         return this.players.stream()
                 .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
@@ -105,11 +114,12 @@ public class Server {
         chat("Welcome to a new game", "SPOOKY VILLAGE!");
         chat("A list of players starting the game", playersInGame());
 
+
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
         for (int i = 0; i < this.players.size(); i++) {
-            chat("Here's your role", roles.get(i).toString());
+            sendPrivateMessage(players.get(i).name, "Your role is " + roles.get(i).toString());
         }
 
     }
@@ -238,8 +248,7 @@ public class Server {
             Command command = Command.getCommandFromDescription(message.split(" ", 2)[0]);
             if (command == null) return;
             command.getHANDLER().command(Server.this, this);
-
-        }
+    }
 
         public String getName() {
             return this.name;
