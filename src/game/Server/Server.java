@@ -71,7 +71,7 @@ public class Server {
         this.players.remove(playerHandler);
     }
 
-    private void startGame() {
+    public void startGame() {
         EnumRole[] roles = EnumRole.values();
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
