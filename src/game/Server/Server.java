@@ -134,7 +134,7 @@ public class Server {
         //Chama as funções todas (como startGame, removePlayer, etc.)
     }
 
-    public Optional<PlayerHandler> getClientByName(String name) {
+    public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.players.stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
                 .findFirst();
@@ -231,6 +231,10 @@ public class Server {
 
         public BufferedReader getIN() {
             return IN;
+        }
+
+        public EnumRole getRole() {
+            return role;
         }
     }
 }
