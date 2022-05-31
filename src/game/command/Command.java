@@ -1,34 +1,44 @@
 package game.command;
 
+import java.util.Arrays;
+
 public enum Command {
-    LIST("/list", new ListHandler()),
-    START ("/start", new StartHandler()),
-    KILL("/kill", new KillHandler()),
-    VISION("/vision", new VisionHandler()),
-    VOTE("/vote", new VoteHandler());
+    START("/start", new StartHandler(), "Starts the game"),
+    LIST("/list", new ListHandler(), "Lists the players in game"),
+    VOTE("/vote", new VoteHandler(), "Vote the player that you want to eliminate"),
+    KILL("/kill", new KillHandler(), "Choose the player that you want to kill (available to Wolfs only)"),
+    VISION("/vision", new VisionHandler(), "Choose a player to check it's role (available to Furtune Teller only)");
 
-    private final String DESCRIPTION;
+    private final String COMMAND;
     private final CommandHandler HANDLER;
+    private final String DESCRIPTION;
 
-    Command(String description, CommandHandler handler) {
-        this.DESCRIPTION = description;
+    Command(String command, CommandHandler handler, String description) {
+        this.COMMAND = command;
         this.HANDLER = handler;
+        this.DESCRIPTION = description;
     }
 
     public static Command getCommandFromDescription(String description) {
         for (Command command : Command.values()) {
-            if (command.DESCRIPTION.equals(description)) {
+            if (command.COMMAND.equals(description)) {
                 return command;
             }
         }
         return null;
     }
 
-    public String getDESCRIPTION() {
-        return this.DESCRIPTION;
+    public String getCOMMAND() {
+        return this.COMMAND;
     }
 
     public CommandHandler getHANDLER() {
         return this.HANDLER;
+    }
+
+    public static String getCommandList() {
+        return "Commands list:\n" + Arrays.stream(Command.values())
+                .map(x -> x.COMMAND + " - " + x.DESCRIPTION)
+                .reduce("", (a, b) -> a + "\n" + b);
     }
 }

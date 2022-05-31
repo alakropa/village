@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,15 +50,18 @@ public class Server {
 
         System.out.println(playerName + " entered the chat"); //consola do servidor
 
-        out.write("Your available commands are:\n/start...................to start the game\n/list....................to list all the players in the game\n/kill <name>.............for wolves to kill\n/vote <name>.............for everyone, to vote for the killer wolf\n/vision <name>...........for the fortuneteller to have a vision");
+        out.write(Command.getCommandList());
         out.newLine();
         out.flush();
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
-        this.players.add(playerHandler);
-        this.service.submit(playerHandler);
-        chat(playerHandler.NAME, "joined the chat");
+        if (this.players.add(playerHandler)) {
+            this.service.submit(playerHandler);
+            chat(playerHandler.NAME, "joined the chat");
+        } else {
+            playerHandler.send("Player name is already taken");
+        }
     }
 
     public void chat(String name, String message) {
@@ -90,31 +92,32 @@ public class Server {
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
         //lista dos jogadores
-        chat("Welcome to a new game", "SPOOKY VILLAGE!" );
+        chat("Welcome to a new game", "SPOOKY VILLAGE!");
         chat("A list of players starting the game", playersInGame());
 
-       ArrayList <EnumRole> roles = new ArrayList <> (players.size());
+        ArrayList<EnumRole> roles = new ArrayList<>(players.size());
         for (int i = 0; i < roles.size(); i++) {
             switch (i) {
                 case 0:
                 case 6:
                 case 11:
                     roles.add(i, EnumRole.WOLF);
-                break;
+                    break;
                 case 1:
                 case 9:
                     roles.add(i, EnumRole.FORTUNE_TELLER);
-                break;
-                default: roles.add(i, EnumRole.VILLAGER);
+                    break;
+                default:
+                    roles.add(i, EnumRole.VILLAGER);
             }
-            }
+        }
         Collections.shuffle(roles);
 
         for (int i = 0; i < this.players.size(); i++) {
             chat("Here's your role", roles.get(i).toString());
         }
 
-        }
+    }
 
 
     private boolean verifyIfGameCanStart() {
