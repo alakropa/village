@@ -123,19 +123,11 @@ public class Server {
 
     private ArrayList<EnumRole> generateEnumCards() {
         ArrayList<EnumRole> roles = new ArrayList<>(players.size());
-        for (int i = 0; i < roles.size(); i++) {
+        for (int i = 0; i < this.players.size(); i++) {
             switch (i) {
-                case 0:
-                case 6:
-                case 11:
-                    roles.add(i, EnumRole.WOLF);
-                    break;
-                case 1:
-                case 9:
-                    roles.add(i, EnumRole.FORTUNE_TELLER);
-                    break;
-                default:
-                    roles.add(i, EnumRole.VILLAGER);
+                case 0, 6, 11 -> roles.add(i, EnumRole.WOLF);
+                case 1, 9 -> roles.add(i, EnumRole.FORTUNE_TELLER);
+                default -> roles.add(i, EnumRole.VILLAGER);
             }
         }
         return roles;
