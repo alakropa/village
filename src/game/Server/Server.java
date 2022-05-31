@@ -119,7 +119,6 @@ public class Server {
         for (int i = 0; i < playersList.size(); i++) {
             sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
         }
-        //awec
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -141,7 +140,6 @@ public class Server {
         }
         return roles;
     }
-
 
     private boolean verifyIfGameCanStart() {
         return false;
