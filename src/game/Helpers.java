@@ -10,6 +10,7 @@ public class Helpers {
     }
 
     public static String removeCommand(String message) {
-        return message.split(" ", 2)[1];
+        if (message.length() >= 2) return message.split(" ", 2)[1];
+        return null;
     }
 }

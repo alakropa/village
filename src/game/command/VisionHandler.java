@@ -11,6 +11,11 @@ public class VisionHandler implements CommandHandler {
     public void command(Server server, Server.PlayerHandler player) {
         if (player.getRole() == EnumRole.FORTUNE_TELLER && server.isNight()) {
             String chosenPName = Helpers.removeCommand(player.getMessage());
+            if (chosenPName == null) {
+                player.send("Unvailble command");
+                return;
+            }
+
             Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
 
             if (chosenPlayer.isPresent()) {
