@@ -1,20 +1,17 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server {
+public class Server implements Runnable {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private final List<ClientConnectionHandler> clients;
+    private HashSet<PlayerHandler> players;
 
     public Server() {
-        this.clients = new ArrayList<>();
+        this.players = new HashSet<>();
     }
 
     public void start(int port) throws IOException {
@@ -27,65 +24,103 @@ public class Server {
     }
 
     public void acceptConnection() throws IOException {
-        Socket clientSocket = this.serverSocket.accept();
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        out.write("Choose your name");
+        //O método .accept() só pode ser utilizado se:
+        //  - Se houver 12 jogadores
+        //  - Se o jogo já estiver a decorrer
+        //Opcional: Haver dois ou mais jogos em simultâneo
+        Socket playerSocket = this.serverSocket.accept();
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+        out.write("Write your name");
         out.newLine();
         out.flush();
-        addClient(new ClientConnectionHandler(clientSocket, in.readLine()));
+        addPlayer(new PlayerHandler(playerSocket, in.readLine()));
     }
 
-    private void addClient(ClientConnectionHandler clientConnectionHandler) {
-        this.clients.add(clientConnectionHandler);
-        this.service.submit(clientConnectionHandler);
-        broadcast(clientConnectionHandler.getNAME(), "joined the chat");
+    private void addPlayer(PlayerHandler playerHandler) {
+        this.players.add(playerHandler);
+        this.service.submit(playerHandler);
+        chat(playerHandler.NAME, "joined the chat");
     }
 
-    public void broadcast(String name, String message) {
-        for (ClientConnectionHandler client : this.clients) {
+    public void chat(String name, String message) {
+        for (PlayerHandler client : this.players) {
             if (!client.NAME.equals(name)) {
                 client.send(name + ": " + message);
             }
         }
     }
 
-    public String listClients() {
-        return this.clients.stream()
-                .map(ClientConnectionHandler::getNAME)
+    public String playersInGame() {
+        return this.players.stream()
+                .map(x -> x.NAME + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("", (a, b) -> a + "\n" + b);
+        //Adicionar estado (alive ou dead)
     }
 
-    public void removeClient(ClientConnectionHandler clientConnectionHandler) {
+    public void removePlayer(PlayerHandler playerHandler) {
         try {
-            clientConnectionHandler.CLIENT_SOCKET.close();
+            playerHandler.CLIENT_SOCKET.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.clients.remove(clientConnectionHandler);
+        this.players.remove(playerHandler);
     }
 
-    public Optional<ClientConnectionHandler> getClientByName(String name) {
-        return this.clients.stream()
-                .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
-                .findFirst();
+    private void startGame() {
+        EnumRole[] roles = EnumRole.values();
+        // Só um dos jogadores faz /start e o jogo começa
+        // Adicionar bots necessários
     }
 
-    public class ClientConnectionHandler implements Runnable {
+    private boolean verifyIfGameCanStart() {
+        return false;
+    }
+
+    private void verifyConnectedPlayers() {
+
+    }
+
+    private void verifyIfGameContinues() {
+
+    }
+
+    private void play() {
+        //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
+        //Chama as funções todas (como startGame, removePlayer, etc.)
+    }
+
+    public void run () {
+        HashSet<PlayerHandler> gamePlayers = this.players;
+        this.players = new HashSet<>();
+    }
+
+    /*
+        public Optional<ClientConnectionHandler> getClientByName(String name) {
+            return this.clients.stream()
+                    .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
+                    .findFirst();
+        }
+    */
+    public class PlayerHandler implements Runnable {
         private final String NAME;
         private final Socket CLIENT_SOCKET;
         private final BufferedWriter OUT;
         private String message;
+        private boolean alive;
+        private EnumRole role;
 
-        public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
+        public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.CLIENT_SOCKET = clientSocket;
             this.NAME = name;
             this.OUT = new BufferedWriter(new OutputStreamWriter(this.CLIENT_SOCKET.getOutputStream()));
-            System.out.println(this.NAME + ": joined the chat");
+            this.alive = true;
         }
 
         @Override
         public void run() {
+            //play?
+            /*
             BufferedReader in;
             try {
                 in = new BufferedReader(new InputStreamReader(this.CLIENT_SOCKET.getInputStream()));
@@ -95,12 +130,12 @@ public class Server {
                     if (isCommand(message.trim())) {
                         dealWithCommand(this.message);
                     } else {
-                        broadcast(this.NAME, this.message);
+                        chat(this.NAME, this.message);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
         private boolean isCommand(String message) {
@@ -108,11 +143,13 @@ public class Server {
         }
 
         private void dealWithCommand(String message) throws IOException {
+            /*
             String commandReader = message.split(" ")[0];
             Command command = Command.getCommandFromDescription(commandReader);
             this.message = message;
             if (command != null) command.getHANDLER().command(Server.this, this);
-            else broadcast(this.NAME, message);
+            else chat(this.NAME, message);
+            */
         }
 
         public void send(String message) {
@@ -140,6 +177,10 @@ public class Server {
 
         public String getMessage() {
             return this.message;
+        }
+
+        private void killPlayer() {
+            this.alive = false;
         }
     }
 }
