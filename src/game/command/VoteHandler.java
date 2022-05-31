@@ -18,10 +18,10 @@ public class VoteHandler implements CommandHandler {
             player.send("Unvailble command");
             return;
         }
-        Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPlayerName);
+        Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPlayerName); //guarda um playerHander, não só o nome
 
         if (votedPlayer.isPresent()) {
-            votedPlayer.get().increaseNumberOfVotes();
+            votedPlayer.get().increaseNumberOfVotes(); //get permite ir buscar o playerHander,não só o optional
             player.setVote(votedPlayer.get());
             return;
         }
