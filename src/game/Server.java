@@ -5,7 +5,10 @@ import game.command.Command;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,7 +59,6 @@ public class Server {
         return this.players.stream()
                 .map(x -> x.NAME + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("", (a, b) -> a + "\n" + b);
-        //Adicionar estado (alive ou dead)
     }
 
     public void removePlayer(PlayerHandler playerHandler) {
@@ -69,10 +71,35 @@ public class Server {
     }
 
     public void startGame() {
-        EnumRole[] roles = EnumRole.values();
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
-    }
+        //lista dos jogadores
+        chat("Welcome to a new game", "SPOOKY VILLAGE!" );
+        chat("A list of players starting the game", playersInGame());
+
+       ArrayList <EnumRole> roles = new ArrayList <> (players.size());
+        for (int i = 0; i < roles.size(); i++) {
+            switch (i) {
+                case 0:
+                case 6:
+                case 11:
+                    roles.add(i, EnumRole.WOLF);
+                break;
+                case 1:
+                case 9:
+                    roles.add(i, EnumRole.FORTUNE_TELLER);
+                break;
+                default: roles.add(i, EnumRole.VILLAGER);
+            }
+            }
+        Collections.shuffle(roles);
+
+        for (int i = 0; i < this.players.size(); i++) {
+            chat("Here's your role", roles.get(i).toString());
+        }
+
+        }
+
 
     private boolean verifyIfGameCanStart() {
         return false;
