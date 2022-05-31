@@ -6,17 +6,34 @@ public class Main {
     public static void main(String[] args) {
 
         /*   4. começa a noite:
+        - TEMPORIZADOR /sorry caps
+        -dizer que começa a noite
        - os aldeoes estão a dormir
-       - lobo pode matar /kill
-       - vidente pode perguntar /vision
+       - se houver 2 lobos, temos que fazer escolha do quem morre (não podem ser 2 killed)
+
 
        5. começa o dia:
+       -dizer que começa a noite
        informar quem morreu
-       mostrar a lista dos jogadores
-       cada um pode fazer /vote
+       - no final da votação, morre quem teve mais votos
 
-       fazer com que não haja nomes repetidos
-       mostrar a lista de jogadores (com número de votos) sempre que haja o vote
+       - escrever a verivfifcação se o jogo pode começar
+      - escrever a verivfifcação se o jogo pode continuar
+
+
+
+
+
+      DONE - lobo pode matar /kill
+      DONE - vidente pode perguntar /vision
+
+
+
+      DONE mostrar a lista dos jogadores
+      DONE cada um pode fazer /vote
+
+     DONE fazer com que não haja nomes repetidos
+     DONE mostrar a lista de jogadores (com número de votos) sempre que haja o vote
 
 
 
