@@ -162,10 +162,10 @@ public class Server {
         this.players.forEach(x -> x.numberOfVotes = 0);
     }
 
-    private void timer() {
+    private void timer(int setTime) {
         new Thread(() -> {
             try {
-                Thread.sleep(30000);
+                Thread.sleep(setTime);
                 this.timesUp = true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
