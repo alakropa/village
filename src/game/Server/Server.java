@@ -99,11 +99,10 @@ public class Server {
         }
     }
 
-
     public String playersInGame() {
         return this.players.stream()
                 .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
-                .reduce("", (a, b) -> a + "\n" + b);
+                .reduce("Players list:", (a, b) -> a + "\n" + b);
         //Adicionar estado (alive ou dead)
     }
 
@@ -131,6 +130,7 @@ public class Server {
         for (int i = 0; i < playersList.size(); i++) {
             sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
         }
+        play();
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -229,8 +229,8 @@ public class Server {
                     if (Server.this.night) {
                         switch (this.role) {
                             case WOLF -> {
-                                wolvesChat(this.name, this.message);
-                                dealWithCommand(this.message);
+                                if (isCommand(this.message)) dealWithCommand(this.message);
+                                else wolvesChat(this.name, this.message);
                             }
                             case FORTUNE_TELLER -> dealWithCommand(this.message);
                             default -> send("You are sleeping");
