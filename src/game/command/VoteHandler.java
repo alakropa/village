@@ -1,4 +1,10 @@
 package game.command;
 
-public class VoteHandler {
+import game.Server;
+
+public class VoteHandler implements CommandHandler {
+    @Override
+    public void command(Server server, Server.PlayerHandler player) {
+
+    }
 }

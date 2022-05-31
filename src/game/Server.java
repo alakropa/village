@@ -147,8 +147,6 @@ public class Server {
             return message.trim().startsWith("/");
         }
 
-
-
         public void send(String message) {
             try {
                 this.OUT.write(message);

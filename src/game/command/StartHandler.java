@@ -1,7 +1,10 @@
 package game.command;
 
-public class StartHandler {
-    public static interface CommandHandler {
-        void command(game.Server server, game.Server.PlayerHandler player);
+import game.Server;
+
+public class StartHandler implements CommandHandler{
+    @Override
+    public void command(Server server, Server.PlayerHandler player) {
+
     }
 }

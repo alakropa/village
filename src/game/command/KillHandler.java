@@ -1,4 +1,10 @@
 package game.command;
 
-public class KillHandler {
+import game.Server;
+
+public class KillHandler implements CommandHandler {
+    @Override
+    public void command(Server server, Server.PlayerHandler player) {
+
+    }
 }

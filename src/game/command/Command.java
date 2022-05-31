@@ -8,9 +8,9 @@ public enum Command {
     VOTE("/vote", new VoteHandler());
 
     private final String DESCRIPTION;
-    private final StartHandler.CommandHandler HANDLER;
+    private final CommandHandler HANDLER;
 
-    Command(String description, StartHandler.CommandHandler handler) {
+    Command(String description, CommandHandler handler) {
         this.DESCRIPTION = description;
         this.HANDLER = handler;
     }
@@ -30,7 +30,7 @@ public enum Command {
         return this.DESCRIPTION;
     }
 
-    public StartHandler.CommandHandler getHANDLER() {
+    public CommandHandler getHANDLER() {
         return this.HANDLER;
     }
 }
