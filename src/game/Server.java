@@ -1,5 +1,7 @@
 package game;
 
+import game.command.Command;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -104,6 +106,7 @@ public class Server {
 
 
 
+
     public class PlayerHandler implements Runnable {
         private final String NAME;
         private final Socket CLIENT_SOCKET;
@@ -144,15 +147,7 @@ public class Server {
             return message.trim().startsWith("/");
         }
 
-        private void dealWithCommand(String message) throws IOException {
-            /*
-            String commandReader = message.split(" ")[0];
-            game.command.Command game.command = game.command.Command.getCommandFromDescription(commandReader);
-            this.message = message;
-            if (game.command != null) game.command.getHANDLER().game.command(game.Server.this, this);
-            else chat(this.NAME, message);
-            */
-        }
+
 
         public void send(String message) {
             try {
@@ -171,6 +166,13 @@ public class Server {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        private void dealWithCommand(String message) throws IOException {
+            Command command = Command.getCommandFromDescription(message.split(" ", 2)[0]);
+            if (command == null) return;
+            command.getHANDLER().command(Server.this, this);
+
         }
 
         public String getNAME() {
