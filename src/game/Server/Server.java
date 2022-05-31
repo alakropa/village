@@ -1,5 +1,7 @@
-package game;
+package game.Server;
 
+import game.EnumRole;
+import game.Helpers;
 import game.command.Command;
 
 import java.io.*;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,11 +62,12 @@ public class Server {
         return this.players.stream()
                 .map(x -> x.NAME + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("", (a, b) -> a + "\n" + b);
+        //Adicionar estado (alive ou dead)
     }
 
     public void removePlayer(PlayerHandler playerHandler) {
         try {
-            playerHandler.CLIENT_SOCKET.close();
+            playerHandler.PLAYER_SOCKET.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,6 +75,7 @@ public class Server {
     }
 
     public void startGame() {
+        EnumRole[] roles = EnumRole.values();
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
         //lista dos jogadores
@@ -118,31 +123,31 @@ public class Server {
         //Chama as funções todas (como startGame, removePlayer, etc.)
     }
 
-    /*
-        public Optional<ClientConnectionHandler> getClientByName(String name) {
-            return this.clients.stream()
-                    .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
-                    .findFirst();
-        }
-    */
+    public Optional<PlayerHandler> getClientByName(String name) {
+        return this.players.stream()
+                .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
+                .findFirst();
+    }
 
-
-
-
-
+    private void resetNumberOfVotes() {
+        this.players.forEach(x -> x.numberOfVotes = 0);
+    }
 
     public class PlayerHandler implements Runnable {
         private final String NAME;
-        private final Socket CLIENT_SOCKET;
+        private final Socket PLAYER_SOCKET;
         private final BufferedWriter OUT;
+        private final BufferedReader IN;
         private String message;
         private boolean alive;
         private EnumRole role;
+        private int numberOfVotes;
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
-            this.CLIENT_SOCKET = clientSocket;
+            this.PLAYER_SOCKET = clientSocket;
             this.NAME = name;
-            this.OUT = new BufferedWriter(new OutputStreamWriter(this.CLIENT_SOCKET.getOutputStream()));
+            this.OUT = new BufferedWriter(new OutputStreamWriter(this.PLAYER_SOCKET.getOutputStream()));
+            this.IN = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
             this.alive = true;
         }
 
@@ -183,7 +188,7 @@ public class Server {
 
         public void close() {
             try {
-                this.CLIENT_SOCKET.close();
+                this.PLAYER_SOCKET.close();
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -207,6 +212,14 @@ public class Server {
 
         private void killPlayer() {
             this.alive = false;
+        }
+
+        public void increaseNumberOfVotes() {
+            this.numberOfVotes++;
+        }
+
+        public BufferedReader getIN() {
+            return IN;
         }
     }
 }
