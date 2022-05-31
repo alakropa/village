@@ -18,7 +18,7 @@ public class VoteHandler implements CommandHandler {
             player.send("Unavailable command");
             return;
         }
-        Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPlayerName);
+        Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPlayerName); //guarda um playerHander, não só o nome
 
         if (votedPlayerName.equals(player.getName())) {
             player.send("You can't vote on yourself!");

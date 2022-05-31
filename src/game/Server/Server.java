@@ -14,13 +14,13 @@ import java.util.concurrent.Executors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private HashSet<PlayerHandler> players;
+    private HashMap<String, PlayerHandler> players; //HashSet<PlayerHandler> players
     private boolean gameInProgress;
     private boolean timesUp;
     private boolean night;
 
     public Server() {
-        this.players = new HashSet<>();
+        this.players = new HashMap<>();
         this.gameInProgress = false;
     }
 
@@ -44,9 +44,13 @@ public class Server {
                     out.write("Write your name");
                     out.newLine();
                     out.flush();
-                    String playerName = in.readLine(); //fica à espera do nome
+
+                    //addPlayer(new PlayerHandler(playerSocket, playerName));
+                    //System.out.println(playerName + " entered the chat"); //consola do servidor
+                    //String playerName = in.readLine(); //fica à espera do nome
+
                     if (!this.gameInProgress && this.players.size() < 12) {
-                        addPlayer(new PlayerHandler(playerSocket, playerName));
+                        String playerName = verifyIsNameIsAvailable(playerSocket, out, in); //add no HashMap
 
                         System.out.println(playerName + " entered the chat"); //consola do servidor
 
@@ -69,23 +73,51 @@ public class Server {
 
     }
 
-    private void addPlayer(PlayerHandler playerHandler) {
-        while (!this.players.add(playerHandler)) {
-            try {
-                playerHandler.send("Player name is already taken\nWrite a new name: ");
-                BufferedReader in = new BufferedReader(new InputStreamReader(playerHandler.PLAYER_SOCKET.getInputStream()));
-                playerHandler.name = in.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private String verifyIsNameIsAvailable(){
+return "";
+    }
 
+    private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
+        String playerName = in.readLine(); //fica à espera do nome
+        while(!checkIfNameIsAvailable(playerName)){ //false
+            out.write("This name already exists, try another name");
+            out.newLine();
+            out.flush();
+            playerName = in.readLine();
         }
-        this.service.submit(playerHandler);
-        chat(playerHandler.name, "joined the chat");
+        addPlayer(new PlayerHandler(playerSocket, playerName));
+        return playerName;
+    }
+
+
+    private boolean checkIfNameIsAvailable(String playerName){
+       // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+       // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+        for (PlayerHandler player: this.players.values()) {
+            if(player.name.equals(playerName)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void addPlayer(PlayerHandler playerHandler) {
+//        while (!this.players.put(playerHandler.name, playerHandler)) { //(!this.players.add(playerHandler))
+//            try {
+//                playerHandler.send("Player name is already taken\nWrite a new name: ");
+//                BufferedReader in = new BufferedReader(new InputStreamReader(playerHandler.PLAYER_SOCKET.getInputStream()));
+//                playerHandler.name = in.readLine();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        this.players.put(playerHandler.name, playerHandler);
+        this.service.submit(playerHandler); //mandar para a threadpool
+        chat(playerHandler.name, "joined the chat"); //msg para os outros players
     }
 
     public void chat(String name, String message) {
-        for (PlayerHandler client : this.players) {
+        for (PlayerHandler client : this.players.values()) {
             if (!client.name.equals(name)) {
                 client.send(name + ": " + message);
             }
@@ -93,13 +125,21 @@ public class Server {
     }
 
     public void wolvesChat(String name, String message) {
-        this.players.stream()
+        this.players.values().stream()
                 .filter(x -> x.role == EnumRole.WOLF && !x.name.equals(name))
                 .forEach(x -> x.send(message));
     }
 
+    public void sendPrivateMessage(String name, String message) {
+        for (PlayerHandler client : this.players.values()) {
+            if (client.name.equals(name)) {
+                client.send(message);
+            }
+        }
+    }
+
     public String playersInGame() {
-        return this.players.stream()
+        return this.players.values().stream()
                 .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
         //Adicionar estado (alive ou dead)
@@ -133,7 +173,7 @@ public class Server {
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
-        List<PlayerHandler> playersList = new ArrayList<>(this.players);
+        List<PlayerHandler> playersList = new ArrayList<>(this.players.values());
         for (int i = 0; i < playersList.size(); i++) {
             sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
         }
@@ -170,13 +210,13 @@ public class Server {
     }
 
     public Optional<PlayerHandler> getPlayerByName(String name) {
-        return this.players.stream()
+        return this.players.values().stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
                 .findFirst();
     }
 
     private void resetNumberOfVotes() {
-        this.players.forEach(x -> x.numberOfVotes = 0);
+        this.players.values().forEach(x -> x.numberOfVotes = 0);
     }
 
     private void timer(int setTime) {
@@ -190,8 +230,8 @@ public class Server {
         }).start();
     }
 
-    public void sendUpdateOfVotes(){
-        chat("Current score", players.stream()
+    public void sendUpdateOfVotes() {
+        chat("Current score: ", players.values().stream()
                 .filter(player -> player.alive)
                 .map(player -> player.name + ": " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
@@ -283,15 +323,6 @@ public class Server {
                 e.printStackTrace();
             }
         }
-
-       /* public void close() {
-            try {
-                this.PLAYER_SOCKET.close();
-                Thread.currentThread().interrupt();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } */
 
         private void dealWithCommand(String message) throws IOException {
             Command command = Command.getCommandFromDescription(message.split(" ")[0]);
