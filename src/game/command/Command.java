@@ -37,7 +37,7 @@ public enum Command {
     }
 
     public static String getCommandList() {
-        return "Commands list:\n" + Arrays.stream(Command.values())
+        return "Commands list:" + Arrays.stream(Command.values())
                 .map(x -> x.COMMAND + " - " + x.DESCRIPTION)
                 .reduce("", (a, b) -> a + "\n" + b);
     }

@@ -12,6 +12,9 @@ public class VoteHandler implements CommandHandler {
         Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPlayerName);
 
         if (votedPlayer.isEmpty()) player.send("Player is unavailable.");
-        else votedPlayer.get().increaseNumberOfVotes();
+        else {
+            votedPlayer.get().increaseNumberOfVotes();
+            player.setVote(votedPlayer.get());
+        }
     }
 }

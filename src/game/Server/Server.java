@@ -3,7 +3,6 @@ package game.Server;
 import game.EnumRole;
 import game.Helpers;
 import game.command.Command;
-import game.command.StartHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -18,6 +17,7 @@ public class Server {
     private HashSet<PlayerHandler> players;
     private boolean gameInProgress;
     private boolean timesUp;
+    private boolean night;
 
     public Server() {
         this.players = new HashSet<>();
@@ -194,6 +194,7 @@ public class Server {
         private boolean alive;
         private EnumRole role;
         private int numberOfVotes;
+        private PlayerHandler vote;
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
@@ -215,6 +216,8 @@ public class Server {
 
                     if (isCommand(message.trim())) {
                         dealWithCommand(this.message);
+                    } else if (Server.this.night && this.role != EnumRole.WOLF) {
+                        send("You are sleeping");
                     } else {
                         chat(this.name, this.message);
                     }
@@ -275,6 +278,14 @@ public class Server {
 
         public EnumRole getRole() {
             return role;
+        }
+
+        public PlayerHandler getVote() {
+            return vote;
+        }
+
+        public void setVote(PlayerHandler vote) {
+            this.vote = vote;
         }
     }
 }
