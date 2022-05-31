@@ -265,7 +265,7 @@ public class Server {
         }
 
         private void dealWithCommand(String message) throws IOException {
-            Command command = Command.getCommandFromDescription(message.split(" ", 2)[0]);
+            Command command = Command.getCommandFromDescription(message.split(" ")[0]);
             if (command == null) return;
             command.getHANDLER().command(Server.this, this);
         }
