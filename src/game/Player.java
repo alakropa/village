@@ -3,12 +3,12 @@ package game;
 import java.io.*;
 import java.net.Socket;
 
-public class Client {
+public class Player {
 
     public static void main(String[] args) {
-        Client client = new Client();
+        Player player = new Player();
         try {
-            client.start("localhost", 8080);
+            player.start("localhost", 8080);
         } catch (IOException e) {
             e.printStackTrace();
         }
