@@ -3,6 +3,7 @@ package game.Server;
 import game.EnumRole;
 import game.Helpers;
 import game.command.Command;
+import game.command.StartHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -28,32 +29,37 @@ public class Server {
         this.service = Executors.newCachedThreadPool();
 
         while (true) {
-            if (this.players.size() < 12 || !this.gameInProgress) acceptConnection();
+            acceptConnection();
         }
     }
 
     public void acceptConnection() throws IOException {
         //Opcional: Haver dois ou mais jogos em simultâneo
         Socket playerSocket = this.serverSocket.accept();
-        new Thread(() -> { //serve para varios jogadores poderem escrever o nome ao mesmo tempo
-            try {
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-                BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-                out.write("Write your name");
-                out.newLine();
-                out.flush();
-                String playerName = in.readLine(); //fica à espera do nome
-                addPlayer(new PlayerHandler(playerSocket, playerName));
+        if (!this.gameInProgress && this.players.size() < 12) {
+            new Thread(() -> { //serve para varios jogadores poderem escrever o nome ao mesmo tempo
+                try {
+                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+                    BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+                    out.write("Write your name");
+                    out.newLine();
+                    out.flush();
+                    String playerName = in.readLine(); //fica à espera do nome
+                    addPlayer(new PlayerHandler(playerSocket, playerName));
 
-                System.out.println(playerName + " entered the chat"); //consola do servidor
+                    System.out.println(playerName + " entered the chat"); //consola do servidor
 
-                out.write(Command.getCommandList());
-                out.newLine();
-                out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
+                    out.write(Command.getCommandList());
+                    out.newLine();
+                    out.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } else {
+            playerSocket.close();
+        }
+
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
@@ -171,6 +177,14 @@ public class Server {
         }).start();
     }
 
+    public boolean isGameInProgress() {
+        return gameInProgress;
+    }
+
+    public void setGameInProgress(boolean gameInProgress) {
+        this.gameInProgress = gameInProgress;
+    }
+
     public class PlayerHandler implements Runnable {
         private String name;
         private final Socket PLAYER_SOCKET;
@@ -237,7 +251,7 @@ public class Server {
             Command command = Command.getCommandFromDescription(message.split(" ", 2)[0]);
             if (command == null) return;
             command.getHANDLER().command(Server.this, this);
-    }
+        }
 
         public String getName() {
             return this.name;

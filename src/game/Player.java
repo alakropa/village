@@ -8,7 +8,7 @@ public class Player {
     public static void main(String[] args) {
         Player player = new Player();
         try {
-            player.start("localhost", 8081);
+            player.start("localhost", 8080);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,7 +42,12 @@ public class Player {
             new Thread(() -> {
                 while (!this.SOCKET.isClosed()) {
                     try {
-                        System.out.println(this.in.readLine()); //imprime a msg que escreve na consola
+                        String message = this.in.readLine();
+                        if(message == null) {
+                            this.SOCKET.close();
+                            break;
+                        }
+                        System.out.println(message); //imprime a msg que escreve na consola
                     } catch (IOException e) {
                         try {
                             System.out.println("You disconnected from chat");
