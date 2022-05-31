@@ -12,15 +12,15 @@ public class VisionHandler implements CommandHandler {
             player.send("You must be a Fortune Teller to use this command");
             return;
         }
-        String chosenPlayerName = player.getMessage().split(" ")[1];
-        Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPlayerName);
+        String chosenPName = player.getMessage().split(" ")[1];
+        Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
 
         if (chosenPlayer.isPresent()) {
             String message;
-            message = chosenPlayer.get().getRole() == EnumRole.WOLF ? chosenPlayerName + " is a Wolf" : chosenPlayerName + " is a Villager";
+            message = chosenPlayer.get().getRole() == EnumRole.WOLF ? chosenPName + " is a Wolf" : chosenPName + " is a Villager";
             player.send(message);
         } else {
-            player.send(chosenPlayerName + " is unavailble");
+            player.send(chosenPName + " is unavailble");
         }
     }
 }
