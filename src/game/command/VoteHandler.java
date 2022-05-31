@@ -11,15 +11,7 @@ public class VoteHandler implements CommandHandler {
         String votedPlayerName = player.getMessage().split(" ")[1];
         Optional<Server.PlayerHandler> votedPlayer = server.getClientByName(votedPlayerName);
 
-        while (votedPlayer.isEmpty()) {
-            try {
-                player.send("Player is unavailable. Vote other player");
-                votedPlayerName = player.getIN().readLine().split(" ")[1];
-                votedPlayer = server.getClientByName(votedPlayerName);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        votedPlayer.get().increaseNumberOfVotes();
+        if (votedPlayer.isEmpty()) player.send("Player is unavailable.");
+        else votedPlayer.get().increaseNumberOfVotes();
     }
 }
