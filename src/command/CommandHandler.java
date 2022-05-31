@@ -1,0 +1,4 @@
+package command;
+
+interface CommandHandler {
+}

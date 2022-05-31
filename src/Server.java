@@ -145,7 +145,7 @@ public class Server {
         private void dealWithCommand(String message) throws IOException {
             /*
             String commandReader = message.split(" ")[0];
-            Command command = Command.getCommandFromDescription(commandReader);
+            command.Command command = command.Command.getCommandFromDescription(commandReader);
             this.message = message;
             if (command != null) command.getHANDLER().command(Server.this, this);
             else chat(this.NAME, message);
