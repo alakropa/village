@@ -85,6 +85,12 @@ public class Server {
         }
     }
 
+    public void wolvesChat(String name, String message) {
+        this.players.stream()
+                .filter(x -> x.role == EnumRole.WOLF && !x.name.equals(name))
+                .forEach(x -> x.send(message));
+    }
+
     public void sendPrivateMessage(String name, String message) {
         for (PlayerHandler client : this.players) {
             if (client.name.equals(name)) {
@@ -185,6 +191,10 @@ public class Server {
         this.gameInProgress = gameInProgress;
     }
 
+    public boolean isNight() {
+        return night;
+    }
+
     public class PlayerHandler implements Runnable {
         private String name;
         private final Socket PLAYER_SOCKET;
@@ -214,10 +224,20 @@ public class Server {
                     this.message = in.readLine();
                     System.out.println(name + ": " + this.message); //imprime no server as msg q recebe dos clients
 
+                    if (Server.this.night) {
+                        switch (this.role) {
+                            case WOLF -> {
+                                wolvesChat(this.name, this.message);
+                                dealWithCommand(this.message);
+                            }
+                            case FORTUNE_TELLER -> dealWithCommand(this.message);
+                            default -> send("You are sleeping");
+                        }
+                        continue;
+                    }
+
                     if (isCommand(message.trim())) {
                         dealWithCommand(this.message);
-                    } else if (Server.this.night && this.role != EnumRole.WOLF) {
-                        send("You are sleeping");
                     } else {
                         chat(this.name, this.message);
                     }
@@ -280,13 +300,8 @@ public class Server {
             return role;
         }
 
-        public PlayerHandler getVote() {
-            return vote;
-        }
-
         public void setVote(PlayerHandler vote) {
             this.vote = vote;
         }
     }
 }
-
