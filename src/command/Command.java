@@ -1,9 +1,11 @@
+package command;
+
 public enum Command {
     LIST("/list", new ListHandler()),
-    HELP("/help", new HelpHandler()),
-    WHISPER("/whisper", new WhisperHandler()),
-    QUIT("/quit", new QuitHandler()),
-    SHOUT("/shout", new ShoutHandler());
+    START ("/start", new StartHandler()),
+    KILL("/kill", new KillHandler()),
+    VISION("/vision", new VisionHandler()),
+    VOTE("/vote", new VoteHandler());
 
     private final String DESCRIPTION;
     private final CommandHandler HANDLER;
