@@ -38,7 +38,19 @@ public class Server {
         //  - Se o jogo já estiver a decorrer
         //Opcional: Haver dois ou mais jogos em simultâneo
         Socket playerSocket = this.serverSocket.accept();
-        addPlayer(new PlayerHandler(playerSocket, "CLIENT " + number));
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+        out.write("Write your name");
+        out.newLine();
+        out.flush();
+        String playerName = in.readLine(); //fica à espera do nome
+        addPlayer(new PlayerHandler(playerSocket, playerName));
+
+        System.out.println(playerName + " entered the chat"); //consola do servidor
+
+        out.write("Your available commands are:\n/start...................to start the game\n/list....................to list all the players in the game\n/kill <name>.............for wolves to kill\n/vote <name>.............for everyone, to vote for the killer wolf\n/vision <name>...........for the fortuneteller to have a vision");
+        out.newLine();
+        out.flush();
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
