@@ -47,7 +47,7 @@ public class Server {
                     String playerName = verifyIsNameIsAvailable(playerSocket, out, in);
                     addPlayer(new PlayerHandler(playerSocket, playerName));
                     System.out.println(playerName + " entered the chat"); //consola do servidor
-                    String playerName = in.readLine(); //fica à espera do nome
+                    //String playerName = in.readLine(); //fica à espera do nome
                     if (!this.gameInProgress && this.players.size() < 12) {
                         addPlayer(new PlayerHandler(playerSocket, playerName));
 
@@ -219,7 +219,7 @@ public class Server {
     }
 
     public void sendUpdateOfVotes() {
-        chat("Current score: ", players.stream()
+        chat("Current score: ", players.values().stream()
                 .filter(player -> player.alive)
                 .map(player -> player.name + " " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
