@@ -38,10 +38,11 @@ public class Player {
 
         @Override
         public void run() {
+            //ler
             new Thread(() -> {
                 while (!this.SOCKET.isClosed()) {
                     try {
-                        System.out.println(this.in.readLine());
+                        System.out.println(this.in.readLine()); //imprime a msg que escreve na consola
                     } catch (IOException e) {
                         try {
                             System.out.println("You disconnected from chat");
@@ -54,10 +55,11 @@ public class Player {
                 }
             }).start();
 
+            //escrever
             while (!this.SOCKET.isClosed()) {
                 try {
                     String message = this.consoleReader.readLine();
-                    this.out.write(message);
+                    this.out.write(message); //escreve o input da consola
                     this.out.newLine();
                     this.out.flush();
 

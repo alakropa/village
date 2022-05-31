@@ -38,7 +38,7 @@ public class Server {
     public void acceptConnection() throws IOException {
         //Opcional: Haver dois ou mais jogos em simultâneo
         Socket playerSocket = this.serverSocket.accept();
-        new Thread(() -> {
+        new Thread(() -> { //serve para varios jogadores poderem escrever o nome ao mesmo tempo
             try {
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
                 BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
@@ -199,6 +199,7 @@ public class Server {
                 in = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
                 while (!this.PLAYER_SOCKET.isClosed()) {
                     this.message = in.readLine();
+                    System.out.println(name + ": " + this.message); //imprime no server as msg q recebe dos clients
 
                     if (isCommand(message.trim())) {
                         dealWithCommand(this.message);
