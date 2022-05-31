@@ -91,14 +91,6 @@ public class Server {
                 .forEach(x -> x.send(message));
     }
 
-    public void sendPrivateMessage(String name, String message) {
-        for (PlayerHandler client : this.players) {
-            if (client.name.equals(name)) {
-                client.send(message);
-            }
-        }
-    }
-
     public String playersInGame() {
         return this.players.stream()
                 .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
@@ -128,7 +120,7 @@ public class Server {
 
         List<PlayerHandler> playersList = new ArrayList<>(this.players);
         for (int i = 0; i < playersList.size(); i++) {
-            sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
+            chat("your role is", roles.get(i).toString());
         }
         play();
     }
@@ -181,6 +173,13 @@ public class Server {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public void sendUpdateOfVotes(){
+        chat("Current score: ", players.stream()
+                .filter(player -> player.alive)
+                .map(player -> player.name + " " + player.numberOfVotes)
+                .reduce("", (a, b) -> a + "\n" + b));
     }
 
     public boolean isGameInProgress() {

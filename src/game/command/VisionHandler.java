@@ -17,7 +17,7 @@ public class VisionHandler implements CommandHandler {
             Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
             if (chosenPlayer.isPresent()) {
                 String message;
-                message = chosenPlayer.get().getRole() == EnumRole.WOLF ? chosenPName + " is a Wolf" : chosenPName + " isn't a Wolf";
+                message = chosenPlayer.get().getRole().equals(EnumRole.WOLF) ? chosenPName + " is a Wolf" : chosenPName + " isn't a Wolf";
                 player.send(message);
             } else {
                 player.send(chosenPName + " is unavailble");
