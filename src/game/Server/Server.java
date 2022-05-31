@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private HashMap<String, PlayerHandler> players; //HashSet<PlayerHandler> players
+    private HashMap<String, PlayerHandler> players;
     private boolean gameInProgress;
     private boolean timesUp;
     private boolean night;
@@ -22,6 +22,8 @@ public class Server {
     public Server() {
         this.players = new HashMap<>();
         this.gameInProgress = false;
+        this.timesUp = false;
+        this.night = false;
     }
 
     public void start(int port) throws IOException {
@@ -70,16 +72,15 @@ public class Server {
         } else {
             playerSocket.close();
         }
-
     }
 
-    private String verifyIsNameIsAvailable(){
-return "";
+    private String verifyIsNameIsAvailable() {
+        return "";
     }
 
     private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
-        while(!checkIfNameIsAvailable(playerName)){ //false
+        while (!checkIfNameIsAvailable(playerName)) { //false
             out.write("This name already exists, try another name");
             out.newLine();
             out.flush();
@@ -90,11 +91,11 @@ return "";
     }
 
 
-    private boolean checkIfNameIsAvailable(String playerName){
-       // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-       // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-        for (PlayerHandler player: this.players.values()) {
-            if(player.name.equals(playerName)){
+    private boolean checkIfNameIsAvailable(String playerName) {
+        // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+        for (PlayerHandler player : this.players.values()) {
+            if (player.name.equals(playerName)) {
                 return false;
             }
         }
@@ -151,7 +152,7 @@ return "";
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.players.remove(playerHandler);
+        this.players.remove(playerHandler.name, playerHandler);
     }
 
     public void sendPrivateMessage(String name, String message) {
@@ -175,7 +176,9 @@ return "";
 
         List<PlayerHandler> playersList = new ArrayList<>(this.players.values());
         for (int i = 0; i < playersList.size(); i++) {
-            sendPrivateMessage(playersList.get(i).name, "Your role is " + roles.get(i).toString());
+            EnumRole newRole = roles.get(i);
+            sendPrivateMessage(playersList.get(i).name, "Your role is " + newRole.toString());
+            playersList.get(i).role = newRole;
         }
         play();
     }
@@ -231,7 +234,7 @@ return "";
     }
 
     public void sendUpdateOfVotes() {
-        chat("Current score: ", players.values().stream()
+        chat("Current score", players.values().stream()
                 .filter(player -> player.alive)
                 .map(player -> player.name + ": " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
@@ -267,7 +270,6 @@ return "";
         private PlayerHandler previousVote;
 
         //private HashMap<String, Boolean> visions;
-        //Lista especial para o vidente com "is wolf" e "isn't wolf"
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
@@ -326,7 +328,10 @@ return "";
 
         private void dealWithCommand(String message) throws IOException {
             Command command = Command.getCommandFromDescription(message.split(" ")[0]);
-            if (command == null) return;
+            if (command == null) {
+                send("Command unavailable");
+                return;
+            }
             command.getHANDLER().command(Server.this, this);
         }
 
@@ -362,7 +367,7 @@ return "";
             try {
                 chat(this.name, " disconnected");
                 this.PLAYER_SOCKET.close();
-                Server.this.players.remove(this);
+                Server.this.players.remove(this.name, this);
                 Thread.currentThread().interrupt();
             } catch (IOException ex) {
                 ex.printStackTrace();
