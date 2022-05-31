@@ -47,10 +47,21 @@ public class Server {
                     String playerName = verifyIsNameIsAvailable(playerSocket, out, in);
                     addPlayer(new PlayerHandler(playerSocket, playerName));
                     System.out.println(playerName + " entered the chat"); //consola do servidor
+                    String playerName = in.readLine(); //fica à espera do nome
+                    if (!this.gameInProgress && this.players.size() < 12) {
+                        addPlayer(new PlayerHandler(playerSocket, playerName));
 
-                    out.write(Command.getCommandList());
-                    out.newLine();
-                    out.flush();
+                        System.out.println(playerName + " entered the chat"); //consola do servidor
+
+                        out.write(Command.getCommandList());
+                        out.newLine();
+                        out.flush();
+                    } else {
+                        out.write("The game is unavailable");
+                        out.newLine();
+                        out.flush();
+                        playerSocket.close();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -138,6 +149,14 @@ public class Server {
         this.players.remove(playerHandler);
     }
 
+    public void sendPrivateMessage(String name, String message) {
+        for (PlayerHandler client : this.players) {
+            if (client.name.equals(name)) {
+                client.send(message);
+            }
+        }
+    }
+
     public void startGame() {
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
@@ -206,6 +225,13 @@ public class Server {
         }).start();
     }
 
+    public void sendUpdateOfVotes() {
+        chat("Current score: ", players.stream()
+                .filter(player -> player.alive)
+                .map(player -> player.name + " " + player.numberOfVotes)
+                .reduce("", (a, b) -> a + "\n" + b));
+    }
+
     public boolean isGameInProgress() {
         return gameInProgress;
     }
@@ -216,6 +242,10 @@ public class Server {
 
     public boolean isNight() {
         return night;
+    }
+
+    private boolean gameContinues() {
+        return true;
     }
 
     public class PlayerHandler implements Runnable {
@@ -268,7 +298,7 @@ public class Server {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                playerDisconnected();
             }
         }
 
@@ -286,17 +316,8 @@ public class Server {
             }
         }
 
-        public void close() {
-            try {
-                this.PLAYER_SOCKET.close();
-                Thread.currentThread().interrupt();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         private void dealWithCommand(String message) throws IOException {
-            Command command = Command.getCommandFromDescription(message.split(" ", 2)[0]);
+            Command command = Command.getCommandFromDescription(message.split(" ")[0]);
             if (command == null) return;
             command.getHANDLER().command(Server.this, this);
         }
@@ -327,6 +348,17 @@ public class Server {
 
         public void setVote(PlayerHandler vote) {
             this.vote = vote;
+        }
+
+        public void playerDisconnected() {
+            try {
+                chat(this.name, " disconnected");
+                this.PLAYER_SOCKET.close();
+                Server.this.players.remove(this);
+                Thread.currentThread().interrupt();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

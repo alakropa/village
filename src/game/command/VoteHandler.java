@@ -23,7 +23,8 @@ public class VoteHandler implements CommandHandler {
         if (votedPlayer.isPresent()) {
             votedPlayer.get().increaseNumberOfVotes(); //get permite ir buscar o playerHander,não só o optional
             player.setVote(votedPlayer.get());
-            return;
+            server.chat(player.getName(), " voted for " + votedPlayerName);
+            server.sendUpdateOfVotes();
         }
         player.send("Player is unavailable.");
     }
