@@ -7,6 +7,7 @@ public class StartHandler implements CommandHandler{
     public void command(Server server, Server.PlayerHandler player) {
         if(!server.isGameInProgress()) {
             server.setGameInProgress(true);
+            server.setPlayersLife();
             new Thread(server::startGame).start();
             System.out.println(server.isGameInProgress());
         }

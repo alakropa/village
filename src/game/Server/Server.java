@@ -19,7 +19,6 @@ public class Server {
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
-
     private int numOfDays;
 
     public Server() {
@@ -86,7 +85,6 @@ public class Server {
         }
         return playerName;
     }
-
 
     private boolean checkIfNameIsAvailable(String playerName) {
         // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
@@ -264,6 +262,7 @@ public class Server {
     }
 
     //Limitar número de visions por noite
+    //
     //Mensagem para os lobos quando matam alguém
 
     private void choosePlayerWhoDies() {
@@ -279,7 +278,6 @@ public class Server {
 
     //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
     //Chama as funções todas (como startGame, removePlayer, etc.)
-    //  }
 
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -379,6 +377,10 @@ public class Server {
 
     public void setGameInProgress(boolean gameInProgress) {
         this.gameInProgress = gameInProgress;
+    }
+
+    public void setPlayersLife() {
+        this.PLAYERS.values().forEach(x -> x.alive = true);
     }
 
     public boolean isNight() {
@@ -503,8 +505,8 @@ public class Server {
         public void playerDisconnected() {
             try {
                 chat(this.name, " disconnected");
-                this.PLAYER_SOCKET.close();
                 Server.this.PLAYERS.remove(this.name, this);
+                this.PLAYER_SOCKET.close();
                 Thread.currentThread().interrupt();
                 verifyIfGameContinues();
             } catch (IOException ex) {
