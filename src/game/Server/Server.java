@@ -100,15 +100,6 @@ public class Server {
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
-//        while (!this.players.put(playerHandler.name, playerHandler)) { //(!this.players.add(playerHandler))
-//            try {
-//                playerHandler.send("Player name is already taken\nWrite a new name: ");
-//                BufferedReader in = new BufferedReader(new InputStreamReader(playerHandler.PLAYER_SOCKET.getInputStream()));
-//                playerHandler.name = in.readLine();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler); //mandar para a threadpool
         chat(playerHandler.name, "joined the chat"); //msg para os outros players
