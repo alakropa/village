@@ -20,6 +20,8 @@ public class Main {
         // start so pode ser usado quando o jogo nao esta inProgress, e quando se usa o /start, tem que reset as variáveis
         //reset tem que ser feito quando acontece GameOver
 
+        //  -qd user sair, continua aparecer na lista , mas o server quebra ao fazer /list
+
 
 
         /*
@@ -51,6 +53,7 @@ extras:
         - imagens (noite, dia, lobo, aldeao, fortuneteller)
         -adicionar mais papeis (fairy/protect , procurar outros)
         - command /suicide
+
 
 
          */
