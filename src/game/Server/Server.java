@@ -183,29 +183,39 @@ public class Server {
     private void play() {
         chat("===== Welcome to the Spooky Village! =====");
         chat("===== It's day time. Chat with the other players =====");
-        // while (verifyIfGameContinues()) {
-        try {
-            if (this.night) {
-                if (this.PLAYERS.size() >= 6) {
-                    String wolvesList = this.PLAYERS.values().stream()
-                            .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
-                            .map(x -> x.name)
-                            .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
-                    wolvesChat(wolvesList);
+        while (true) {
+            try {
+                if (this.night) {
+                    if (this.PLAYERS.size() >= 6) {
+                        String wolvesList = this.PLAYERS.values().stream()
+                                .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
+                                .map(x -> x.name)
+                                .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
+                        wolvesChat(wolvesList);
+                    }
+                    Thread.sleep(7000);
+                    chat("===== Wake up! The night is over =====");
+                    this.night = false;
+                /*
+                Thread.sleep(2000);  this.wolvesVotes = this.PLAYERS.values().stream()
+                        .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
+                        .map(x -> x.vote)
+                        .collect(Collectors.toList());
+                if (this.wolvesVotes.size() == 0) {
+                    List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
+                    players.get((int) (Math.random() * players.size())).killPlayer();
+                } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
+                */
+                    checkNumOfVotes();
+                } else {
+                    Thread.sleep(7000);
+                    chat("===== It's dark already. Time to sleep =====");
+                    wolvesChat("===== Wolves chat is open! =====");
+                    this.night = true;
                 }
-                Thread.sleep(7000);
-                chat("===== Wake up! The night is over =====");
-                this.night = false;
-                Thread.sleep(2000);
-                checkNumOfVotes();
-            } else {
-                Thread.sleep(7000);
-                chat("===== It's dark already. Time to sleep =====");
-                wolvesChat("===== Wolves chat is open! =====");
-                this.night = true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

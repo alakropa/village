@@ -10,7 +10,7 @@ public class VisionHandler implements CommandHandler {
     @Override
     public void command(Server server, Server.PlayerHandler player) {
         String chosenPName = Helpers.removeCommand(player.getMessage());
-        if (commandConditions(server, player, EnumRole.VILLAGER, chosenPName)) {
+        if (commandConditions(server, player, EnumRole.FORTUNE_TELLER, chosenPName)) {
             Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
             if (chosenPlayer.isPresent()) {
                 String message;
