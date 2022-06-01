@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class Server {
     private ServerSocket serverSocket;
@@ -17,11 +18,13 @@ public class Server {
     private final HashMap<String, PlayerHandler> PLAYERS;
     private boolean gameInProgress;
     private boolean night;
+    private List<PlayerHandler> wolvesVotes;
 
     public Server() {
         this.PLAYERS = new HashMap<>();
         this.gameInProgress = false;
         this.night = false;
+        this.wolvesVotes = new ArrayList<>();
     }
 
     public void start(int port) throws IOException {
@@ -193,22 +196,22 @@ public class Server {
                                 .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
                         wolvesChat(wolvesList);
                     }
-                    Thread.sleep(7000);
+                    Thread.sleep(30000);
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
-                /*
-                Thread.sleep(2000);  this.wolvesVotes = this.PLAYERS.values().stream()
-                        .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
-                        .map(x -> x.vote)
-                        .collect(Collectors.toList());
-                if (this.wolvesVotes.size() == 0) {
-                    List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
-                    players.get((int) (Math.random() * players.size())).killPlayer();
-                } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
-                */
-                    checkNumOfVotes();
+
+                    Thread.sleep(2000);
+                    this.wolvesVotes = this.PLAYERS.values().stream()
+                            .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
+                            .map(x -> x.vote)
+                            .collect(Collectors.toList());
+                    if (this.wolvesVotes.size() == 0) {
+                        List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
+                        players.get((int) (Math.random() * players.size())).killPlayer();
+                    } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
                 } else {
-                    Thread.sleep(7000);
+                    Thread.sleep(30000);
+                    checkNumOfVotes();
                     chat("===== It's dark already. Time to sleep =====");
                     wolvesChat("===== Wolves chat is open! =====");
                     this.night = true;
@@ -257,14 +260,10 @@ public class Server {
         }
 
         if (wolfCount >= nonWolfCount || wolfCount == 0) {
-            for (PlayerHandler player : this.PLAYERS.values()) {
-                sendPrivateMessage(player.getName(), "Game over, there are no more alive wolves left");
-                //é preciso parar o chat dos players que ficaram em jogo
-            }
+            chat("Game over, there are no more alive wolves left"); //é preciso parar o chat dos players que ficaram em jogo
         }
-        return wolfCount <= nonWolfCount || wolfCount != 0;
+        return wolfCount < nonWolfCount || wolfCount != 0;
         //return verdadeiro, o jogo continua, return falso, o jogo para
-
     }
 
     public Optional<PlayerHandler> getPlayerByName(String name) {
@@ -280,14 +279,15 @@ public class Server {
 
     private void checkNumOfVotes() {
         checkIfAllPlayersVoted();
-        PlayerHandler highestVote = PLAYERS.values().stream()
+        Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
                 .filter(player -> player.alive)
                 .filter(player -> player.numberOfVotes > 0)
-                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
-                .orElseThrow(NoSuchElementException::new);
+                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes));
 
-        highestVote.killPlayer();
-        resetNumberOfVotes();
+        if (highestVote.isPresent()) {
+            highestVote.get().killPlayer();
+            chat(highestVote.get().name + " was killed");
+        } else resetNumberOfVotes();
     }
 
     private void checkIfAllPlayersVoted() {
@@ -317,6 +317,10 @@ public class Server {
 
     private boolean gameContinues() {
         return true;
+    }
+
+    public int getNumberOfPlayers() {
+        return this.PLAYERS.size();
     }
 
     public class PlayerHandler implements Runnable {
