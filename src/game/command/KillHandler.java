@@ -5,7 +5,6 @@ import game.Helpers;
 import game.Server.Server;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class KillHandler implements CommandHandler {
     @Override
