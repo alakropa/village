@@ -11,13 +11,16 @@ public class VisionHandler implements CommandHandler {
         String chosenPName = Helpers.removeCommand(player.getMessage());
         if (this.commandConditions(server, player, EnumRole.FORTUNE_TELLER, chosenPName)) {
             Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
-            if (chosenPlayer.isPresent()) {
-                String message = (chosenPlayer.get()).getRole().equals(EnumRole.WOLF) ? chosenPName + " is a Wolf" : chosenPName + " isn't a Wolf";
+            if (player.hasUsedVision()) player.send("You have already used this hability");
+            else if (chosenPlayer.isPresent()) {
+                boolean isChosenPlayerWolf = chosenPlayer.get().getRole().equals(EnumRole.WOLF);
+                String message = isChosenPlayerWolf ? chosenPName + " is a Wolf" : chosenPName + " isn't a Wolf";
+                player.addVisions(chosenPName, isChosenPlayerWolf);
+                player.setUsedVision(true);
                 player.send(message);
             } else {
                 player.send(chosenPName + " is unavailable");
             }
         }
-
     }
 }

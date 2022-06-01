@@ -24,7 +24,6 @@ public class Server {
     public Server() {
         this.PLAYERS = new HashMap<>();
         this.gameInProgress = false;
-        this.night = false;
         this.wolvesVotes = new ArrayList<>();
     }
 
@@ -48,7 +47,7 @@ public class Server {
                     out.write("Write your name");
                     out.newLine();
                     out.flush();
-                    String playerName = verifyIfNameIsAvailable(playerSocket, out, in);
+                    String playerName = verifyIfNameIsAvailable(out, in);
 
                     //addPlayer(new PlayerHandler(playerSocket, playerName));
                     //System.out.println(playerName + " entered the chat"); //consola do servidor
@@ -75,10 +74,10 @@ public class Server {
         }
     }
 
-    private String verifyIfNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
+    private String verifyIfNameIsAvailable(BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
-        while (!checkIfNameIsAvailable(playerName)) { //false
-            out.write("This name already exists, try another name");
+        while (!checkIfNameIsAvailable(playerName) || playerName.startsWith("/")) { //false
+            out.write("You can't choose this name. Try another one");
             out.newLine();
             out.flush();
             playerName = in.readLine();
@@ -90,7 +89,7 @@ public class Server {
         // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
         // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.name.equals(playerName)) {
+            if (player.NAME.equals(playerName)) {
                 return false;
             }
         }
@@ -98,14 +97,14 @@ public class Server {
     }
 
     private void addPlayer(PlayerHandler playerHandler) {
-        this.PLAYERS.put(playerHandler.name, playerHandler);
+        this.PLAYERS.put(playerHandler.NAME, playerHandler);
         this.service.submit(playerHandler); //mandar para a threadpool
-        chat(playerHandler.name, "joined the chat"); //msg para os outros players
+        chat(playerHandler.NAME, "joined the chat"); //msg para os outros players
     }
 
     public void chat(String name, String message) {
         for (PlayerHandler client : this.PLAYERS.values()) {
-            if (!client.name.equals(name)) {
+            if (!client.NAME.equals(name)) {
                 client.send(name + ": " + message);
             }
         }
@@ -119,7 +118,7 @@ public class Server {
 
     public void wolvesChat(String name, String message) {
         this.PLAYERS.values().stream()
-                .filter(x -> x.role == EnumRole.WOLF && !x.name.equals(name))
+                .filter(x -> x.role == EnumRole.WOLF && !x.NAME.equals(name))
                 .forEach(x -> x.send(name + ": " + message));
     }
 
@@ -131,7 +130,7 @@ public class Server {
 
     public String playersInGame() {
         return this.PLAYERS.values().stream()
-                .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
+                .map(x -> x.NAME + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
@@ -141,12 +140,12 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.PLAYERS.remove(playerHandler.name, playerHandler);
+        this.PLAYERS.remove(playerHandler.NAME, playerHandler);
     }
 
     public void sendPrivateMessage(String name, String message) {
         for (PlayerHandler client : this.PLAYERS.values()) {
-            if (client.name.equals(name)) {
+            if (client.NAME.equals(name)) {
                 client.send(message);
             }
         }
@@ -154,7 +153,7 @@ public class Server {
 
     public void startGame() {
         // Adicionar bots necessários
-        System.out.println("night: " + this.night);
+        this.night = false;
         //chat(displayVillageImage());
         chat(displayVillageImage2());
         chat(displayVillageImage3());
@@ -163,17 +162,18 @@ public class Server {
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
+        chat("\n===== Welcome to the Spooky Village! =====\n");
         List<PlayerHandler> playersList = new ArrayList<>(this.PLAYERS.values());
         for (int i = 0; i < playersList.size(); i++) {
             EnumRole newRole = roles.get(i);
-            sendPrivateMessage(playersList.get(i).name, "Your role is " + newRole.toString());
+            sendPrivateMessage(playersList.get(i).NAME, "You are a " + newRole.toString());
             playersList.get(i).role = newRole;
         }
         play();
     }
 
     private String displayVillageImage() {
-        String villageImage = "" +
+        return "" +
                 " __        __   _                                  _          _   _          \n" +
                 " \\ \\      / /__| | ___ ___  _ __ ___   ___        | |_ ___   | |_| |__   ___ \n" +
                 "  \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\       | __/ _ \\  | __| '_ \\ / _ \\\n" +
@@ -184,12 +184,10 @@ public class Server {
                 "  ___) | |_) | (_) | (_) |   <| |_| |   \\ V / | | | | (_| | (_| |  __/_|     \n" +
                 " |____/| .__/ \\___/ \\___/|_|\\_\\\\__, |    \\_/  |_|_|_|\\__,_|\\__, |\\___(_)     \n" +
                 "       |_|                     |___/                       |___/             ";
-
-        return villageImage;
     }
 
     private String displayVillageImage2() {
-        String villageImage = "                                                               \n" +
+        return "                                                               \n" +
                 "                _ _ _     _                            _          _   _       \n" +
                 "               | | | |___| |___ ___ _____ ___         | |_ ___   | |_| |_ ___ \n" +
                 "               | | | | -_| |  _| . |     | -_|_ _ _   |  _| . |  |  _|   | -_|\n" +
@@ -201,12 +199,10 @@ public class Server {
                 "               |__   | . | . | . | '_| | |  |  | | | | .'| . | -_|\n" +
                 "               |_____|  _|___|___|_,_|_  |\\___/|_|_|_|__,|_  |___|\n" +
                 "                     |_|             |___|               |___|    ";
-
-        return villageImage;
     }
 
     private String displayVillageImage3() {
-        String villageImage = "                                                                                                       \n" +
+        return "                                                                                                       \n" +
                 " .         _  .          .          .    +     .          .          .      .                           \n" +
                 "        .          .            .            .            .       :               .           .         \n" +
                 "        .   .      .    .     .     .    .      .   .      . .  .  -+-        .                        \n" +
@@ -223,42 +219,50 @@ public class Server {
                 "<__________\\______)\\__) ._ - /~~\\/~\\ -                                        `-/~\\_            .      \n" +
                 " .      .-'                                                                           `-/\\_            \n" +
                 "  _/\\.-'                                                                                    __/~\\/\\-.__.";
-
-        return villageImage;
     }
 
     private void play() {
-        chat("===== Welcome to the Spooky Village! =====");
-        chat("===== It's day time. Chat with the other players =====");
         while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
-                    if (this.PLAYERS.size() >= 6) {
-                        String wolvesList = this.PLAYERS.values().stream()
-                                .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
-                                .map(x -> x.name)
-                                .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
-                        wolvesChat(wolvesList);
-                    }
+                    chat("\n===== It's dark already. Time to sleep =====\n");
+                    Thread.sleep(500);
+                    wolvesChat("===== Wolves chat is open! =====\n");
+                    Thread.sleep(500);
+                    printAliveWolves();
                     Thread.sleep(30000);
                     choosePlayerWhoDies();
-                    chat("===== Wake up! The night is over =====");
                     this.night = false;
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
-
-                    Thread.sleep(2000);
+                    Thread.sleep(500);
+                    resetUsedVision();
                 } else {
-
+                    chat("===== It's day time. Chat with the other players =====");
                     Thread.sleep(30000);
-                    checkNumOfVotes();
-                    chat("===== It's dark already. Time to sleep =====");
-                    wolvesChat("===== Wolves chat is open! =====");
+                    checkVotes();
                     this.night = true;
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        resetGame();
+    }
+
+    private void printAliveWolves() {
+        if (this.PLAYERS.size() >= 7) {
+            String wolvesList = this.PLAYERS.values().stream()
+                    .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
+                    .map(x -> x.NAME)
+                    .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
+            wolvesChat(wolvesList);
+        }
+    }
+
+    private void resetGame() {
+        this.gameInProgress = false;
+        this.numOfDays = 0;
+        this.night = false;
     }
 
     //Limitar número de visions por noite
@@ -292,14 +296,6 @@ public class Server {
         return roles;
     }
 
-    private boolean verifyIfGameCanStart() {
-        return false;
-    }
-
-    private void verifyConnectedPlayers() {
-
-    }
-
     private boolean verifyIfGameContinues() {
         //se não houver lobos vivos: todos os jogadores recebem uma mensagem “No more wolves left. game over”
         //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
@@ -311,31 +307,25 @@ public class Server {
                 else nonWolfCount++;
             }
         }
-
-        if (wolfCount >= nonWolfCount) {
-            chat("The wolves won! \n Game over");
-            gameInProgress = false;
-            killAll();
-            return false;
-        } else if (wolfCount == 0) {
-            chat("The villagers won! \n There are no wolves left alive \n GAME OVER");
-            gameInProgress = false;
-            killAll();
-            return false;
-        }
-
-        return true;
+        return checkWinner(wolfCount, nonWolfCount);
     }
 
-    private void killAll() {
-        this.PLAYERS.values().stream()
-                .filter(x -> x.alive)
-                .forEach(PlayerHandler::killPlayer);
+    private boolean checkWinner(int wolfCount, int nonWolfCount) {
+        if (wolfCount >= nonWolfCount) {
+            chat("The wolves won!\nGame over");
+            resetGame();
+            return false;
+        } else if (wolfCount == 0) {
+            chat("The villagers won!\nThere are no wolves left alive\nGAME OVER");
+            resetGame();
+            return false;
+        }
+        return true;
     }
 
     public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.PLAYERS.values().stream()
-                .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
+                .filter(x -> Helpers.compareIfNamesMatch(x.getNAME(), name))
                 .findFirst();
     }
 
@@ -344,16 +334,16 @@ public class Server {
         this.PLAYERS.values().forEach(x -> x.vote = null);
     }
 
-    private void checkNumOfVotes() {
+    private void checkVotes() {
         checkIfAllPlayersVoted();
         Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
                 .filter(player -> player.alive)
                 .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
                 .stream().findAny();
 
-        if (highestVote.isPresent()) {
+        if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().killPlayer();
-            chat(highestVote.get().name + " was killed");
+            chat(highestVote.get().NAME + " was tragically killed");
         }
         resetNumberOfVotes();
     }
@@ -367,7 +357,7 @@ public class Server {
     public void sendUpdateOfVotes() {
         chat("Current score", PLAYERS.values().stream()
                 .filter(player -> player.alive)
-                .map(player -> player.name + ": " + player.numberOfVotes)
+                .map(player -> player.NAME + ": " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
     }
 
@@ -387,37 +377,33 @@ public class Server {
         return night;
     }
 
-    private boolean gameContinues() {
-        return true;
-    }
-
-    public int getNumberOfPlayers() {
-        return this.PLAYERS.size();
-    }
-
     public int getNumOfDays() {
         return numOfDays;
     }
 
+    private void resetUsedVision() {
+        this.PLAYERS.values().forEach(x -> x.usedVision = false);
+    }
+
     public class PlayerHandler implements Runnable {
-        private String name;
+        private final String NAME;
         private final Socket PLAYER_SOCKET;
         private final BufferedWriter OUT;
-        private final BufferedReader IN;
         private String message;
         private boolean alive;
         private EnumRole role;
         private int numberOfVotes;
         private PlayerHandler vote;
         private PlayerHandler previousVote;
-        //private HashMap<String, Boolean> visions;
+        private final HashMap<String, Boolean> VISIONS;
+        private boolean usedVision;
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
-            this.name = name;
+            this.NAME = name;
             this.OUT = new BufferedWriter(new OutputStreamWriter(this.PLAYER_SOCKET.getOutputStream()));
-            this.IN = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
             this.alive = true;
+            this.VISIONS = new HashMap<>();
         }
 
         @Override
@@ -428,26 +414,28 @@ public class Server {
                 in = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
                 while (!this.PLAYER_SOCKET.isClosed()) {
                     this.message = in.readLine();
-                    System.out.println(name + ": " + this.message); //imprime no server as msg q recebe dos clients
+                    System.out.println(NAME + ": " + this.message); //imprime no server as msg q recebe dos clients
 
                     if (Server.this.night) {
                         switch (this.role) {
                             case WOLF -> {
                                 if (isCommand(this.message)) dealWithCommand(this.message);
-                                else wolvesChat(this.name, this.message);
+                                else wolvesChat(this.NAME, this.message);
                             }
-                            case FORTUNE_TELLER -> dealWithCommand(this.message);
+                            case FORTUNE_TELLER -> {
+                                dealWithCommand(this.message);
+                                this.usedVision = true;
+                            }
                             default -> send("You are sleeping");
                         }
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat(this.name, this.message);
+                        } else chat(this.NAME, this.message);
 
                     }
                 }
             } catch (IOException e) {
-                System.out.println("disconnected :( ");
                 playerDisconnected();
             }
         }
@@ -475,8 +463,8 @@ public class Server {
             command.getHANDLER().command(Server.this, this);
         }
 
-        public String getName() {
-            return this.name;
+        public String getNAME() {
+            return this.NAME;
         }
 
         public String getMessage() {
@@ -491,10 +479,6 @@ public class Server {
             this.numberOfVotes++;
         }
 
-        public BufferedReader getIN() {
-            return IN;
-        }
-
         public EnumRole getRole() {
             return role;
         }
@@ -505,11 +489,10 @@ public class Server {
 
         public void playerDisconnected() {
             try {
-                chat(this.name, " disconnected");
-                Server.this.PLAYERS.remove(this.name, this);
+                chat(this.NAME, " disconnected");
+                Server.this.PLAYERS.remove(this.NAME, this);
                 this.PLAYER_SOCKET.close();
                 Thread.currentThread().interrupt();
-                verifyIfGameContinues();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -535,8 +518,20 @@ public class Server {
             return alive;
         }
 
-        public PlayerHandler getVote() {
-            return vote;
+        public HashMap<String, Boolean> getVISIONS() {
+            return VISIONS;
+        }
+
+        public void addVisions(String playerName, Boolean isWolf) {
+            this.VISIONS.put(playerName, isWolf);
+        }
+
+        public boolean hasUsedVision() {
+            return usedVision;
+        }
+
+        public void setUsedVision(boolean usedVision) {
+            this.usedVision = usedVision;
         }
     }
 }

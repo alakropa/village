@@ -8,7 +8,7 @@ public interface CommandHandler {
 
     default boolean commandConditions(Server server, Server.PlayerHandler player, EnumRole role, String chosenPName) {
         if (!server.isGameInProgress()) {
-            player.send("Game hasn't started yet");
+            player.send("You must start the game first");
             return false;
         } else if (!player.isAlive()) {
             player.send("You are dead");
@@ -22,13 +22,16 @@ public interface CommandHandler {
         } else if (chosenPName == null) {
             player.send("You need to write a name");
             return false;
+        } else if (chosenPName.equalsIgnoreCase(player.getNAME())) {
+            player.send("You can't target yourself");
+            return false;
         }
         return true;
     }
 
     default boolean commandConditions(Server server, Server.PlayerHandler player, String votedPName) {
         if (!server.isGameInProgress()) {
-            player.send("Game hasn't started yet");
+            player.send("You must start the game first");
             return false;
         } else if (server.getNumOfDays() == 0) {
             player.send("You can't vote on the 1st day!");
@@ -42,7 +45,7 @@ public interface CommandHandler {
         } else if (votedPName == null) {
             player.send("You need to write a name");
             return false;
-        } else if (votedPName.equals(player.getName())) {
+        } else if (votedPName.equals(player.getNAME())) {
             player.send("You can't vote on yourself!");
             return false;
         }

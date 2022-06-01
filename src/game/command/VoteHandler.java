@@ -17,7 +17,7 @@ public class VoteHandler implements CommandHandler {
                 player.setPreviousVote(votedPlayer.get());
                 (votedPlayer.get()).increaseNumberOfVotes();
                 player.setVote(votedPlayer.get());
-                server.chat(player.getName(), " voted for " + votedPName);
+                server.chat(player.getNAME(), " voted for " + votedPName);
                 server.sendUpdateOfVotes();
             } else {
                 player.send("Player is unavailable.");
