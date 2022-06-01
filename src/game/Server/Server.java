@@ -164,9 +164,7 @@ public class Server {
     }
 
     public void startGame() {
-        // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
-        //lista dos jogadores
         System.out.println("night: " + this.night);
         chat("Welcome to a new game", "SPOOKY VILLAGE!");
         chat("A list of players starting the game", playersInGame());
@@ -216,11 +214,9 @@ public class Server {
             }
         }
     }
+
     //Limitar número de visions por noite
-    //Limitar números de kills por noite quando é apenas um lobo
-    //Limitar o vote logo no primeiro dia
     //Mensagem para os lobos quando matam alguém
-    //Quando alguém faz start e outra pessoa está no "write name", ela já não pode entrar
 
     private void choosePlayerWhoDies() {
         this.wolvesVotes = this.PLAYERS.values().stream()
@@ -292,13 +288,14 @@ public class Server {
         checkIfAllPlayersVoted();
         Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
                 .filter(player -> player.alive)
-                .filter(player -> player.numberOfVotes > 0)
-                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes));
+                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
+                .stream().findAny();
 
         if (highestVote.isPresent()) {
             highestVote.get().killPlayer();
             chat(highestVote.get().name + " was killed");
-        } else resetNumberOfVotes();
+        }
+        resetNumberOfVotes();
     }
 
     private void checkIfAllPlayersVoted() {
