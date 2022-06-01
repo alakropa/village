@@ -15,6 +15,8 @@ public class Main {
 
         //quando esceve "que o comando nao funciona" os outros utilizadores vêm no chat o nome: com um espaço em branco
 
+        //quando os lobos ganham, e ainda houver um villager vivo, esse jogador vivo ainda pode usar comandos, não devia!!!!!
+
 
 
 
