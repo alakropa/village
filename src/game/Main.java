@@ -17,6 +17,8 @@ public class Main {
 
         //quando os lobos ganham, e ainda houver um villager vivo, esse jogador vivo ainda pode usar comandos, não devia!!!!!
 
+        // start so pode ser usado quando o jogo nao esta inProgress, e quando se usa o /start, tem que reset as variáveis
+        //reset tem que ser feito quando acontece GameOver
 
 
 
