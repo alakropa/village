@@ -49,16 +49,15 @@ public class Server {
                     out.write("Write your name");
                     out.newLine();
                     out.flush();
+                    String playerName = verifyIsNameIsAvailable(playerSocket, out, in);
 
                     //addPlayer(new PlayerHandler(playerSocket, playerName));
                     //System.out.println(playerName + " entered the chat"); //consola do servidor
                     //String playerName = in.readLine(); //fica à espera do nome
 
                     if (!this.gameInProgress && this.PLAYERS.size() < 12) {
-                        String playerName = verifyIsNameIsAvailable(playerSocket, out, in); //add no HashMap
-
                         System.out.println(playerName + " entered the chat"); //consola do servidor
-
+                        addPlayer(new PlayerHandler(playerSocket, playerName));
                         out.write(Command.getCommandList());
                         out.newLine();
                         out.flush();
@@ -85,7 +84,6 @@ public class Server {
             out.flush();
             playerName = in.readLine();
         }
-        addPlayer(new PlayerHandler(playerSocket, playerName));
         return playerName;
     }
 
