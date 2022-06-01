@@ -165,7 +165,9 @@ public class Server {
         // Adicionar bots necessários
         //lista dos jogadores
         System.out.println("night: " + this.night);
-        chat("Welcome to a new game", "SPOOKY VILLAGE!");
+        //chat(displayVillageImage());
+        chat(displayVillageImage2());
+        chat(displayVillageImage3());
         chat("A list of players starting the game", playersInGame());
 
         ArrayList<EnumRole> roles = generateEnumCards();
@@ -178,6 +180,61 @@ public class Server {
             playersList.get(i).role = newRole;
         }
         play();
+    }
+
+    private String displayVillageImage(){
+        String villageImage = "" +
+                " __        __   _                                  _          _   _          \n" +
+                              " \\ \\      / /__| | ___ ___  _ __ ___   ___        | |_ ___   | |_| |__   ___ \n" +
+                              "  \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\       | __/ _ \\  | __| '_ \\ / _ \\\n" +
+                              "   \\ V  V /  __/ | (_| (_) | | | | | |  __/_ _ _  | || (_) | | |_| | | |  __/\n" +
+                              "  __\\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___(_|_|_)_ \\__\\___/   \\__|_| |_|\\___|\n" +
+                              " / ___| _ __   ___   ___ | | ___   _  \\ \\   / (_) | | __ _  __ _  ___| |     \n" +
+                              " \\___ \\| '_ \\ / _ \\ / _ \\| |/ / | | |  \\ \\ / /| | | |/ _` |/ _` |/ _ \\ |     \n" +
+                              "  ___) | |_) | (_) | (_) |   <| |_| |   \\ V / | | | | (_| | (_| |  __/_|     \n" +
+                              " |____/| .__/ \\___/ \\___/|_|\\_\\\\__, |    \\_/  |_|_|_|\\__,_|\\__, |\\___(_)     \n" +
+                              "       |_|                     |___/                       |___/             ";
+
+        return villageImage;
+    }
+
+    private String displayVillageImage2(){
+        String villageImage = "                                                               \n" +
+                "                _ _ _     _                            _          _   _       \n" +
+                "               | | | |___| |___ ___ _____ ___         | |_ ___   | |_| |_ ___ \n" +
+                "               | | | | -_| |  _| . |     | -_|_ _ _   |  _| . |  |  _|   | -_|\n" +
+                "               |_____|___|_|___|___|_|_|_|___|_|_|_|  |_| |___|  |_| |_|_|___|\n" +
+                "                                                               " +
+                "                                                   \n" +
+                "                _____             _       _____ _ _ _             \n" +
+                "               |   __|___ ___ ___| |_ _ _|  |  |_| | |___ ___ ___ \n" +
+                "               |__   | . | . | . | '_| | |  |  | | | | .'| . | -_|\n" +
+                "               |_____|  _|___|___|_,_|_  |\\___/|_|_|_|__,|_  |___|\n" +
+                "                     |_|             |___|               |___|    ";
+
+        return villageImage;
+    }
+
+    private String displayVillageImage3(){
+        String villageImage = "                                                                                                       \n" +
+                              " .         _  .          .          .    +     .          .          .      .                           \n" +
+                              "        .          .            .            .            .       :               .           .         \n" +
+                              "        .   .      .    .     .     .    .      .   .      . .  .  -+-        .                        \n" +
+                              "                      .           .           .   .        .           .          /         :  .       \n" +
+                              "           .        / V\\    . .        .  .      / .   .    .    .     .      .  / .      . ' .        \n" +
+                              "    .             / `  /        .  +       .    /     .          .          .   /      .               \n" +
+                              "           *     <<   |       .             .  /         .            .        *   .         .     .    \n" +
+                              "                 /    |      .   .       .    *     .     .    .      .   .       .  .                 \n" +
+                              "       .       /      |          .           .           .           .           .         +  .        \n" +
+                              "    .        /        |  . .        .  .       .   .      .    .     .     .    .      .   .           \n" +
+                              "           /    \\  \\ /                                                                                 \n" +
+                              "          (      ) | | .   +      .          ___/\\_._/~~\\_...__/\\__.._._/~\\        .         .   .     \n" +
+                              "  ________|   _/_  | |       .         _.--'                              `--./\\          .   .        \n" +
+                              "<__________\\______)\\__) ._ - /~~\\/~\\ -                                        `-/~\\_            .      \n" +
+                              " .      .-'                                                                           `-/\\_            \n" +
+                              "  _/\\.-'                                                                                    __/~\\/\\-.__.";
+
+        return villageImage;
     }
 
     private void play() {
@@ -368,7 +425,6 @@ public class Server {
                 }
             } catch (IOException e) {
                 playerDisconnected();
-                verifyIfGameContinues();
             }
         }
 
@@ -455,7 +511,7 @@ public class Server {
                 this.PLAYER_SOCKET.close();
                 Server.this.PLAYERS.remove(this.name, this);
                 Thread.currentThread().interrupt();
-                // verify if the game can continue
+                verifyIfGameContinues();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
