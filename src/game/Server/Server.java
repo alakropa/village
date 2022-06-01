@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 public class Server {
     private ServerSocket serverSocket;
@@ -211,9 +212,6 @@ public class Server {
         //Chama as funções todas (como startGame, removePlayer, etc.)
     }
 
-    private boolean verifyIfGameContinues() {
-        return true;
-    }
 
     private ArrayList<EnumRole> generateEnumCards() {
         ArrayList<EnumRole> roles = new ArrayList<>(PLAYERS.size());
@@ -232,6 +230,10 @@ public class Server {
     }
 
     private void verifyConnectedPlayers() {
+
+    }
+
+    private void verifyIfGameContinues() {
 
     }
 
@@ -341,7 +343,33 @@ public class Server {
                 return;
             }
             command.getHANDLER().command(Server.this, this);
-        }
+            if (command.equals(Command.KILL) && (this.getRole().equals(EnumRole.WOLF))) {
+              /*  int numOfWolves = (int) Stream.of(players)
+                        .filter(player -> player.values().contains(alive))
+                        .filter(x -> x.values().contains(EnumRole.WOLF))
+                        .count();
+                if (numOfWolves > 1) { */
+
+                    PlayerHandler victim = PLAYERS.values().stream()
+                            .filter(player -> player.alive)
+                            .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
+                            .orElseThrow();
+
+                    victim.killPlayer();
+                    chat("Someone has died... ", "It was " + victim.name);
+                }
+            }
+
+
+      /*  private Object killOneOfWolves() {
+            //   Object [] volves =
+            Stream.of(players)
+                    .filter(player -> player.values().contains(alive))
+                    .filter(x -> x.values().contains(EnumRole.WOLF))
+                    .toArray()
+
+
+        } */
 
         public String getName() {
             return this.name;
@@ -393,6 +421,14 @@ public class Server {
 
         public void decreaseNumberOfVotes() {
             this.numberOfVotes--;
+        }
+
+        public int getNumberOfVotes() {
+            return numberOfVotes;
+        }
+
+        public boolean isAlive() {
+            return alive;
         }
     }
 }
