@@ -317,11 +317,22 @@ public class Server {
         if (wolfCount >= nonWolfCount) {
             chat("The wolves won! \n Game over");
             gameInProgress = false;
+            killAll();
+            return false;
         } else if (wolfCount == 0) {
             chat("The villagers won! \n There are no wolves left alive \n GAME OVER");
             gameInProgress = false;
+            killAll();
+            return false;
         }
-        return wolfCount < nonWolfCount || wolfCount != 0;
+
+        return true;
+    }
+
+    private void killAll() {
+        this.PLAYERS.values().stream()
+                .filter(x -> x.alive)
+                .forEach(PlayerHandler::killPlayer);
     }
 
     public Optional<PlayerHandler> getPlayerByName(String name) {

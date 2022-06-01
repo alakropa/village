@@ -17,13 +17,14 @@ public class Main {
     DONE dizer que começa o dia
     DONE função da votação
     DONE fazer escolha entre os mais votados (no caso de empate))
+    DONE escrever a verificação se o jogo pode continuar (loop)
 
 
  Nas rondas que o vidente já sabe quem são todos os lobos, o vidente não acorda mais (não abre o chat dele e está tratado como um aldeão normal);
 - limitar o nº de visions a noite
 - mensgem para os lobos qd matam alguém
 -mensagem para aldeia quem morre
- - escrever a verificação se o jogo pode continuar (loop)
+
   -função check winner
     -mensagem final
 
