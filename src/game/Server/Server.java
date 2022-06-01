@@ -234,7 +234,26 @@ public class Server {
 
     }
 
-    private void verifyIfGameContinues() {
+    private boolean verifyIfGameContinues() {
+        //se não houver lobos vivos: todos os jogadores recebem uma mensagem “No more wolves left. game over”
+        //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
+        int wolfCount = 0;
+        int nonWolfCount = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (player.alive) {
+                if (player.role.equals(EnumRole.WOLF)) wolfCount++;
+                else nonWolfCount++;
+            }
+        }
+
+        if (wolfCount >= nonWolfCount || wolfCount == 0) {
+            for (PlayerHandler player : this.PLAYERS.values()) {
+                sendPrivateMessage(player.getName(), "Game over, there are no more alive wolves left");
+                //é preciso parar o chat dos players que ficaram em jogo
+            }
+        }
+        return wolfCount <= nonWolfCount || wolfCount != 0;
+        //return verdadeiro, o jogo continua, return falso, o jogo para
 
     }
 
@@ -339,6 +358,7 @@ public class Server {
                 }
             } catch (IOException e) {
                 playerDisconnected();
+                verifyIfGameContinues();
             }
         }
 
