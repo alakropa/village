@@ -362,6 +362,7 @@ public class Server {
                 this.PLAYER_SOCKET.close();
                 Server.this.players.remove(this.name, this);
                 Thread.currentThread().interrupt();
+                // verify if the game can continue
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
