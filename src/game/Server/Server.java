@@ -184,33 +184,35 @@ public class Server {
     private void play() {
         chat("===== Welcome to the Spooky Village! =====");
         chat("===== It's day time. Chat with the other players =====");
-        while (verifyIfGameContinues()) {
-            try {
-                if (this.night) {
-                    if (this.PLAYERS.size() >= 6) {
-                        String wolvesList = this.PLAYERS.values().stream()
-                                .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
-                                .map(x -> x.name)
-                                .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
-                        wolvesChat(wolvesList);
-                    }
-                    Thread.sleep(7000);
-                    chat("===== Wake up! The night is over =====");
-                    this.night = false;
-                } else {
-                    Thread.sleep(7000);
-                    chat("===== It's dark already. Time to sleep =====");
-                    wolvesChat("===== Wolves chat is open! =====");
-                    this.night = true;
+        // while (verifyIfGameContinues()) {
+        try {
+            if (this.night) {
+                if (this.PLAYERS.size() >= 6) {
+                    String wolvesList = this.PLAYERS.values().stream()
+                            .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
+                            .map(x -> x.name)
+                            .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
+                    wolvesChat(wolvesList);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.sleep(7000);
+                chat("===== Wake up! The night is over =====");
+                this.night = false;
+                Thread.sleep(2000);
+                checkNumOfVotes();
+            } else {
+                Thread.sleep(7000);
+                chat("===== It's dark already. Time to sleep =====");
+                wolvesChat("===== Wolves chat is open! =====");
+                this.night = true;
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
-        //Chama as funções todas (como startGame, removePlayer, etc.)
     }
+
+    //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
+    //Chama as funções todas (como startGame, removePlayer, etc.)
+    //  }
 
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -233,7 +235,26 @@ public class Server {
 
     }
 
-    private void verifyIfGameContinues() {
+    private boolean verifyIfGameContinues() {
+        //se não houver lobos vivos: todos os jogadores recebem uma mensagem “No more wolves left. game over”
+        //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
+        int wolfCount = 0;
+        int nonWolfCount = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (player.alive) {
+                if (player.role.equals(EnumRole.WOLF)) wolfCount++;
+                else nonWolfCount++;
+            }
+        }
+
+        if (wolfCount >= nonWolfCount || wolfCount == 0) {
+            for (PlayerHandler player : this.PLAYERS.values()) {
+                sendPrivateMessage(player.getName(), "Game over, there are no more alive wolves left");
+                //é preciso parar o chat dos players que ficaram em jogo
+            }
+        }
+        return wolfCount <= nonWolfCount || wolfCount != 0;
+        //return verdadeiro, o jogo continua, return falso, o jogo para
 
     }
 
@@ -245,6 +266,25 @@ public class Server {
 
     private void resetNumberOfVotes() {
         this.PLAYERS.values().forEach(x -> x.numberOfVotes = 0);
+        this.PLAYERS.values().forEach(x -> x.vote = null);
+    }
+
+    private void checkNumOfVotes() {
+        checkIfAllPlayersVoted();
+        PlayerHandler highestVote = PLAYERS.values().stream()
+                .filter(player -> player.alive)
+                .filter(player -> player.numberOfVotes > 0)
+                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
+                .orElseThrow(NoSuchElementException::new);
+
+        highestVote.killPlayer();
+        resetNumberOfVotes();
+    }
+
+    private void checkIfAllPlayersVoted() {
+        PLAYERS.values().stream()
+                .filter(x -> x.vote == null)
+                .forEach(x -> x.setVote(x));
     }
 
     public void sendUpdateOfVotes() {
@@ -319,6 +359,7 @@ public class Server {
                 }
             } catch (IOException e) {
                 playerDisconnected();
+                verifyIfGameContinues();
             }
         }
 
@@ -350,15 +391,15 @@ public class Server {
                         .count();
                 if (numOfWolves > 1) { */
 
-                    PlayerHandler victim = PLAYERS.values().stream()
-                            .filter(player -> player.alive)
-                            .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
-                            .orElseThrow();
+                PlayerHandler victim = PLAYERS.values().stream()
+                        .filter(player -> player.alive)
+                        .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
+                        .orElseThrow();
 
-                    victim.killPlayer();
-                    chat("Someone has died... ", "It was " + victim.name);
-                }
+                victim.killPlayer();
+                chat("Someone has died... ", "It was " + victim.name);
             }
+        }
 
 
       /*  private Object killOneOfWolves() {
@@ -429,6 +470,10 @@ public class Server {
 
         public boolean isAlive() {
             return alive;
+        }
+
+        public PlayerHandler getVote() {
+            return vote;
         }
     }
 }
