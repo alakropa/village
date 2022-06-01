@@ -197,18 +197,10 @@ public class Server {
                         wolvesChat(wolvesList);
                     }
                     Thread.sleep(30000);
+                    choosePlayerWhoDies();
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
-
                     Thread.sleep(2000);
-                    this.wolvesVotes = this.PLAYERS.values().stream()
-                            .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
-                            .map(x -> x.vote)
-                            .collect(Collectors.toList());
-                    if (this.wolvesVotes.size() == 0) {
-                        List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
-                        players.get((int) (Math.random() * players.size())).killPlayer();
-                    } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
                 } else {
                     Thread.sleep(30000);
                     checkNumOfVotes();
@@ -219,6 +211,19 @@ public class Server {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void choosePlayerWhoDies() {
+        if (this.PLAYERS.size() >= 6) {
+            this.wolvesVotes = this.PLAYERS.values().stream()
+                    .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
+                    .map(x -> x.vote)
+                    .collect(Collectors.toList());
+            if (this.wolvesVotes.size() == 0) {
+                List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
+                players.get((int) (Math.random() * players.size())).killPlayer();
+            } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
         }
     }
 
