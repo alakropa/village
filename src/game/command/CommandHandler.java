@@ -7,7 +7,10 @@ public interface CommandHandler {
     void command(Server server, Server.PlayerHandler player);
 
     default boolean commandConditions(Server server, Server.PlayerHandler player, EnumRole role, String chosenPName) {
-        if (!server.isGameInProgress()) {
+        if (!player.isAlive()) {
+            player.send("You are dead");
+            return false;
+        } else if (!server.isGameInProgress()) {
             player.send("Game hasn't started yet");
             return false;
         } else if (!player.getRole().equals(role)) {
@@ -24,7 +27,13 @@ public interface CommandHandler {
     }
 
     default boolean commandConditions(Server server, Server.PlayerHandler player, String votedPName) {
-        if (server.isNight()) {
+        if (server.getNumOfDays() == 0) {
+            player.send("You can't vote on the 1st day!");
+            return false;
+        } else if (!player.isAlive()) {
+            player.send("You are dead");
+            return false;
+        } else if (server.isNight()) {
             player.send("You can't use this command at night");
             return false;
         } else if (votedPName == null) {

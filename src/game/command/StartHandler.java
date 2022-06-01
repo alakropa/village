@@ -8,6 +8,7 @@ public class StartHandler implements CommandHandler{
         if(!server.isGameInProgress()) {
             server.setGameInProgress(true);
             new Thread(server::startGame).start();
+            System.out.println(server.isGameInProgress());
         }
     }
 }

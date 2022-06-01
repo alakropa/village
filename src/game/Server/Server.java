@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class Server {
     private ServerSocket serverSocket;
@@ -17,11 +18,15 @@ public class Server {
     private final HashMap<String, PlayerHandler> PLAYERS;
     private boolean gameInProgress;
     private boolean night;
+    private List<PlayerHandler> wolvesVotes;
+
+    private int numOfDays;
 
     public Server() {
         this.PLAYERS = new HashMap<>();
         this.gameInProgress = false;
         this.night = false;
+        this.wolvesVotes = new ArrayList<>();
     }
 
     public void start(int port) throws IOException {
@@ -44,16 +49,15 @@ public class Server {
                     out.write("Write your name");
                     out.newLine();
                     out.flush();
+                    String playerName = verifyIfNameIsAvailable(playerSocket, out, in);
 
                     //addPlayer(new PlayerHandler(playerSocket, playerName));
                     //System.out.println(playerName + " entered the chat"); //consola do servidor
                     //String playerName = in.readLine(); //fica à espera do nome
 
                     if (!this.gameInProgress && this.PLAYERS.size() < 12) {
-                        String playerName = verifyIsNameIsAvailable(playerSocket, out, in); //add no HashMap
-
                         System.out.println(playerName + " entered the chat"); //consola do servidor
-
+                        addPlayer(new PlayerHandler(playerSocket, playerName));
                         out.write(Command.getCommandList());
                         out.newLine();
                         out.flush();
@@ -72,7 +76,7 @@ public class Server {
         }
     }
 
-    private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
+    private String verifyIfNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
         while (!checkIfNameIsAvailable(playerName)) { //false
             out.write("This name already exists, try another name");
@@ -80,7 +84,6 @@ public class Server {
             out.flush();
             playerName = in.readLine();
         }
-        addPlayer(new PlayerHandler(playerSocket, playerName));
         return playerName;
     }
 
@@ -161,9 +164,7 @@ public class Server {
     }
 
     public void startGame() {
-        // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
-        //lista dos jogadores
         System.out.println("night: " + this.night);
         //chat(displayVillageImage());
         chat(displayVillageImage2());
@@ -250,22 +251,17 @@ public class Server {
                                 .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
                         wolvesChat(wolvesList);
                     }
-                    Thread.sleep(7000);
+                    Thread.sleep(30000);
+                    choosePlayerWhoDies();
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
-                /*
-                Thread.sleep(2000);  this.wolvesVotes = this.PLAYERS.values().stream()
-                        .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
-                        .map(x -> x.vote)
-                        .collect(Collectors.toList());
-                if (this.wolvesVotes.size() == 0) {
-                    List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
-                    players.get((int) (Math.random() * players.size())).killPlayer();
-                } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
-                */
-                    checkNumOfVotes();
+                    chat("THIS IS DAY NUMBER " + ++numOfDays);
+
+                    Thread.sleep(2000);
                 } else {
-                    Thread.sleep(7000);
+
+                    Thread.sleep(30000);
+                    checkNumOfVotes();
                     chat("===== It's dark already. Time to sleep =====");
                     wolvesChat("===== Wolves chat is open! =====");
                     this.night = true;
@@ -274,6 +270,20 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    //Limitar número de visions por noite
+    //Mensagem para os lobos quando matam alguém
+
+    private void choosePlayerWhoDies() {
+        this.wolvesVotes = this.PLAYERS.values().stream()
+                .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
+                .map(x -> x.vote)
+                .collect(Collectors.toList());
+        if (this.wolvesVotes.size() == 0) {
+            List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
+            players.get((int) (Math.random() * players.size())).killPlayer();
+        } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
     }
 
     //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
@@ -314,14 +324,10 @@ public class Server {
         }
 
         if (wolfCount >= nonWolfCount || wolfCount == 0) {
-            for (PlayerHandler player : this.PLAYERS.values()) {
-                sendPrivateMessage(player.getName(), "Game over, there are no more alive wolves left");
-                //é preciso parar o chat dos players que ficaram em jogo
-            }
+            chat("Game over, there are no more alive wolves left"); //é preciso parar o chat dos players que ficaram em jogo
         }
-        return wolfCount <= nonWolfCount || wolfCount != 0;
+        return wolfCount < nonWolfCount || wolfCount != 0;
         //return verdadeiro, o jogo continua, return falso, o jogo para
-
     }
 
     public Optional<PlayerHandler> getPlayerByName(String name) {
@@ -337,13 +343,15 @@ public class Server {
 
     private void checkNumOfVotes() {
         checkIfAllPlayersVoted();
-        PlayerHandler highestVote = PLAYERS.values().stream()
+        Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
                 .filter(player -> player.alive)
-                .filter(player -> player.numberOfVotes > 0)
                 .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
-                .orElseThrow(NoSuchElementException::new);
+                .stream().findAny();
 
-        highestVote.killPlayer();
+        if (highestVote.isPresent()) {
+            highestVote.get().killPlayer();
+            chat(highestVote.get().name + " was killed");
+        }
         resetNumberOfVotes();
     }
 
@@ -374,6 +382,14 @@ public class Server {
 
     private boolean gameContinues() {
         return true;
+    }
+
+    public int getNumberOfPlayers() {
+        return this.PLAYERS.size();
+    }
+
+    public int getNumOfDays() {
+        return numOfDays;
     }
 
     public class PlayerHandler implements Runnable {
@@ -449,33 +465,7 @@ public class Server {
                 return;
             }
             command.getHANDLER().command(Server.this, this);
-            if (command.equals(Command.KILL) && (this.getRole().equals(EnumRole.WOLF))) {
-              /*  int numOfWolves = (int) Stream.of(players)
-                        .filter(player -> player.values().contains(alive))
-                        .filter(x -> x.values().contains(EnumRole.WOLF))
-                        .count();
-                if (numOfWolves > 1) { */
-
-                PlayerHandler victim = PLAYERS.values().stream()
-                        .filter(player -> player.alive)
-                        .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
-                        .orElseThrow();
-
-                victim.killPlayer();
-                chat("Someone has died... ", "It was " + victim.name);
-            }
         }
-
-
-      /*  private Object killOneOfWolves() {
-            //   Object [] volves =
-            Stream.of(players)
-                    .filter(player -> player.values().contains(alive))
-                    .filter(x -> x.values().contains(EnumRole.WOLF))
-                    .toArray()
-
-
-        } */
 
         public String getName() {
             return this.name;
