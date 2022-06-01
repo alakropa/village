@@ -23,6 +23,5 @@ public class VoteHandler implements CommandHandler {
                 player.send("Player is unavailable.");
             }
         }
-
     }
 }
