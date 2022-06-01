@@ -20,7 +20,8 @@ public class Main {
 - não se pode fazer vote no 1º dia
 - limitar o vito no 1º dia
 - mensgem para os lobos qd matam alguém
--qg alguém
+-mensagem para aldeia quem morre
+- qd ninguem votar dele haver uma escolha random dos votos para matar alguém (noite)
 
 
        5. começa o dia:

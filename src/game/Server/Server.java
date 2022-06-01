@@ -20,7 +20,7 @@ public class Server {
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
 
-    private static int NUM_OF_DAYS;
+    private int numOfDays;
 
     public Server() {
         this.PLAYERS = new HashMap<>();
@@ -49,7 +49,7 @@ public class Server {
                     out.write("Write your name");
                     out.newLine();
                     out.flush();
-                    String playerName = verifyIsNameIsAvailable(playerSocket, out, in);
+                    String playerName = verifyIfNameIsAvailable(playerSocket, out, in);
 
                     //addPlayer(new PlayerHandler(playerSocket, playerName));
                     //System.out.println(playerName + " entered the chat"); //consola do servidor
@@ -76,7 +76,7 @@ public class Server {
         }
     }
 
-    private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
+    private String verifyIfNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
         while (!checkIfNameIsAvailable(playerName)) { //false
             out.write("This name already exists, try another name");
@@ -198,7 +198,7 @@ public class Server {
                     choosePlayerWhoDies();
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
-                    chat("THIS IS DAY NUMBER " + ++NUM_OF_DAYS);
+                    chat("THIS IS DAY NUMBER " + ++numOfDays);
 
                     Thread.sleep(2000);
                 } else {
@@ -331,8 +331,8 @@ public class Server {
         return this.PLAYERS.size();
     }
 
-    public static int getNumOfDays() {
-        return NUM_OF_DAYS;
+    public int getNumOfDays() {
+        return numOfDays;
     }
 
     public class PlayerHandler implements Runnable {
