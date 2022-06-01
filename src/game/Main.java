@@ -4,6 +4,19 @@ import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) {
+        //dá para fazer vote depois do jogo acabar
+        //poder fazer um restart ao jogo /start
+        //quando o jogo acaba, quanso alguem usar o comando /kill, dizer "1st you need to restart the game"
+        //" " " /vision -> mudar texto para "1st you need to restart the game"
+        //depois do 1º gameover, se um lobo se desconectar, diz que já não há lobos alive, GAME OVER
+
+        //msg para os lobos, quando matam mesmo alguem
+        //msg para a aldeia da pessoa que morreu
+
+        //quando esceve "que o comando nao funciona" os outros utilizadores vêm no chat o nome: com um espaço em branco
+
+
+
 
         /*
     DONE TEMPORIZADOR /sorry caps
