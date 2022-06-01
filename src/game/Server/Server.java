@@ -184,7 +184,7 @@ public class Server {
     private void play() {
         chat("===== Welcome to the Spooky Village! =====");
         chat("===== It's day time. Chat with the other players =====");
-        while (verifyIfGameContinues()) {
+       // while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
                     if (this.PLAYERS.size() >= 6) {
@@ -197,6 +197,8 @@ public class Server {
                     Thread.sleep(7000);
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
+                    Thread.sleep(2000);
+                    checkNumOfVotes();
                 } else {
                     Thread.sleep(7000);
                     chat("===== It's dark already. Time to sleep =====");
@@ -210,7 +212,7 @@ public class Server {
 
         //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
         //Chama as funções todas (como startGame, removePlayer, etc.)
-    }
+  //  }
 
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -245,7 +247,24 @@ public class Server {
 
     private void resetNumberOfVotes() {
         this.PLAYERS.values().forEach(x -> x.numberOfVotes = 0);
+        this.PLAYERS.values().forEach(x -> x.vote = null);
     }
+
+    private void checkNumOfVotes() {
+    PlayerHandler highestVote = PLAYERS.values().stream()
+                .filter(player -> player.alive)
+                .filter(player -> player.numberOfVotes > 0)
+                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
+                .orElseThrow(NoSuchElementException::new);
+
+    highestVote.killPlayer();
+    resetNumberOfVotes();
+    }
+
+  /*  private void checkIfPlayerVoted(){
+        this.PLAYERS.values().stream()
+
+    } */
 
     public void sendUpdateOfVotes() {
         chat("Current score", PLAYERS.values().stream()
@@ -429,6 +448,10 @@ public class Server {
 
         public boolean isAlive() {
             return alive;
+        }
+
+        public PlayerHandler getVote() {
+            return vote;
         }
     }
 }

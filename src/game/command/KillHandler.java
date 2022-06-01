@@ -23,7 +23,7 @@ public class KillHandler implements CommandHandler {
 
             }
             if (commandConditions(server, player, EnumRole.WOLF, chosenPName)) {
-                Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
+              //  Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
                 if (chosenPlayer.isPresent()) chosenPlayer.get().killPlayer();
                 else player.send(chosenPName + " is unavailable");
             }
