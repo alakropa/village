@@ -12,9 +12,7 @@ public class KillHandler implements CommandHandler {
         if (this.commandConditions(server, player, EnumRole.WOLF, chosenPName)) {
             Optional<Server.PlayerHandler> playerWhoDies = server.getPlayerByName(chosenPName);
             if (playerWhoDies.isPresent()) {
-                if (server.getNumberOfPlayers() < 6 && (playerWhoDies.get()).isAlive())
-                    (playerWhoDies.get()).killPlayer();
-                if (server.getNumberOfPlayers() >= 6 && (playerWhoDies.get()).isAlive())
+                if (playerWhoDies.get().isAlive())
                     player.setVote(playerWhoDies.get());
             } else {
                 player.send(chosenPName + " is unavailable");

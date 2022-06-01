@@ -213,18 +213,21 @@ public class Server {
             }
         }
     }
+    //Limitar número de visions por noite
+    //Limitar números de kills por noite quando é apenas um lobo
+    //Limitar o vote logo no primeiro dia
+    //Mensagem para os lobos quando matam alguém
+    //Quando alguém faz start e outra pessoa está no "write name", ela já não pode entrar
 
     private void choosePlayerWhoDies() {
-        if (this.PLAYERS.size() >= 6) {
-            this.wolvesVotes = this.PLAYERS.values().stream()
-                    .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
-                    .map(x -> x.vote)
-                    .collect(Collectors.toList());
-            if (this.wolvesVotes.size() == 0) {
-                List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
-                players.get((int) (Math.random() * players.size())).killPlayer();
-            } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
-        }
+        this.wolvesVotes = this.PLAYERS.values().stream()
+                .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
+                .map(x -> x.vote)
+                .collect(Collectors.toList());
+        if (this.wolvesVotes.size() == 0) {
+            List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
+            players.get((int) (Math.random() * players.size())).killPlayer();
+        } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
     }
 
     //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
@@ -402,33 +405,7 @@ public class Server {
                 return;
             }
             command.getHANDLER().command(Server.this, this);
-            if (command.equals(Command.KILL) && (this.getRole().equals(EnumRole.WOLF))) {
-              /*  int numOfWolves = (int) Stream.of(players)
-                        .filter(player -> player.values().contains(alive))
-                        .filter(x -> x.values().contains(EnumRole.WOLF))
-                        .count();
-                if (numOfWolves > 1) { */
-
-                PlayerHandler victim = PLAYERS.values().stream()
-                        .filter(player -> player.alive)
-                        .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
-                        .orElseThrow();
-
-                victim.killPlayer();
-                chat("Someone has died... ", "It was " + victim.name);
-            }
         }
-
-
-      /*  private Object killOneOfWolves() {
-            //   Object [] volves =
-            Stream.of(players)
-                    .filter(player -> player.values().contains(alive))
-                    .filter(x -> x.values().contains(EnumRole.WOLF))
-                    .toArray()
-
-
-        } */
 
         public String getName() {
             return this.name;
