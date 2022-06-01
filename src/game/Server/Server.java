@@ -196,7 +196,7 @@ public class Server {
                                 .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
                         wolvesChat(wolvesList);
                     }
-                    Thread.sleep(7000);
+                    Thread.sleep(30000);
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
 
@@ -210,8 +210,8 @@ public class Server {
                         players.get((int) (Math.random() * players.size())).killPlayer();
                     } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
                 } else {
-                    Thread.sleep(7000);
-                    //checkNumOfVotes();
+                    Thread.sleep(30000);
+                    checkNumOfVotes();
                     chat("===== It's dark already. Time to sleep =====");
                     wolvesChat("===== Wolves chat is open! =====");
                     this.night = true;
@@ -279,14 +279,15 @@ public class Server {
 
     private void checkNumOfVotes() {
         checkIfAllPlayersVoted();
-        PlayerHandler highestVote = PLAYERS.values().stream()
+        Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
                 .filter(player -> player.alive)
                 .filter(player -> player.numberOfVotes > 0)
-                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
-                .orElseThrow(NoSuchElementException::new);
+                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes));
 
-        highestVote.killPlayer();
-        resetNumberOfVotes();
+        if (highestVote.isPresent()) {
+            highestVote.get().killPlayer();
+            chat(highestVote.get().name + " was killed");
+        } else resetNumberOfVotes();
     }
 
     private void checkIfAllPlayersVoted() {
