@@ -5,10 +5,12 @@ import java.util.Arrays;
 public enum Command {
     START("/start", new StartHandler(), "Starts the game"),
     LIST("/list", new ListHandler(), "Lists the players in game"),
+    COMMAND_LIST("/cmd", new CommandListHandler(), "Lists the game commands"),
     VOTE("/vote", new VoteHandler(), "Vote the player that you want to eliminate"),
     KILL("/kill", new KillHandler(), "Choose the player that you want to kill (available to Wolfs only)"),
     VISION("/vision", new VisionHandler(), "Choose a player to check it's role (available to Furtune Teller only)"),
     QUIT("/quit", new QuitHandler(), "Quit from the game");
+    //Fazer comando com as regras do jogo
 
     private final String COMMAND;
     private final CommandHandler HANDLER;
@@ -27,10 +29,6 @@ public enum Command {
             }
         }
         return null;
-    }
-
-    public String getCOMMAND() {
-        return this.COMMAND;
     }
 
     public CommandHandler getHANDLER() {

@@ -14,15 +14,13 @@ import java.util.concurrent.Executors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private HashMap<String, PlayerHandler> players;
+    private final HashMap<String, PlayerHandler> PLAYERS;
     private boolean gameInProgress;
-    private boolean timesUp;
     private boolean night;
 
     public Server() {
-        this.players = new HashMap<>();
+        this.PLAYERS = new HashMap<>();
         this.gameInProgress = false;
-        this.timesUp = false;
         this.night = false;
     }
 
@@ -38,7 +36,7 @@ public class Server {
     public void acceptConnection() throws IOException {
         //Opcional: Haver dois ou mais jogos em simultâneo
         Socket playerSocket = this.serverSocket.accept();
-        if (!this.gameInProgress && this.players.size() < 12) {
+        if (!this.gameInProgress && this.PLAYERS.size() < 12) {
             new Thread(() -> { //serve para varios jogadores poderem escrever o nome ao mesmo tempo
                 try {
                     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
@@ -51,7 +49,7 @@ public class Server {
                     //System.out.println(playerName + " entered the chat"); //consola do servidor
                     //String playerName = in.readLine(); //fica à espera do nome
 
-                    if (!this.gameInProgress && this.players.size() < 12) {
+                    if (!this.gameInProgress && this.PLAYERS.size() < 12) {
                         String playerName = verifyIsNameIsAvailable(playerSocket, out, in); //add no HashMap
 
                         System.out.println(playerName + " entered the chat"); //consola do servidor
@@ -74,10 +72,6 @@ public class Server {
         }
     }
 
-    private String verifyIsNameIsAvailable() {
-        return "";
-    }
-
     private String verifyIsNameIsAvailable(Socket playerSocket, BufferedWriter out, BufferedReader in) throws IOException {
         String playerName = in.readLine(); //fica à espera do nome
         while (!checkIfNameIsAvailable(playerName)) { //false
@@ -94,7 +88,7 @@ public class Server {
     private boolean checkIfNameIsAvailable(String playerName) {
         // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
         // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-        for (PlayerHandler player : this.players.values()) {
+        for (PlayerHandler player : this.PLAYERS.values()) {
             if (player.name.equals(playerName)) {
                 return false;
             }
@@ -112,31 +106,41 @@ public class Server {
 //                e.printStackTrace();
 //            }
 //        }
-        this.players.put(playerHandler.name, playerHandler);
+        this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler); //mandar para a threadpool
         chat(playerHandler.name, "joined the chat"); //msg para os outros players
     }
 
     public void chat(String name, String message) {
-        for (PlayerHandler client : this.players.values()) {
+        for (PlayerHandler client : this.PLAYERS.values()) {
             if (!client.name.equals(name)) {
                 client.send(name + ": " + message);
             }
         }
     }
 
+    public void chat(String message) {
+        for (PlayerHandler client : this.PLAYERS.values()) {
+            client.send(message);
+        }
+    }
+
     public void wolvesChat(String name, String message) {
-        this.players.values().stream()
+        this.PLAYERS.values().stream()
                 .filter(x -> x.role == EnumRole.WOLF && !x.name.equals(name))
+                .forEach(x -> x.send(name + ": " + message));
+    }
+
+    public void wolvesChat(String message) {
+        this.PLAYERS.values().stream()
+                .filter(x -> x.role == EnumRole.WOLF)
                 .forEach(x -> x.send(message));
     }
 
-
     public String playersInGame() {
-        return this.players.values().stream()
+        return this.PLAYERS.values().stream()
                 .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
-        //Adicionar estado (alive ou dead)
     }
 
     public void removePlayer(PlayerHandler playerHandler) {
@@ -145,11 +149,11 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.players.remove(playerHandler.name, playerHandler);
+        this.PLAYERS.remove(playerHandler.name, playerHandler);
     }
 
     public void sendPrivateMessage(String name, String message) {
-        for (PlayerHandler client : this.players.values()) {
+        for (PlayerHandler client : this.PLAYERS.values()) {
             if (client.name.equals(name)) {
                 client.send(message);
             }
@@ -160,14 +164,14 @@ public class Server {
         // Só um dos jogadores faz /start e o jogo começa
         // Adicionar bots necessários
         //lista dos jogadores
+        System.out.println("night: " + this.night);
         chat("Welcome to a new game", "SPOOKY VILLAGE!");
         chat("A list of players starting the game", playersInGame());
-
 
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
 
-        List<PlayerHandler> playersList = new ArrayList<>(this.players.values());
+        List<PlayerHandler> playersList = new ArrayList<>(this.PLAYERS.values());
         for (int i = 0; i < playersList.size(); i++) {
             EnumRole newRole = roles.get(i);
             sendPrivateMessage(playersList.get(i).name, "Your role is " + newRole.toString());
@@ -176,9 +180,44 @@ public class Server {
         play();
     }
 
+    private void play() {
+        chat("===== Welcome to the Spooky Village! =====");
+        chat("===== It's day time. Chat with the other players =====");
+        while (verifyIfGameContinues()) {
+            try {
+                if (this.night) {
+                    if (this.PLAYERS.size() >= 6) {
+                        String wolvesList = this.PLAYERS.values().stream()
+                                .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
+                                .map(x -> x.name)
+                                .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
+                        wolvesChat(wolvesList);
+                    }
+                    Thread.sleep(7000);
+                    chat("===== Wake up! The night is over =====");
+                    this.night = false;
+                } else {
+                    Thread.sleep(7000);
+                    chat("===== It's dark already. Time to sleep =====");
+                    wolvesChat("===== Wolves chat is open! =====");
+                    this.night = true;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
+        //Chama as funções todas (como startGame, removePlayer, etc.)
+    }
+
+    private boolean verifyIfGameContinues() {
+        return true;
+    }
+
     private ArrayList<EnumRole> generateEnumCards() {
-        ArrayList<EnumRole> roles = new ArrayList<>(players.size());
-        for (int i = 0; i < this.players.size(); i++) {
+        ArrayList<EnumRole> roles = new ArrayList<>(PLAYERS.size());
+        for (int i = 0; i < this.PLAYERS.size(); i++) {
             switch (i) {
                 case 0, 6, 11 -> roles.add(i, EnumRole.WOLF);
                 case 1, 9 -> roles.add(i, EnumRole.FORTUNE_TELLER);
@@ -196,38 +235,18 @@ public class Server {
 
     }
 
-    private void verifyIfGameContinues() {
-
-    }
-
-    private void play() {
-        //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
-        //Chama as funções todas (como startGame, removePlayer, etc.)
-    }
-
     public Optional<PlayerHandler> getPlayerByName(String name) {
-        return this.players.values().stream()
+        return this.PLAYERS.values().stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
                 .findFirst();
     }
 
     private void resetNumberOfVotes() {
-        this.players.values().forEach(x -> x.numberOfVotes = 0);
-    }
-
-    private void timer(int setTime) {
-        new Thread(() -> {
-            try {
-                Thread.sleep(setTime);
-                this.timesUp = true;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        this.PLAYERS.values().forEach(x -> x.numberOfVotes = 0);
     }
 
     public void sendUpdateOfVotes() {
-        chat("Current score", players.values().stream()
+        chat("Current score", PLAYERS.values().stream()
                 .filter(player -> player.alive)
                 .map(player -> player.name + ": " + player.numberOfVotes)
                 .reduce("", (a, b) -> a + "\n" + b));
@@ -259,9 +278,7 @@ public class Server {
         private EnumRole role;
         private int numberOfVotes;
         private PlayerHandler vote;
-
         private PlayerHandler previousVote;
-
         //private HashMap<String, Boolean> visions;
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
@@ -291,13 +308,11 @@ public class Server {
                             case FORTUNE_TELLER -> dealWithCommand(this.message);
                             default -> send("You are sleeping");
                         }
-                        continue;
-                    }
-
-                    if (isCommand(message.trim())) {
-                        dealWithCommand(this.message);
                     } else {
-                        chat(this.name, this.message);
+                        if (isCommand(this.message.trim())) {
+                            dealWithCommand(this.message);
+                        } else chat(this.name, this.message);
+
                     }
                 }
             } catch (IOException e) {
@@ -360,7 +375,7 @@ public class Server {
             try {
                 chat(this.name, " disconnected");
                 this.PLAYER_SOCKET.close();
-                Server.this.players.remove(this.name, this);
+                Server.this.PLAYERS.remove(this.name, this);
                 Thread.currentThread().interrupt();
                 // verify if the game can continue
             } catch (IOException ex) {
