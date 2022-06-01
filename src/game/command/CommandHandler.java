@@ -27,7 +27,10 @@ public interface CommandHandler {
     }
 
     default boolean commandConditions(Server server, Server.PlayerHandler player, String votedPName) {
-        if (!player.isAlive()) {
+        if (server.getNumOfDays() == 1) {
+            player.send("You can't vote on the 1st day!");
+            return false;
+        } else if (!player.isAlive()) {
             player.send("You are dead");
             return false;
         } else if (server.isNight()) {

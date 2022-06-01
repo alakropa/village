@@ -20,6 +20,8 @@ public class Server {
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
 
+    private static int NUM_OF_DAYS;
+
     public Server() {
         this.PLAYERS = new HashMap<>();
         this.gameInProgress = false;
@@ -200,8 +202,11 @@ public class Server {
                     choosePlayerWhoDies();
                     chat("===== Wake up! The night is over =====");
                     this.night = false;
+                    chat("THIS IS DAY NUMBER " + ++NUM_OF_DAYS);
+
                     Thread.sleep(2000);
                 } else {
+
                     Thread.sleep(30000);
                     checkNumOfVotes();
                     chat("===== It's dark already. Time to sleep =====");
@@ -329,6 +334,10 @@ public class Server {
 
     public int getNumberOfPlayers() {
         return this.PLAYERS.size();
+    }
+
+    public static int getNumOfDays() {
+        return NUM_OF_DAYS;
     }
 
     public class PlayerHandler implements Runnable {

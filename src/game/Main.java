@@ -15,6 +15,13 @@ public class Main {
      Ala  -Nas rondas que o vidente já sabe quem são todos os lobos, o vidente não acorda mais (não abre o chat dele e está tratado como um aldeão normal);
 
 
+- limitar o nº de visions a noite
+- limitar o número de votos do lobo
+- não se pode fazer vote no 1º dia
+- limitar o vito no 1º dia
+- mensgem para os lobos qd matam alguém
+-qg alguém
+
 
        5. começa o dia:
        -dizer que começa o dia
