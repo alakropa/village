@@ -63,5 +63,10 @@ String image = " _ _ _       _                                    _           _ 
         System.out.println(image);
         System.out.println(image2);
 
+        //Start tem de reiniciar as variáveis alive
+        //
+
+
+
     }
 }
