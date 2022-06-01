@@ -174,23 +174,23 @@ public class Server {
         play();
     }
 
-    private String displayVillageImage(){
+    private String displayVillageImage() {
         String villageImage = "" +
                 " __        __   _                                  _          _   _          \n" +
-                              " \\ \\      / /__| | ___ ___  _ __ ___   ___        | |_ ___   | |_| |__   ___ \n" +
-                              "  \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\       | __/ _ \\  | __| '_ \\ / _ \\\n" +
-                              "   \\ V  V /  __/ | (_| (_) | | | | | |  __/_ _ _  | || (_) | | |_| | | |  __/\n" +
-                              "  __\\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___(_|_|_)_ \\__\\___/   \\__|_| |_|\\___|\n" +
-                              " / ___| _ __   ___   ___ | | ___   _  \\ \\   / (_) | | __ _  __ _  ___| |     \n" +
-                              " \\___ \\| '_ \\ / _ \\ / _ \\| |/ / | | |  \\ \\ / /| | | |/ _` |/ _` |/ _ \\ |     \n" +
-                              "  ___) | |_) | (_) | (_) |   <| |_| |   \\ V / | | | | (_| | (_| |  __/_|     \n" +
-                              " |____/| .__/ \\___/ \\___/|_|\\_\\\\__, |    \\_/  |_|_|_|\\__,_|\\__, |\\___(_)     \n" +
-                              "       |_|                     |___/                       |___/             ";
+                " \\ \\      / /__| | ___ ___  _ __ ___   ___        | |_ ___   | |_| |__   ___ \n" +
+                "  \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\       | __/ _ \\  | __| '_ \\ / _ \\\n" +
+                "   \\ V  V /  __/ | (_| (_) | | | | | |  __/_ _ _  | || (_) | | |_| | | |  __/\n" +
+                "  __\\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___(_|_|_)_ \\__\\___/   \\__|_| |_|\\___|\n" +
+                " / ___| _ __   ___   ___ | | ___   _  \\ \\   / (_) | | __ _  __ _  ___| |     \n" +
+                " \\___ \\| '_ \\ / _ \\ / _ \\| |/ / | | |  \\ \\ / /| | | |/ _` |/ _` |/ _ \\ |     \n" +
+                "  ___) | |_) | (_) | (_) |   <| |_| |   \\ V / | | | | (_| | (_| |  __/_|     \n" +
+                " |____/| .__/ \\___/ \\___/|_|\\_\\\\__, |    \\_/  |_|_|_|\\__,_|\\__, |\\___(_)     \n" +
+                "       |_|                     |___/                       |___/             ";
 
         return villageImage;
     }
 
-    private String displayVillageImage2(){
+    private String displayVillageImage2() {
         String villageImage = "                                                               \n" +
                 "                _ _ _     _                            _          _   _       \n" +
                 "               | | | |___| |___ ___ _____ ___         | |_ ___   | |_| |_ ___ \n" +
@@ -207,24 +207,24 @@ public class Server {
         return villageImage;
     }
 
-    private String displayVillageImage3(){
+    private String displayVillageImage3() {
         String villageImage = "                                                                                                       \n" +
-                              " .         _  .          .          .    +     .          .          .      .                           \n" +
-                              "        .          .            .            .            .       :               .           .         \n" +
-                              "        .   .      .    .     .     .    .      .   .      . .  .  -+-        .                        \n" +
-                              "                      .           .           .   .        .           .          /         :  .       \n" +
-                              "           .        / V\\    . .        .  .      / .   .    .    .     .      .  / .      . ' .        \n" +
-                              "    .             / `  /        .  +       .    /     .          .          .   /      .               \n" +
-                              "           *     <<   |       .             .  /         .            .        *   .         .     .    \n" +
-                              "                 /    |      .   .       .    *     .     .    .      .   .       .  .                 \n" +
-                              "       .       /      |          .           .           .           .           .         +  .        \n" +
-                              "    .        /        |  . .        .  .       .   .      .    .     .     .    .      .   .           \n" +
-                              "           /    \\  \\ /                                                                                 \n" +
-                              "          (      ) | | .   +      .          ___/\\_._/~~\\_...__/\\__.._._/~\\        .         .   .     \n" +
-                              "  ________|   _/_  | |       .         _.--'                              `--./\\          .   .        \n" +
-                              "<__________\\______)\\__) ._ - /~~\\/~\\ -                                        `-/~\\_            .      \n" +
-                              " .      .-'                                                                           `-/\\_            \n" +
-                              "  _/\\.-'                                                                                    __/~\\/\\-.__.";
+                " .         _  .          .          .    +     .          .          .      .                           \n" +
+                "        .          .            .            .            .       :               .           .         \n" +
+                "        .   .      .    .     .     .    .      .   .      . .  .  -+-        .                        \n" +
+                "                      .           .           .   .        .           .          /         :  .       \n" +
+                "           .        / V\\    . .        .  .      / .   .    .    .     .      .  / .      . ' .        \n" +
+                "    .             / `  /        .  +       .    /     .          .          .   /      .               \n" +
+                "           *     <<   |       .             .  /         .            .        *   .         .     .    \n" +
+                "                 /    |      .   .       .    *     .     .    .      .   .       .  .                 \n" +
+                "       .       /      |          .           .           .           .           .         +  .        \n" +
+                "    .        /        |  . .        .  .       .   .      .    .     .     .    .      .   .           \n" +
+                "           /    \\  \\ /                                                                                 \n" +
+                "          (      ) | | .   +      .          ___/\\_._/~~\\_...__/\\__.._._/~\\        .         .   .     \n" +
+                "  ________|   _/_  | |       .         _.--'                              `--./\\          .   .        \n" +
+                "<__________\\______)\\__) ._ - /~~\\/~\\ -                                        `-/~\\_            .      \n" +
+                " .      .-'                                                                           `-/\\_            \n" +
+                "  _/\\.-'                                                                                    __/~\\/\\-.__.";
 
         return villageImage;
     }
@@ -232,7 +232,7 @@ public class Server {
     private void play() {
         chat("===== Welcome to the Spooky Village! =====");
         chat("===== It's day time. Chat with the other players =====");
-        while (true) {
+        while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
                     if (this.PLAYERS.size() >= 6) {
@@ -314,11 +314,14 @@ public class Server {
             }
         }
 
-        if (wolfCount >= nonWolfCount || wolfCount == 0) {
-            chat("Game over, there are no more alive wolves left"); //é preciso parar o chat dos players que ficaram em jogo
+        if (wolfCount >= nonWolfCount) {
+            chat("The wolves won! \n Game over");
+            gameInProgress = false;
+        } else if (wolfCount == 0) {
+            chat("The villagers won! \n There are no wolves left alive \n GAME OVER");
+            gameInProgress = false;
         }
         return wolfCount < nonWolfCount || wolfCount != 0;
-        //return verdadeiro, o jogo continua, return falso, o jogo para
     }
 
     public Optional<PlayerHandler> getPlayerByName(String name) {
