@@ -10,10 +10,10 @@ public interface CommandHandler {
         if (!server.isGameInProgress()) {
             player.send("You must start the game first");
             return false;
-        } else if (!player.isAlive()) {
+        } else if (!player.getCharacter().isAlive()) {
             player.send("You are dead");
             return false;
-        } else if (!player.getRole().equals(role)) {
+        } else if (!player.getCharacter().getRole().equals(role)) {
             player.send("Only " + role.getPLURAL() + " can use this command");
             return false;
         } else if (!server.isNight()) {
@@ -36,7 +36,7 @@ public interface CommandHandler {
         } else if (server.getNumOfDays() == 0) {
             player.send("You can't vote on the 1st day!");
             return false;
-        } else if (!player.isAlive()) {
+        } else if (!player.getCharacter().isAlive()) {
             player.send("You are dead");
             return false;
         } else if (server.isNight()) {
