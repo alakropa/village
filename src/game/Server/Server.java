@@ -25,6 +25,7 @@ public class Server {
     private List<PlayerHandler> wolvesVotes;
     private PlayerHandler victim;
     private int numOfDays;
+    private boolean stopTimer;
 
     public Server() {
         this.PLAYERS = new HashMap<>();
@@ -272,11 +273,17 @@ public class Server {
                     wolvesChat(Colors.RED + "===== Wolves chat is open! =====");
                     Thread.sleep(500);
                     printAliveWolves();
-
-                    Thread.sleep(10000);
+                    new Thread(this::botsNightVotes);
+                   Thread.sleep(10000);
+                   if(!stopTimer) {
+                       for (int seconds = 5; seconds > 0; seconds--) {
+                           chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the night...");
+                           Thread.sleep(1000);
+                       }
+                       chat("The night is over..." + playersInGame());
+                       stopTimer=true;
+                   }
                     choosePlayerWhoDies();
-
-                    //chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
                     sendPrivateMessage(this.victim.name, (Colors.BLACK + "\n x.x You have been killed last night x.x") + Colors.RESET);
                     sendPrivateMessage(this.victim.name, (displaySkullImage()));
                     //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
@@ -288,7 +295,6 @@ public class Server {
                         chat("Watch out! There are still wolves walking around. No one is safe!\n");
                     }
 
-                    //chat(Colors.YELLOW + "THIS IS DAY NUMBER " + ++numOfDays);
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
                     resetUsedVision();
@@ -296,8 +302,18 @@ public class Server {
                 } else {
                     chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
                     Thread.sleep(10000);
+                    if(!stopTimer) {
+                        for (int seconds = 5; seconds > 0; seconds--) {
+                            chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the day...");
+                            Thread.sleep(1000);
+                        }
+                        chat("The day is over..." );
+                        stopTimer=true;
+                    } if(numOfDays != 0) {
+                    choosePlayerWhoDies();
+                    Thread.sleep(1000);
                     botsDayVotes();
-                    checkVotes();
+                    checkVotes();}
                     this.night = true;
                 }
             } catch (InterruptedException e) {
@@ -340,6 +356,26 @@ public class Server {
         }
     }
 
+   /* Thread timer = new Thread(() -> {
+            try {
+
+                // Thread.sleep(2000);
+                stopTimer = false;
+                for (int seconds = 5; seconds > 0; seconds--) {
+                    chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the night...");
+                    Thread.sleep(1000);
+                }
+                chat("The night is over..." + playersInGame());
+                notifyTimer();
+            } catch (InterruptedException weCanIgnoreThisException) {
+            }
+    });
+
+    public synchronized void notifyTimer(){
+        stopTimer = true;
+        notifyAll();
+    } */
+
     private void printAliveWolves() {
         if (this.PLAYERS.size() >= 7) {
             String wolvesList = this.PLAYERS.values().stream()
@@ -380,6 +416,7 @@ public class Server {
         wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name.toUpperCase() + Colors.RESET + "\n");
         chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
         chat("Unfortunately, " + this.victim.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victim.name.toUpperCase());
+        chat("Check out the latest update" + playersInGame());
     }
 
     private ArrayList<EnumRole> generateEnumCards(int playersInGame) {
