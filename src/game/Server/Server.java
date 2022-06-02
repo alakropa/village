@@ -263,7 +263,6 @@ public class Server {
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
-                    System.out.println("Ja???");
                     resetUsedVision();
                 } else {
                     chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
@@ -316,6 +315,9 @@ public class Server {
             killedPlayer.getCharacter().killPlayer();
         }
         wolvesChat("You have decided to kill... " + killedPlayer.NAME.toUpperCase());
+        chat("THIS IS DAY NUMBER " + ++numOfDays);
+        chat("Unfortunately, " + killedPlayer.NAME.toUpperCase() + " was killed by hungry wolves... Rest in peace, " +killedPlayer.NAME);
+
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
