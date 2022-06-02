@@ -8,6 +8,7 @@ public class Character {
     private int numberOfVotes;
     private Character previousVote;
     private boolean defended;
+    private boolean protected;
 
     public void increaseNumberOfVotes() {
         this.numberOfVotes++;
@@ -48,5 +49,13 @@ public class Character {
         return "Character{" +
                 "role=" + role +
                 '}';
+    }
+
+    public boolean isDefended() {
+        return defended;
+    }
+
+    public void setDefended(boolean defended) {
+        this.defended = defended;
     }
 }

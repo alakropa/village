@@ -6,7 +6,8 @@ import game.Characters.FortuneTeller;
 public enum EnumRole {
     WOLF("Wolf", "Wolves", new Character()),
     VILLAGER("Villager", "Villagers", new Character()),
-    FORTUNE_TELLER("Fortune Teller", "Fortune Tellers", new FortuneTeller());
+    FORTUNE_TELLER("Fortune Teller", "Fortune Tellers", new FortuneTeller()),
+    GUARD("Guard", "Guards", new Character());
 
     private final String NAME;
     private final String PLURAL;
