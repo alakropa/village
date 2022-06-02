@@ -43,7 +43,7 @@ public class Player {
                 while (!this.SOCKET.isClosed()) {
                     try {
                         String message = this.in.readLine();
-                        if(message == null) {
+                        if (message == null) {
                             this.SOCKET.close();
                             break;
                         }

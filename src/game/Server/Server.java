@@ -1,6 +1,9 @@
 package game.Server;
 
+import game.Characters.Character;
+import game.Characters.FortuneTeller;
 import game.EnumRole;
+import game.Game;
 import game.Helpers;
 import game.command.Command;
 
@@ -119,19 +122,19 @@ public class Server {
 
     public void wolvesChat(String name, String message) {
         this.PLAYERS.values().stream()
-                .filter(x -> x.role == EnumRole.WOLF && !x.NAME.equals(name))
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.NAME.equals(name))
                 .forEach(x -> x.send(name + ": " + message));
     }
 
     public void wolvesChat(String message) {
         this.PLAYERS.values().stream()
-                .filter(x -> x.role == EnumRole.WOLF)
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF))
                 .forEach(x -> x.send(message));
     }
 
     public String playersInGame() {
         return this.PLAYERS.values().stream()
-                .map(x -> x.NAME + " - " + (x.alive ? "Alive" : "Dead"))
+                .map(x -> x.NAME + " - " + (x.getCharacter().isAlive() ? "Alive" : "Dead"))
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
@@ -154,6 +157,7 @@ public class Server {
 
     public void startGame() {
         // Adicionar bots necessários
+        Game game = new Game();
         this.night = false;
         //chat(displayVillageImage());
         chat(displayVillageImage2());
@@ -168,7 +172,8 @@ public class Server {
         for (int i = 0; i < playersList.size(); i++) {
             EnumRole newRole = roles.get(i);
             sendPrivateMessage(playersList.get(i).NAME, "You are a " + newRole.toString());
-            playersList.get(i).role = newRole;
+            playersList.get(i).character = newRole.getCHARACTER();
+            playersList.get(i).character.setRole(newRole);
         }
         play();
     }
@@ -254,7 +259,7 @@ public class Server {
     private void printAliveWolves() {
         if (this.PLAYERS.size() >= 7) {
             String wolvesList = this.PLAYERS.values().stream()
-                    .filter(x -> x.alive && x.role.equals(EnumRole.WOLF))
+                    .filter(x -> x.getCharacter().isAlive() && x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .map(x -> x.NAME)
                     .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
             wolvesChat(wolvesList);
@@ -273,24 +278,21 @@ public class Server {
 
     private void choosePlayerWhoDies() {
         this.wolvesVotes = this.PLAYERS.values().stream()
-                .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
+                        && x.getCharacter().isAlive() && x.vote != null)
                 .map(x -> x.vote)
                 .collect(Collectors.toList()); //List<PlayerHandler> wolvesVotes
         if (this.wolvesVotes.size() == 0) {
             List<PlayerHandler> players = this.PLAYERS.values().stream().toList(); //se ninguém votar
-            players.get((int) (Math.random() * players.size())).killPlayer(); //alive=false
+            players.get((int) (Math.random() * players.size())).getCharacter().killPlayer(); //alive=false
         } else {
             PlayerHandler victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
             victimName = victim.NAME;
-            victim.killPlayer();
+            victim.getCharacter().killPlayer();
             //this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer(); //random dos votados, mesmo q seja repetido
             wolvesChat("You have decided to kill... " + victimName.toUpperCase());
         }
     }
-
-    //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!
-    //Chama as funções todas (como startGame, removePlayer, etc.)
-
 
     private ArrayList<EnumRole> generateEnumCards() {
         ArrayList<EnumRole> roles = new ArrayList<>(PLAYERS.size());
@@ -310,8 +312,8 @@ public class Server {
         int wolfCount = 0;
         int nonWolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.alive) {
-                if (player.role.equals(EnumRole.WOLF)) wolfCount++;
+            if (player.getCharacter().isAlive()) {
+                if (player.getCharacter().getRole().equals(EnumRole.WOLF)) wolfCount++;
                 else nonWolfCount++;
             }
         }
@@ -338,19 +340,19 @@ public class Server {
     }
 
     private void resetNumberOfVotes() {
-        this.PLAYERS.values().forEach(x -> x.numberOfVotes = 0);
+        this.PLAYERS.values().forEach(x -> x.getCharacter().setNumberOfVotes(0));
         this.PLAYERS.values().forEach(x -> x.vote = null);
     }
 
     private void checkVotes() {
         checkIfAllPlayersVoted();
         Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
-                .filter(player -> player.alive)
-                .max(Comparator.comparing(PlayerHandler::getNumberOfVotes))
+                .filter(player -> player.getCharacter().isAlive())
+                .max(Comparator.comparing(x -> x.getCharacter().getNumberOfVotes()))
                 .stream().findAny();
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
-            highestVote.get().killPlayer();
+            highestVote.get().getCharacter().killPlayer();
             chat(highestVote.get().NAME + " was tragically killed");
         }
         resetNumberOfVotes();
@@ -359,13 +361,13 @@ public class Server {
     private void checkIfAllPlayersVoted() {
         PLAYERS.values().stream()
                 .filter(x -> x.vote == null)
-                .forEach(x -> x.setVote(x));
+                .forEach(x -> x.vote = x);
     }
 
     public void sendUpdateOfVotes() {
         chat("Current score", PLAYERS.values().stream()
-                .filter(player -> player.alive)
-                .map(player -> player.NAME + ": " + player.numberOfVotes)
+                .filter(player -> player.getCharacter().isAlive())
+                .map(player -> player.NAME + ": " + player.getCharacter().getNumberOfVotes())
                 .reduce("", (a, b) -> a + "\n" + b));
     }
 
@@ -378,7 +380,7 @@ public class Server {
     }
 
     public void setPlayersLife() {
-        this.PLAYERS.values().forEach(x -> x.alive = true);
+        this.PLAYERS.values().forEach(x -> x.getCharacter().healPlayer());
     }
 
     public boolean isNight() {
@@ -390,33 +392,25 @@ public class Server {
     }
 
     private void resetUsedVision() {
-        this.PLAYERS.values().forEach(x -> x.usedVision = false);
+        this.PLAYERS.values().forEach(x -> ((FortuneTeller) x.getCharacter()).setUsedVision(false));
     }
 
     public class PlayerHandler implements Runnable {
         private final String NAME;
         private final Socket PLAYER_SOCKET;
         private final BufferedWriter OUT;
-        private String message;
-        private boolean alive;
-        private EnumRole role;
-        private int numberOfVotes;
         private PlayerHandler vote;
-        private PlayerHandler previousVote;
-        private final HashMap<String, Boolean> VISIONS;
-        private boolean usedVision;
+        private String message;
+        private Character character;
 
         public PlayerHandler(Socket clientSocket, String name) throws IOException {
             this.PLAYER_SOCKET = clientSocket;
             this.NAME = name;
             this.OUT = new BufferedWriter(new OutputStreamWriter(this.PLAYER_SOCKET.getOutputStream()));
-            this.alive = true;
-            this.VISIONS = new HashMap<>();
         }
 
         @Override
         public void run() {
-            //play?
             BufferedReader in;
             try {
                 in = new BufferedReader(new InputStreamReader(this.PLAYER_SOCKET.getInputStream()));
@@ -425,15 +419,12 @@ public class Server {
                     System.out.println(NAME + ": " + this.message); //imprime no server as msg q recebe dos clients
 
                     if (Server.this.night) {
-                        switch (this.role) {
+                        switch (this.character.getRole()) {
                             case WOLF -> {
                                 if (isCommand(this.message)) dealWithCommand(this.message);
                                 else wolvesChat(this.NAME, this.message);
                             }
-                            case FORTUNE_TELLER -> {
-                                dealWithCommand(this.message);
-                                this.usedVision = true;
-                            }
+                            case FORTUNE_TELLER -> dealWithCommand(this.message);
                             default -> send("You are sleeping");
                         }
                     } else {
@@ -446,6 +437,15 @@ public class Server {
             } catch (IOException e) {
                 playerDisconnected();
             }
+        }
+
+        private void dealWithCommand(String message) throws IOException {
+            Command command = Command.getCommandFromDescription(message.split(" ")[0]);
+            if (command == null) {
+                send("Command unavailable");
+                return;
+            }
+            command.getHANDLER().command(Server.this, this);
         }
 
         private boolean isCommand(String message) {
@@ -462,15 +462,6 @@ public class Server {
             }
         }
 
-        private void dealWithCommand(String message) throws IOException {
-            Command command = Command.getCommandFromDescription(message.split(" ")[0]);
-            if (command == null) {
-                send("Command unavailable");
-                return;
-            }
-            command.getHANDLER().command(Server.this, this);
-        }
-
         public String getNAME() {
             return this.NAME;
         }
@@ -479,16 +470,8 @@ public class Server {
             return this.message;
         }
 
-        public void killPlayer() {
-            this.alive = false;
-        }
-
-        public void increaseNumberOfVotes() {
-            this.numberOfVotes++;
-        }
-
-        public EnumRole getRole() {
-            return role;
+        public Character getCharacter() {
+            return character;
         }
 
         public void setVote(PlayerHandler vote) {
@@ -504,42 +487,6 @@ public class Server {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
-
-        public PlayerHandler getPreviousVote() {
-            return previousVote;
-        }
-
-        public void setPreviousVote(PlayerHandler previousVote) {
-            this.previousVote = previousVote;
-        }
-
-        public void decreaseNumberOfVotes() {
-            this.numberOfVotes--;
-        }
-
-        public int getNumberOfVotes() {
-            return numberOfVotes;
-        }
-
-        public boolean isAlive() {
-            return alive;
-        }
-
-        public HashMap<String, Boolean> getVISIONS() {
-            return VISIONS;
-        }
-
-        public void addVisions(String playerName, Boolean isWolf) {
-            this.VISIONS.put(playerName, isWolf);
-        }
-
-        public boolean hasUsedVision() {
-            return usedVision;
-        }
-
-        public void setUsedVision(boolean usedVision) {
-            this.usedVision = usedVision;
         }
     }
 }
