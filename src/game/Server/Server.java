@@ -312,7 +312,6 @@ public class Server {
                         chat("The day is over..." );
                         stopTimer=true;
                     } if(numOfDays != 0) {
-                    choosePlayerWhoDies();
                     Thread.sleep(1000);
                     botsDayVotes();
                     checkVotes();}
@@ -424,7 +423,7 @@ public class Server {
             chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
             chat("HURRAYYYY! The guard bravely protected the village, so everyone survived the last night!");
         }
-        chat("Check out the latest update" + playersInGame());
+        chat("Check out the latest update of the " + playersInGame());
     }
 
     private ArrayList<EnumRole> generateEnumCards(int playersInGame) {
