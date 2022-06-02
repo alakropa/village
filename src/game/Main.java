@@ -20,6 +20,8 @@ public class Main {
             Command /suicide
         */
 
+        //verificar se os sockets estão activos ou não ->
+
 
 
         /*
@@ -77,38 +79,9 @@ public class Main {
                 "\\__ \\| . \\/ . \\/ . \\| / /| | | | ' || || || |<_> |/ . |/ ._>|_/             \n" +
                 "<___/|  _/\\___/\\___/|_\\_\\`_. | |__/ |_||_||_|<___|\\_. |\\___.<_>             \n" +
                 "     |_|                 <___'                    <___'                     ";
-        System.out.println("☠");
+
         //System.out.println(image2);
 
-
-        String skull =
-                "        _;~)                    (~;_   \n" +
-                "        (   |                  |   )   \n" +
-                "         ~', ',   ,''~'',   ,' ,'~     \n" +
-                "            ', ','       ',' ,'        \n" +
-                "              ',: {'} {'} :,'          \n" +
-                "                ;   /^\\   ;            \n" +
-                "                 ~\\  ~  /~             \n" +
-                "               ,' ,~~~~~, ',           \n" +
-                "             ,' ,' ;~~~; ', ',         \n" +
-                "           ,' ,'    '''    ', ',       \n" +
-                "         (~  ;               ;  ~)     \n" +
-                "          -;_)               (_;-      ";
-        System.out.println(skull);
-/*
-                . !YPGIGPY !.
-        7#@ @ @ @ @ @ @ @ @#7
-        ! @ @ @ @ @ @ @ @ @ @ @ @ !
-                J @#GG#@ @ @#GG#@J
-        ! @ 7 ~ @ @ @ ~7 @ !
-                5#GG & YYY & GG#5
-                ^ 7 !. .J @ @GGG @ @J. .!7 ^
-                ? @ @B !. ^7 JJJ7 ^ .!B @ @?
-        !BGGBGPY7 ^^^7 YPGBGGB ~
-                .::^7 YB @&GGG & @BY7^::.
-        Y @ @&GJ ! ^.   .^!JG & @ @Y
-                :P5 ^            ^5 P:
-*/
         System.out.println(Colors.BLACK_BOLD + "ola");
         System.out.println(Colors.RED + "ola");
         System.out.println(Colors.GREEN + "ola");

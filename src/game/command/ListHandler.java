@@ -10,7 +10,8 @@ public class ListHandler implements CommandHandler {
             player.send("You must start the game first");
             return;
         }
-        if (server.isNight() && !player.getRole().equals(EnumRole.WOLF)) {
+        EnumRole playerRole = player.getCharacter().getRole();
+        if (server.isNight() && !playerRole.equals(EnumRole.WOLF)) {
             player.send("Only wolves can use this command at night");
             return;
         }
