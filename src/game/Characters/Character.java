@@ -12,7 +12,8 @@ public class Character {
     private int numberOfVotes;
     private Character previousVote;
     private boolean defended;
-    private boolean protected;
+
+    private Character previousDefend;
 
     public void increaseNumberOfVotes() {
         this.numberOfVotes++;
@@ -60,5 +61,13 @@ public class Character {
 
     public void setDefended(boolean defended) {
         this.defended = defended;
+    }
+
+    public Character getPreviousDefend() {
+        return previousDefend;
+    }
+
+    public void setPreviousDefend(Character previousDefend) {
+        this.previousDefend = previousDefend;
     }
 }

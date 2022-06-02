@@ -274,7 +274,7 @@ public class Server {
                     Thread.sleep(500);
                     printAliveWolves();
                     new Thread(this::botsNightVotes);
-                   Thread.sleep(10000);
+                   Thread.sleep(20000);
                    if(!stopTimer) {
                        for (int seconds = 5; seconds > 0; seconds--) {
                            chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the night...");
@@ -301,7 +301,8 @@ public class Server {
                     this.night = false;
                 } else {
                     chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
-                    Thread.sleep(10000);
+                    Thread.sleep(20000);
+                    stopTimer = false;
                     if(!stopTimer) {
                         for (int seconds = 5; seconds > 0; seconds--) {
                             chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the day...");
@@ -555,6 +556,8 @@ public class Server {
         private boolean isBot;
         private boolean alive;
 
+        private PlayerHandler defend;
+
         public PlayerHandler(Socket clientSocket, String name) {
             try {
                 this.playerSocket = clientSocket;
@@ -665,6 +668,10 @@ public class Server {
 
         public boolean isAlive() {
             return alive;
+        }
+
+        public void setDefend(PlayerHandler defend) {
+            this.defend = defend;
         }
     }
 }
