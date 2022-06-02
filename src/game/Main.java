@@ -1,7 +1,5 @@
 package game;
 
-import game.colors.Colors;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,6 +14,8 @@ public class Main {
 
         /*
         TO DO LIST:
+            VER TRIM() E IGNORE CASE NOS NOMES
+            VisionsList bug quando se reinicia o jogo
             Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
            Elisa Mensagem para os lobos quando matam alguém
            Elisa Mensagem para a aldeia sobre quem morreu durante a noite
