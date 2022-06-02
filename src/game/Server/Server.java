@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class Server {
     private ServerSocket serverSocket;
     private ExecutorService service;
-    private final HashMap<String, PlayerHandler> PLAYERS;
+    private HashMap<String, PlayerHandler> PLAYERS;
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
@@ -70,11 +70,13 @@ public class Server {
                         playerSocket.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("Players left");
                 }
             }).start();
         } else {
             out.write("The game has already started");
+            out.newLine();
+            out.flush();
             playerSocket.close();
         }
     }
@@ -154,8 +156,18 @@ public class Server {
         //chat(displayWolfImage());
 
         chat("\n===== Welcome to the Spooky Village! =====\n");
-        List<PlayerHandler> playersList = new ArrayList<>(this.PLAYERS.values());
-        int playersInGame = Math.max(playersList.size(), 5);
+        List<PlayerHandler> playersList = new ArrayList<>();
+        //int playersInGame = Math.max(playersList.size(), 5);
+
+        int nonBots = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.isBot) {
+                nonBots++;
+                playersList.add(player);
+            }
+        }
+        int playersInGame = Math.max(nonBots, 5);
+        System.out.println(playersInGame);
 
         ArrayList<EnumRole> roles = generateEnumCards(playersInGame);
         Collections.shuffle(roles);
@@ -167,12 +179,16 @@ public class Server {
                 Bot bot = new Bot();
                 PlayerHandler botPlayer = new PlayerHandler(bot);
                 botPlayer.character.setRole(newRole);
-                this.PLAYERS.put(botPlayer.name, botPlayer);
+                playersList.add(botPlayer);
             } else {
                 sendPrivateMessage(playersList.get(i).name, "You are a " + newRole.toString() + "\n");
                 playersList.get(i).character = newRole.getCHARACTER();
                 playersList.get(i).character.setRole(newRole);
             }
+        }
+        this.PLAYERS = new HashMap<>();
+        for (PlayerHandler player : playersList) {
+            this.PLAYERS.put(player.name, player);
         }
         setPlayersLife();
         chat(playersInGame());
@@ -311,6 +327,10 @@ public class Server {
                 .filter(x -> x.isBot && x.alive)
                 .toList();
 
+        for (PlayerHandler aliveBot : aliveBots) {
+            System.out.println(aliveBot.getCharacter().toString());
+        }
+
         if (aliveBots.size() > 0) {
             Optional<PlayerHandler> botVote;
             for (PlayerHandler aliveBot : aliveBots) {
@@ -334,6 +354,7 @@ public class Server {
         this.gameInProgress = false;
         this.numOfDays = 0;
         this.night = false;
+        Bot.resetBotNumber();
     }
 
     //Mensagem para os lobos quando matam alguém

@@ -1,6 +1,10 @@
 package game.Characters;
 
 import game.EnumRole;
+import game.Server.Server;
+
+import java.util.List;
+import java.util.Optional;
 
 public class Character {
 
@@ -36,7 +40,6 @@ public class Character {
     public void setNumberOfVotes(int numberOfVotes) {
         this.numberOfVotes = numberOfVotes;
     }
-
 
 
     public void setRole(EnumRole role) {
