@@ -106,7 +106,7 @@ public class Server {
 
     /**
      * This method verifies if the given name is already in use or not
-     * @param playerName String, the player name
+     * @param playerName a String, the player name
      * @return returns a boolean. If true, the name is available. If false, the name is taken.
      */
     private boolean checkIfNameIsAvailable(String playerName) {
@@ -118,6 +118,10 @@ public class Server {
         return true;
     }
 
+    /**
+     * This method adds the player to the XXXXX, and submits it into the Thread Pool. It also sends a message to all the other players informing them that this particular player joined the game.
+     * @param playerHandler receives a PlayerHander, an inner class from the Server, that deals with the players, and its attributes
+     */
     private void addPlayer(PlayerHandler playerHandler) {
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler); //mandar para a threadpool
@@ -126,6 +130,11 @@ public class Server {
         //add textColor to everyplayer
     }
 
+    /**
+     * This method sends a private message to every player, except the one sending it
+     * @param name a String, the name of the person you want to send the message to
+     * @param message a String, the message you want to send to the other players
+     */
     public void chat(String name, String message) {
 
 //        for (PlayerHandler player : this.PLAYERS.values()) {
@@ -143,6 +152,9 @@ public class Server {
         }
     }
 
+    /**
+     * This method assigns one of the 12 chat colors available to each player
+     */
     private void giveAColorToEachPlayer() { //onde por esta função? está no addPlayer
         putEnumColorInArrayList();
         for (PlayerHandler player : this.PLAYERS.values()) {
@@ -152,7 +164,9 @@ public class Server {
         }
     }
 
-
+    /**
+     * This method puts all 12 available chat colors, inside an Enum, into an ArrayList
+     */
     public void putEnumColorInArrayList() {
 //        private ArrayList<String> colorList;
 //        ArrayList<ColorsRef> colorEnumList = new ArrayList<>();
@@ -180,13 +194,21 @@ public class Server {
         }
     }
 
-
+    /**
+     * This method sends a private message to every player, except the one sending it
+     * @param message a String, the message you want to send to the other players
+     */
     public void chat(String message) {
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (!player.isBot) player.send(message);
         }
     }
 
+    /**
+     *
+     * @param name
+     * @param message
+     */
     public void wolvesChat(String name, String message) {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
