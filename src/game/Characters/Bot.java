@@ -18,6 +18,7 @@ public class Bot extends Character {
         return NAME;
     }
 
+
     public Optional<Server.PlayerHandler> getDayVote(Server server) {
         List<Server.PlayerHandler> playersList = server.getPLAYERS().values().stream().toList();
 

@@ -14,6 +14,12 @@ public class Player {
         }
     }
 
+    /**
+     * This function starts a new KeyboardHandler thread, using given host name and port.
+     * @param host this is a host name;
+     * @param port this is a port that will receive data from KeyboardHandler.
+     * @throws IOException
+     */
     public void start(String host, int port) throws IOException {
         Socket socket = new Socket(host, port);
         new Thread(new KeyboardHandler(socket)).start();
@@ -25,6 +31,10 @@ public class Player {
         BufferedReader in;
         BufferedWriter out;
 
+        /**
+         * This is a Thread that
+         * @param socket
+         */
         KeyboardHandler(Socket socket) {
             this.SOCKET = socket;
             this.consoleReader = new BufferedReader(new InputStreamReader(System.in));

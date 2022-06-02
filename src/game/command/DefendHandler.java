@@ -8,7 +8,12 @@ import game.Server.Server;
 import java.util.Optional;
 
 public class DefendHandler implements CommandHandler {
-
+    /**
+     * This method allows to set a chosen player's Defend attribute as true;
+     *
+     * @param server receives a running server
+     * @param player receives a current player that uses /defend command
+     */
     @Override
     public void command(Server server, Server.PlayerHandler player) {
         String defendedName = Helpers.removeCommand(player.getMessage());

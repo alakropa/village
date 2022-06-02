@@ -546,12 +546,18 @@ public class Server {
         return numOfDays;
     }
 
+    /**
+     * This method set the value of Vision attribute of Fortune Teller character to false.
+     */
     private void resetUsedVision() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.FORTUNE_TELLER) && !x.isBot)
                 .forEach(x -> ((FortuneTeller) x.getCharacter()).setUsedVision(false));
     }
 
+    /**
+     * This method set the value of Defend attribute of each Player Handler to false.
+     */
     private void resetDefense() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().isDefended())
@@ -570,6 +576,11 @@ public class Server {
 
         private PlayerHandler defend;
 
+        /**
+         * Constructor of PlayerHandler.
+         * @param clientSocket Socket of a player
+         * @param name Name of a player
+         */
         public PlayerHandler(Socket clientSocket, String name) {
             try {
                 this.playerSocket = clientSocket;
@@ -580,12 +591,21 @@ public class Server {
             }
         }
 
+        /**
+         * Constructor of a default bot
+         * @param bot a Bot instance extending the Character class
+         */
         public PlayerHandler(Bot bot) {
             this.character = bot;
             this.name = bot.getNAME();
             this.isBot = true;
         }
 
+        /**
+         * This method receives an input string from a user.
+         * If a given string is a simple message, it is send to all users participating in the chat.
+         * If a given string is a command, the command method is invoked.
+         */
         @Override
         public void run() {
             BufferedReader in;
@@ -621,6 +641,11 @@ public class Server {
             }
         }
 
+        /**
+         * This method allows to call Command method on a given string.
+         * @param message String received from a user input.
+         * @throws IOException
+         */
         private void dealWithCommand(String message) throws IOException {
             Command command = Command.getCommandFromDescription(message.split(" ")[0]);
             if (command == null) {
@@ -630,10 +655,20 @@ public class Server {
             command.getHANDLER().command(Server.this, this);
         }
 
+        /**
+         * This method verify if a given message is a command.
+         * @param message String received from a user input.
+         * @return true if a message is a command.
+         */
         private boolean isCommand(String message) {
             return message.trim().startsWith("/");
         }
 
+        /**
+         * This method allows to send a message through a BufferedWriter.
+         * @param message message that is being sent.
+         *
+         */
         public void send(String message) {
             try {
                 this.out.write(message);
