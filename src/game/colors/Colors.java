@@ -12,7 +12,7 @@ public enum Colors {
     WHITE("\033[0;37m"),    // WHITE
 
     // Bold
-//  BLACK_BOLD("\033[1;30m"),   // BLACK
+  BLACK_BOLD("\033[1;30m"),   // BLACK
     RED_BOLD("\033[1;31m"),     // RED
     GREEN_BOLD("\033[1;32m"),   // GREEN
     YELLOW_BOLD("\033[1;33m"),  // YELLOW

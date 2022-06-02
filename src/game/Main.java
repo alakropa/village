@@ -1,5 +1,7 @@
 package game;
 
+import game.colors.Colors;
+
 public class Main {
     public static void main(String[] args) {
         /*
@@ -17,8 +19,6 @@ public class Main {
             Adicionar mais papeis (fairy/protect, procurar outros)
             Command /suicide
         */
-
-        //verificar se os sockets estão activos ou não ->
 
 
 
@@ -81,73 +81,42 @@ public class Main {
         //System.out.println(image2);
 
 
-
-        /*   _                   _
- _( )                 ( )_
-(_, |      __ __      | ,_)
-   \'\    /  ^  \    /'/
-    '\'\,/\      \,/'/'
-      '\| []   [] |/'
-        (_  /^\  _)
-          \  ~  /
-          /HHHHH\
-        /'/{^^^}\'\
-    _,/'/'  ^^^  '\'\,_
-   (_, |           | ,_)
-     (_)           (_)
-
- _;~)                  (~;_
-(   |                  |   )
- ~', ',    ,''~'',   ,' ,'~
-     ', ','       ',' ,'
-       ',: {'} {'} :,'
-         ;   /^\   ;
-          ~\  ~  /~
-        ,' ,~~~~~, ',
-      ,' ,' ;~~~; ', ',
-    ,' ,'    '''    ', ',
-  (~  ;               ;  ~)
-   -;_)               (_;-
-
-
-       ~~~~~~~~~
-     /           \
-    /             \
-   | )           ( |
-    \  /C\   /C\  /
-    /  ~~~   ~~~  \
-    \___  .^,  ___/
-     `| _______ |'
-  _   | HHHHHHH |   _
- ( )  \         /  ( )
-(_) \  ~~~~^~~~~ ,/ (_)
-  ~\ "\         /  /~
-     \  \     /  /
-       \  \v/  /
-        >     <
-       /  /^\  \
-     /  /     \  \
- _~/ "/         \  \~_
-( ) /             \ ( )
- (_)               (_)*/
- /*String death = "" +
-"                       ______                  \n" +
-"                    .-"      "-.               \n" +
-"                   /            \\              \n" +
-"       _          |              |          _  \n" +
-"      ( \\         |,  .-.  .-.  ,|         / ) \n" +
-"       > "_ _     | )(__/  \\__)( |     _._" <  \n" +
-"      (_/"_._"_._ |/     /\\     \\| _._"_._"\\_) \n" +
-"             "_._ (_     ^^     _)"_._"        \n" +
-"                 "_\\__|IIIIII|__/_"            \n" +
-"                _.="| \\IIIIII/ |"=._           \n" +
-"      _     _.="_._"\\          /"_._"__     _ \n" +
-"     ( \\_._"_._"     `--------`     "_._"_._/ )\n" +
-"      > _._"                            "_._ < \n" +
-"     (_/                                    \\_)  "
-
+        String skull =
+                "        _;~)                    (~;_   \n" +
+                "        (   |                  |   )   \n" +
+                "         ~', ',   ,''~'',   ,' ,'~     \n" +
+                "            ', ','       ',' ,'        \n" +
+                "              ',: {'} {'} :,'          \n" +
+                "                ;   /^\\   ;            \n" +
+                "                 ~\\  ~  /~             \n" +
+                "               ,' ,~~~~~, ',           \n" +
+                "             ,' ,' ;~~~; ', ',         \n" +
+                "           ,' ,'    '''    ', ',       \n" +
+                "         (~  ;               ;  ~)     \n" +
+                "          -;_)               (_;-      ";
+        System.out.println(skull);
+/*
+                . !YPGIGPY !.
+        7#@ @ @ @ @ @ @ @ @#7
+        ! @ @ @ @ @ @ @ @ @ @ @ @ !
+                J @#GG#@ @ @#GG#@J
+        ! @ 7 ~ @ @ @ ~7 @ !
+                5#GG & YYY & GG#5
+                ^ 7 !. .J @ @GGG @ @J. .!7 ^
+                ? @ @B !. ^7 JJJ7 ^ .!B @ @?
+        !BGGBGPY7 ^^^7 YPGBGGB ~
+                .::^7 YB @&GGG & @BY7^::.
+        Y @ @&GJ ! ^.   .^!JG & @ @Y
+                :P5 ^            ^5 P:
 */
-
-
+        System.out.println(Colors.BLACK_BOLD + "ola");
+        System.out.println(Colors.RED + "ola");
+        System.out.println(Colors.GREEN + "ola");
+        System.out.println(Colors.YELLOW + "ola");
+        System.out.println(Colors.BLUE + "ola");
+        System.out.println(Colors.MAGENTA + "ola");
+        System.out.println(Colors.CYAN + "ola");
+        System.out.println(Colors.WHITE + "ola");
+        System.out.println(Colors.WHITE_BOLD + "ola");
     }
 }

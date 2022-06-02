@@ -2,6 +2,7 @@ package game.Server;
 
 import game.EnumRole;
 import game.Helpers;
+import game.colors.Colors;
 import game.command.Command;
 
 import java.io.*;
@@ -222,28 +223,46 @@ public class Server {
                 "  _/\\.-'                                                                                    __/~\\/\\-.__.";
     }
 
+    private String displaySkullImage() {
+        return Colors.BLACK_BOLD +
+                "        _;~)                    (~;_   \n" +
+                        "        (   |                  |   )   \n" +
+                        "         ~', ',   ,''~'',   ,' ,'~     \n" +
+                        "            ', ','       ',' ,'        \n" +
+                        "              ',: {'} {'} :,'          \n" +
+                        "                ;   /^\\   ;            \n" +
+                        "                 ~\\  ~  /~             \n" +
+                        "               ,' ,~~~~~, ',           \n" +
+                        "             ,' ,' ;~~~; ', ',         \n" +
+                        "           ,' ,'    '''    ', ',       \n" +
+                        "         (~  ;               ;  ~)     \n" +
+                        "          -;_)               (_;-      \n";
+    }
+
+
     private void play() {
         while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
-                    chat("\n===== It's dark already. Time to sleep =====\n");
+                    chat(Colors.BLUE + "\n===== It's dark already. Time to sleep =====\n");
                     Thread.sleep(500);
-                    wolvesChat("===== Wolves chat is open! =====\n");
+                    wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n");
                     Thread.sleep(500);
                     printAliveWolves();
                     Thread.sleep(30000);
                     choosePlayerWhoDies();
                     this.night = false;
-                    chat("THIS IS DAY NUMBER " + ++numOfDays);
-                    sendPrivateMessage(victimName, " x.x You have been killed last night x.x");
-                    chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
+                    chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
+                    sendPrivateMessage(victimName, (Colors.WHITE + " x.x You have been killed last night x.x"));
+                    sendPrivateMessage(victimName, displaySkullImage());
+                    chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     if(ifThereAreAliveWolves()){
-                        chat("Unfortunately, there are still wolves walking around. No one is safe");
+                        chat(Colors.WHITE + "Unfortunately, there are still wolves walking around. No one is safe");
                     }
                     Thread.sleep(500);
                     resetUsedVision();
                 } else {
-                    chat("===== It's day time. Chat with the other players =====");
+                    chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
                     Thread.sleep(30000);
                     checkVotes();
                     this.night = true;
@@ -346,7 +365,7 @@ public class Server {
             resetGame();
             return false;
         } else if (wolfCount == 0) {
-            chat("The villagers won!\nThere are no wolves left alive\nGAME OVER");
+            chat("The villagers won!\nThere are no wolves left alive\n" + Colors.RED + "GAME OVER");
             resetGame();
             return false;
         }
@@ -373,7 +392,7 @@ public class Server {
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().killPlayer();
-            chat("The Villagers have decided to kill " + highestVote.get().NAME.toUpperCase() + " thinking that it was the wolf");
+            chat(Colors.WHITE + highestVote.get().NAME + " was tragically killed");
         }
         resetNumberOfVotes();
     }
