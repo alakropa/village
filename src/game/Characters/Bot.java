@@ -41,4 +41,8 @@ public class Bot extends Character {
                 "NAME='" + NAME + '\'' + super.getRole() +
                 '}';
     }
+
+    public static void resetBotNumber() {
+        botNumber = 0;
+    }
 }
