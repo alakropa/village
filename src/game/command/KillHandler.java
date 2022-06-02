@@ -19,7 +19,7 @@ public class KillHandler implements CommandHandler {
                 EnumRole chosenPRole = playerWhoDies.get().getCharacter().getRole();
                 if (chosenPRole.equals(EnumRole.WOLF)) {
                     player.send("You can't target a Wolf");
-                } else if (playerCharacter.isAlive()) {
+                } else if (player.isAlive()) {
                     player.setVote(playerWhoDies.get()); //voto current
                 }
             } else {

@@ -3,19 +3,13 @@ package game.Characters;
 import game.EnumRole;
 
 public class Character {
-    private boolean alive;
+
     private EnumRole role;
     private int numberOfVotes;
     private Character previousVote;
     private boolean defended;
 
-    public void killPlayer() {
-        this.alive = false;
-    }
 
-    public void healPlayer() {
-        this.alive = true;
-    }
 
     public void increaseNumberOfVotes() {
         this.numberOfVotes++;
@@ -45,9 +39,7 @@ public class Character {
         this.numberOfVotes = numberOfVotes;
     }
 
-    public boolean isAlive() {
-        return alive;
-    }
+
 
     public void setRole(EnumRole role) {
         this.role = role;

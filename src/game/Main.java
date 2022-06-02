@@ -2,8 +2,17 @@ package game;
 
 import game.colors.Colors;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
+        HashMap<Integer, String> asd = new HashMap<>();
+        asd.put(1, "a");
+        List<String> dsa = asd.values().stream().filter(x -> x.equals("b")).toList();
+        System.out.println(dsa.size());
+
+
         /*
         TO DO LIST:
             Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???

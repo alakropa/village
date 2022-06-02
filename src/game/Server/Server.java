@@ -23,7 +23,6 @@ public class Server {
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
-    private PlayerHandler victimName;
     private int numOfDays;
     private List<Bot> bots;
 
@@ -108,39 +107,39 @@ public class Server {
     }
 
     public void chat(String name, String message) {
-        for (PlayerHandler client : this.PLAYERS.values()) {
-            if (!client.name.equals(name)) {
-                client.send(name + ": " + message);
-            }
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.name.equals(name) && !player.isBot)
+                player.send(name + ": " + message);
         }
     }
 
     public void chat(String message) {
-        for (PlayerHandler client : this.PLAYERS.values()) {
-            client.send(message);
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.isBot) player.send(message);
         }
     }
 
     public void wolvesChat(String name, String message) {
         this.PLAYERS.values().stream()
-                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.name.equals(name))
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
+                        && !x.name.equals(name) && !x.isBot)
                 .forEach(x -> x.send(name + ": " + message));
     }
 
     public void wolvesChat(String message) {
         this.PLAYERS.values().stream()
-                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF))
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.isBot)
                 .forEach(x -> x.send(message));
     }
 
     public String playersInGame() {
         String botNames = null;
-        if (this.bots.size() > 0) botNames = this.bots.stream()
-                .map(x -> x.getNAME() + " - " + (x.isAlive() ? "Alive" : "Dead"))
+        /*if (this.bots.size() > 0) botNames = this.bots.stream()
+                .map(x -> x.getNAME() + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("Bots list:", (a, b) -> a + "\n" + b);
-
+*/
         return this.PLAYERS.values().stream()
-                .map(x -> x.name + " - " + (x.getCharacter().isAlive() ? "Alive" : "Dead"))
+                .map(x -> x.name + " - " + (x.alive ? "Alive" : "Dead"))
                 .reduce("Players list:", (a, b) -> a + "\n" + b) + "\n" + botNames;
     }
 
@@ -158,7 +157,6 @@ public class Server {
         chat(displayVillageImage2());
         chat(displayVillageImage3());
 
-
         chat("\n===== Welcome to the Spooky Village! =====\n");
         List<PlayerHandler> playersList = new ArrayList<>(this.PLAYERS.values());
         int playersInGame = Math.max(playersList.size(), 5);
@@ -170,8 +168,9 @@ public class Server {
         for (int i = 0; i < playersInGame; i++) {
             EnumRole newRole = roles.get(i);
             if (i >= playersList.size()) {
-                Bot bot = new Bot(newRole);
-                this.bots.add(bot);
+                Bot bot = new Bot();
+                PlayerHandler botPlayer = new PlayerHandler(bot.getNAME());
+                this.PLAYERS.put(botPlayer.name, botPlayer);
                 System.out.println("Created " + ++count + " bots");
                 this.PLAYERS.values().forEach(System.out::println);
                 this.bots.forEach(System.out::println);
@@ -262,16 +261,14 @@ public class Server {
                     Thread.sleep(500);
                     printAliveWolves();
 
-                    new Thread(this::botsNightVotes);
-
-                    Thread.sleep(30000);
+                    Thread.sleep(10000);
                     choosePlayerWhoDies();
                     this.night = false;
 
                     chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
-                    sendPrivateMessage(victimName.name, (Colors.WHITE + " x.x You have been killed last night x.x"));
-                    sendPrivateMessage(victimName.name, displaySkullImage());
-                    chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
+                    //sendPrivateMessage(victimName.name, (Colors.WHITE + " x.x You have been killed last night x.x"));
+                    //sendPrivateMessage(victimName.name, displaySkullImage());
+                    //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
                     if (ifThereAreAliveWolves()) {
                         chat(Colors.WHITE + "Unfortunately, there are still wolves walking around. No one is safe");
                     }
@@ -282,7 +279,8 @@ public class Server {
                     resetUsedVision();
                 } else {
                     chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
-                    Thread.sleep(30000);
+                    Thread.sleep(10000);
+                    botsDayVotes();
                     checkVotes();
                     this.night = true;
                 }
@@ -294,7 +292,19 @@ public class Server {
     }
 
     private void botsNightVotes() {
-        List<Bot> wolfBots = this.bots.stream()
+        List<PlayerHandler> wolfBots = this.PLAYERS.values().stream()
+                .filter(x -> x.isBot && x.alive
+                        && x.getCharacter().getRole().equals(EnumRole.WOLF))
+                .toList();
+
+        if (wolfBots.size() > 0) {
+            Optional<PlayerHandler> botVote;
+            for (PlayerHandler wolfBot : wolfBots) {
+                botVote = ((Bot) wolfBot.getCharacter()).getNightVote(this);
+                botVote.ifPresent(x -> this.wolvesVotes.add(x));
+            }
+        }
+        /*List<Bot> wolfBots = this.bots.stream()
                 .filter(x -> x.getRole().equals(EnumRole.WOLF))
                 .toList();
         if (wolfBots.size() > 0) {
@@ -309,13 +319,27 @@ public class Server {
                     e.printStackTrace();
                 }
             }
+        }*/
+    }
+
+    private void botsDayVotes() {
+        List<PlayerHandler> aliveBots = this.PLAYERS.values().stream()
+                .filter(x -> x.isBot && x.alive)
+                .toList();
+
+        if (aliveBots.size() > 0) {
+            Optional<PlayerHandler> botVote;
+            for (PlayerHandler aliveBot : aliveBots) {
+                botVote = ((Bot) aliveBot.getCharacter()).getDayVote(this);
+                botVote.ifPresent(playerHandler -> aliveBot.vote = playerHandler);
+            }
         }
     }
 
     private void printAliveWolves() {
         if (this.PLAYERS.size() >= 7) {
             String wolvesList = this.PLAYERS.values().stream()
-                    .filter(x -> x.getCharacter().isAlive() && x.getCharacter().getRole().equals(EnumRole.WOLF))
+                    .filter(x -> x.alive && x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .map(x -> x.name)
                     .reduce("Alive Wolves list:", (a, b) -> a + "\n" + b);
             wolvesChat(wolvesList);
@@ -331,24 +355,29 @@ public class Server {
     //Mensagem para os lobos quando matam alguém
 
     private void choosePlayerWhoDies() {
+        PlayerHandler victim;
         this.wolvesVotes = this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
-                        && x.getCharacter().isAlive() && x.vote != null)
+                        && x.alive && x.vote != null)
                 .map(x -> x.vote)
                 .collect(Collectors.toList()); //List<PlayerHandler> wolvesVotes
+
+        botsNightVotes();
+
         if (this.wolvesVotes.size() == 0) {
             List<PlayerHandler> players = this.PLAYERS.values().stream()
                     .filter(x -> !x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .toList(); //se ninguém votar
-            this.victimName = players.get((int) (Math.random() * players.size()));
-            this.victimName.getCharacter().killPlayer(); //alive=false
+            victim = players.get((int) (Math.random() * players.size()));
+            victim.alive = false; //alive=false
+
         } else {
-            this.victimName = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
-            this.victimName.getCharacter().killPlayer();
+            victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
+            victim.alive = false;
         }
-        wolvesChat("You have decided to kill... " + this.victimName.name.toUpperCase());
-        chat("THIS IS DAY NUMBER " + ++numOfDays);
-        chat("Unfortunately, " + this.victimName.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victimName.name);
+        //wolvesChat("You have decided to kill... " + this.victimName.name.toUpperCase());
+        //chat("THIS IS DAY NUMBER " + ++numOfDays);
+        //chat("Unfortunately, " + this.victimName.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victimName.name);
     }
 
     private ArrayList<EnumRole> generateEnumCards(int playersInGame) {
@@ -368,48 +397,44 @@ public class Server {
         int wolfCount = 0;
         int nonWolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.getCharacter().isAlive()) {
+            if (player.alive) {
                 if (player.getCharacter().getRole().equals(EnumRole.WOLF)) wolfCount++;
                 else nonWolfCount++;
             }
         }
-        for (Bot bot : this.bots) {
-            if (bot.isAlive()) {
+        /*for (Bot bot : this.bots) {
+            if (bot.alive) {
                 if (bot.getRole().equals(EnumRole.WOLF)) wolfCount++;
                 else nonWolfCount++;
             }
-        }
+        }*/
         return checkWinner(wolfCount, nonWolfCount);
     }
 
     private boolean ifThereAreAliveWolves() {
         //se o count de lobos for maior que villagers, true, else false
         int wolfCount = 0;
-        int nonWolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.getCharacter().isAlive()) {
-                if (player.getCharacter().getRole().equals(EnumRole.WOLF)) {
+            if (player.alive) {
+                if (player.getCharacter().getRole().equals(EnumRole.WOLF))
                     wolfCount++;
-                } else {
-                    nonWolfCount++;
-                }
             }
         }
-        if (wolfCount > 0) {
-            return true;
-        }
-        return false;
+        return (wolfCount > 0);
     }
-
 
     private boolean checkWinner(int wolfCount, int nonWolfCount) {
         if (wolfCount >= nonWolfCount) {
             chat("The wolves won!\nGame over");
             resetGame();
+            this.PLAYERS.values().forEach(System.out::println);
+            System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         } else if (wolfCount == 0) {
             chat("The villagers won!\nThere are no wolves left alive\n" + Colors.RED + "GAME OVER");
             resetGame();
+            this.PLAYERS.values().forEach(System.out::println);
+            System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         }
         return true;
@@ -429,15 +454,16 @@ public class Server {
     private void checkVotes() {
         checkIfAllPlayersVoted();
         Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
-                .filter(player -> player.getCharacter().isAlive())
+                .filter(player -> player.alive)
                 .max(Comparator.comparing(x -> x.getCharacter().getNumberOfVotes()))
                 .stream().findAny();
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
-            highestVote.get().getCharacter().killPlayer();
+            highestVote.get().alive = false;
             chat(Colors.WHITE + highestVote.get().name + " was tragically killed");
         }
         resetNumberOfVotes();
+        this.PLAYERS.values().stream().toList().forEach(System.out::println);
     }
 
     private void checkIfAllPlayersVoted() {
@@ -448,7 +474,7 @@ public class Server {
 
     public void sendUpdateOfVotes() {
         chat("Current score", PLAYERS.values().stream()
-                .filter(player -> player.getCharacter().isAlive())
+                .filter(player -> player.alive)
                 .map(player -> player.name + ": " + player.getCharacter().getNumberOfVotes())
                 .reduce("", (a, b) -> a + "\n" + b));
     }
@@ -462,12 +488,12 @@ public class Server {
     }
 
     public void setPlayersLife() {
-        for (String name : this.PLAYERS.keySet()) {
+        /*for (String name : this.PLAYERS.keySet()) {
             String value = String.valueOf(this.PLAYERS.get(name).getCharacter());
             System.out.println(name + " " + value);
         }
-        this.bots.forEach(Character::healPlayer);
-        this.PLAYERS.values().forEach(x -> x.getCharacter().healPlayer());
+        this.bots.forEach(Character::healPlayer);*/
+        this.PLAYERS.values().forEach(x -> x.alive = true);
     }
 
     public boolean isNight() {
@@ -491,6 +517,8 @@ public class Server {
         private PlayerHandler vote;
         private String message;
         private Character character;
+        private boolean isBot;
+        private boolean alive;
 
         public PlayerHandler(Socket clientSocket, String name) {
             try {
@@ -500,6 +528,11 @@ public class Server {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public PlayerHandler(String name) {
+            this.name = name;
+            this.isBot = true;
         }
 
         @Override
@@ -590,8 +623,16 @@ public class Server {
         @Override
         public String toString() {
             return "PlayerHandler{" +
-                    "NAME='" + name + '\'' +
+                    "NAME='" + name + '\'' + this.alive +
                     '}';
+        }
+
+        public void setAlive(boolean alive) {
+            this.alive = alive;
+        }
+
+        public boolean isAlive() {
+            return alive;
         }
     }
 }

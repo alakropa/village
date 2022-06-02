@@ -10,9 +10,8 @@ public class Bot extends Character {
     private final String NAME;
     private static int botNumber;
 
-    public Bot(EnumRole role) {
+    public Bot() {
         this.NAME = "Bot" + ++botNumber;
-        super.setRole(role);
     }
 
     public String getNAME() {

@@ -11,7 +11,7 @@ public class VisionListHandler implements CommandHandler {
         FortuneTeller playerCharacter = (FortuneTeller) player.getCharacter();
 
         if (!server.isGameInProgress()) player.send("You must start the game first");
-        else if (!playerCharacter.isAlive()) player.send("You are dead");
+        else if (!player.isAlive()) player.send("You are dead");
         else if (!playerCharacter.getRole().equals(role))
             player.send("Only " + role.getPLURAL() + " can use this command");
 
