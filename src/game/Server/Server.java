@@ -292,7 +292,7 @@ public class Server {
                     //sendPrivateMessage(victimName.name, displaySkullImage());
                     //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
                     if (ifThereAreAliveWolves()) {
-                        chat("Watch out! There are still wolves walking around. No one is safe!\n It's time to vote and then kill the one that seems to be the wolf...");
+                        chat("Watch out! There are still wolves walking around. No one is safe!\nIt's time to vote and then kill the one that seems to be the wolf...");
                     }
 
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
@@ -472,13 +472,13 @@ public class Server {
 
     private boolean checkWinner(int wolfCount, int nonWolfCount) {
         if (wolfCount >= nonWolfCount) {
-            chat("\nThe wolves won!\nGame over");
+            chat("\nWolves took over the village... Anyone who's letf alive, will be eaten tonight.\nWolves won!\nGAME OVER");
             resetGame();
             this.PLAYERS.values().forEach(System.out::println);
             System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         } else if (wolfCount == 0) {
-            chat("\nThe villagers won!\nThere are no wolves left alive\n" + "GAME OVER");
+            chat("\nThe villagers won!\nThere are no wolves left alive.\n" + "GAME OVER");
             resetGame();
             this.PLAYERS.values().forEach(System.out::println);
             System.out.println(wolfCount + " " + nonWolfCount);
