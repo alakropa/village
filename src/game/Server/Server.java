@@ -345,6 +345,27 @@ public class Server {
         return checkWinner(wolfCount, nonWolfCount);
     }
 
+    private boolean ifThereAreAliveWolves() {
+        //se o count de lobos for maior que villagers, true, else false
+        int wolfCount = 0;
+        int nonWolfCount = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (player.getCharacter().isAlive()) {
+                if (player.getCharacter().getRole().equals(EnumRole.WOLF)){
+                    wolfCount++;
+                } else {
+                    nonWolfCount++;
+                }
+            }
+        }
+        if(wolfCount > 0) {
+            return true;
+        }
+        return false;
+    }
+
+
+
     private boolean checkWinner(int wolfCount, int nonWolfCount) {
         if (wolfCount >= nonWolfCount) {
             chat("The wolves won!\nGame over");
@@ -377,7 +398,7 @@ public class Server {
                 .stream().findAny();
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
-            highestVote.get().killPlayer();
+            highestVote.get().getCharacter().killPlayer();
             chat(Colors.WHITE + highestVote.get().NAME + " was tragically killed");
         }
         resetNumberOfVotes();
