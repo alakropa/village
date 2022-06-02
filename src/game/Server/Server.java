@@ -292,12 +292,13 @@ public class Server {
                     //sendPrivateMessage(victimName.name, displaySkullImage());
                     //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
                     if (ifThereAreAliveWolves()) {
-                        chat("Watch out! There are still wolves walking around. No one is safe!\n");
+                        chat("Watch out! There are still wolves walking around. No one is safe!\n It's time to vote and then kill the one that seems to be the wolf...");
                     }
 
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
                     resetUsedVision();
+                    resetDefense();
                     this.night = false;
                 } else {
                     chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
@@ -413,10 +414,16 @@ public class Server {
         } else {
             this.victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
         }
-        this.victim.alive = false;
-        wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name.toUpperCase() + Colors.RESET + "\n");
-        chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
-        chat("Unfortunately, " + this.victim.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victim.name.toUpperCase());
+        if(!this.victim.getCharacter().isDefended()) {
+            this.victim.alive = false;
+            wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name.toUpperCase() + Colors.RESET + "\n");
+            chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
+            chat("Unfortunately, " + this.victim.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victim.name.toUpperCase());
+        } else {
+            wolvesChat(Colors.RED + "You have decided to kill " + this.victim.name.toUpperCase() + "... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
+            chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
+            chat("HURRAYYYY! The guard bravely protected the village, so everyone survived the last night!");
+        }
         chat("Check out the latest update" + playersInGame());
     }
 
@@ -426,7 +433,7 @@ public class Server {
             switch (i) {
                 case 0, 11 -> roles.add(i, EnumRole.WOLF);
                 case 1, 9 -> roles.add(i, EnumRole.FORTUNE_TELLER);
-                case 6 -> roles.add(i, EnumRole.GUARD);
+                case 5 -> roles.add(i, EnumRole.GUARD);
                 default -> roles.add(i, EnumRole.VILLAGER);
             }
         }
@@ -546,6 +553,12 @@ public class Server {
                 .forEach(x -> ((FortuneTeller) x.getCharacter()).setUsedVision(false));
     }
 
+    private void resetDefense() {
+        this.PLAYERS.values().stream()
+                .filter(x -> x.getCharacter().isDefended())
+                .forEach(x -> (x.getCharacter()).setDefended(false));
+    }
+
     public class PlayerHandler implements Runnable {
         private String name;
         private Socket playerSocket;
@@ -589,7 +602,7 @@ public class Server {
                                 if (isCommand(this.message)) dealWithCommand(this.message);
                                 else wolvesChat(this.name, this.message);
                             }
-                            case FORTUNE_TELLER -> dealWithCommand(this.message);
+                            case FORTUNE_TELLER, GUARD -> dealWithCommand(this.message);
                             default -> {
                                 if (!this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()) ||
                                         !this.message.split(" ")[0].equals(Command.COMMAND_LIST.getCOMMAND()))

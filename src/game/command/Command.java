@@ -11,10 +11,11 @@ public enum Command {
     VOTE("/vote", new VoteHandler(), Colors.WHITE + "Vote the player that you want to eliminate" + Colors.RESET),
     KILL("/kill", new KillHandler(), Colors.WHITE + "Choose the player that you want to kill (available to Wolfs only)" + Colors.RESET),
     VISION("/vision", new VisionHandler(), Colors.WHITE + "Once per night you can choose a player to check if it's a wolf (available to Furtune Teller only)" + Colors.RESET),
+    DEFEND("/defend", new DefendHandler(),Colors.WHITE +"Once per night you can choose a player to protect, so surely it won't be attacked by wolves (available to Guard only)" + Colors.RESET),
     VISIONS_LIST("/visionsList", new VisionListHandler(), Colors.WHITE + "Lists the previous visions (available to Furtune Teller only)" + Colors.RESET),
-    QUIT("/quit", new QuitHandler(), Colors.WHITE + "Quit from the game" + Colors.RESET + "\n"),
+    QUIT("/quit", new QuitHandler(), Colors.WHITE + "Quit from the game" + Colors.RESET + "\n");
 
-    DEFEND("/defend", new DefendHandler(),"Once per night you can choose a player to protect, so surely it won't be attacked by wolves (available to Guard only)" + Colors.RESET );
+
     //Fazer comando com as regras do jogo
 
     private final String COMMAND;
