@@ -1,8 +1,9 @@
 package game;
 
+import game.colors.Colors;
+
 public class Main {
     public static void main(String[] args) {
-
         /*
         TO DO LIST:
             Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
@@ -78,76 +79,17 @@ public class Main {
                 "\\__ \\| . \\/ . \\/ . \\| / /| | | | ' || || || |<_> |/ . |/ ._>|_/             \n" +
                 "<___/|  _/\\___/\\___/|_\\_\\`_. | |__/ |_||_||_|<___|\\_. |\\___.<_>             \n" +
                 "     |_|                 <___'                    <___'                     ";
-        System.out.println("☠");
+
         //System.out.println(image2);
 
-
-
-        /*   _                   _
- _( )                 ( )_
-(_, |      __ __      | ,_)
-   \'\    /  ^  \    /'/
-    '\'\,/\      \,/'/'
-      '\| []   [] |/'
-        (_  /^\  _)
-          \  ~  /
-          /HHHHH\
-        /'/{^^^}\'\
-    _,/'/'  ^^^  '\'\,_
-   (_, |           | ,_)
-     (_)           (_)
-
- _;~)                  (~;_
-(   |                  |   )
- ~', ',    ,''~'',   ,' ,'~
-     ', ','       ',' ,'
-       ',: {'} {'} :,'
-         ;   /^\   ;
-          ~\  ~  /~
-        ,' ,~~~~~, ',
-      ,' ,' ;~~~; ', ',
-    ,' ,'    '''    ', ',
-  (~  ;               ;  ~)
-   -;_)               (_;-
-
-
-       ~~~~~~~~~
-     /           \
-    /             \
-   | )           ( |
-    \  /C\   /C\  /
-    /  ~~~   ~~~  \
-    \___  .^,  ___/
-     `| _______ |'
-  _   | HHHHHHH |   _
- ( )  \         /  ( )
-(_) \  ~~~~^~~~~ ,/ (_)
-  ~\ "\         /  /~
-     \  \     /  /
-       \  \v/  /
-        >     <
-       /  /^\  \
-     /  /     \  \
- _~/ "/         \  \~_
-( ) /             \ ( )
- (_)               (_)*/
- /*String death = "" +
-"                       ______                  \n" +
-"                    .-"      "-.               \n" +
-"                   /            \\              \n" +
-"       _          |              |          _  \n" +
-"      ( \\         |,  .-.  .-.  ,|         / ) \n" +
-"       > "_ _     | )(__/  \\__)( |     _._" <  \n" +
-"      (_/"_._"_._ |/     /\\     \\| _._"_._"\\_) \n" +
-"             "_._ (_     ^^     _)"_._"        \n" +
-"                 "_\\__|IIIIII|__/_"            \n" +
-"                _.="| \\IIIIII/ |"=._           \n" +
-"      _     _.="_._"\\          /"_._"__     _ \n" +
-"     ( \\_._"_._"     `--------`     "_._"_._/ )\n" +
-"      > _._"                            "_._ < \n" +
-"     (_/                                    \\_)  "
-
-*/
-
+        System.out.println(Colors.BLACK_BOLD + "ola");
+        System.out.println(Colors.RED + "ola");
+        System.out.println(Colors.GREEN + "ola");
+        System.out.println(Colors.YELLOW + "ola");
+        System.out.println(Colors.BLUE + "ola");
+        System.out.println(Colors.MAGENTA + "ola");
+        System.out.println(Colors.CYAN + "ola");
+        System.out.println(Colors.WHITE + "ola");
+        System.out.println(Colors.WHITE_BOLD + "ola");
     }
 }

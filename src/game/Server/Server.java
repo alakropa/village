@@ -6,6 +6,7 @@ import game.Characters.FortuneTeller;
 import game.EnumRole;
 import game.Game;
 import game.Helpers;
+import game.colors.Colors;
 import game.command.Command;
 
 import java.io.*;
@@ -23,6 +24,7 @@ public class Server {
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
+    private String victimName;
     private int numOfDays;
 
     public Server() {
@@ -222,25 +224,48 @@ public class Server {
                 "  _/\\.-'                                                                                    __/~\\/\\-.__.";
     }
 
+    private String displaySkullImage() {
+        return Colors.BLACK_BOLD +
+                "        _;~)                    (~;_   \n" +
+                        "        (   |                  |   )   \n" +
+                        "         ~', ',   ,''~'',   ,' ,'~     \n" +
+                        "            ', ','       ',' ,'        \n" +
+                        "              ',: {'} {'} :,'          \n" +
+                        "                ;   /^\\   ;            \n" +
+                        "                 ~\\  ~  /~             \n" +
+                        "               ,' ,~~~~~, ',           \n" +
+                        "             ,' ,' ;~~~; ', ',         \n" +
+                        "           ,' ,'    '''    ', ',       \n" +
+                        "         (~  ;               ;  ~)     \n" +
+                        "          -;_)               (_;-      \n";
+    }
+
+
     private void play() {
         while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
-                    chat("\n===== It's dark already. Time to sleep =====\n");
+                    chat(Colors.BLUE + "\n===== It's dark already. Time to sleep =====\n");
                     Thread.sleep(500);
-                    wolvesChat("===== Wolves chat is open! =====\n");
+                    wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n");
                     Thread.sleep(500);
                     printAliveWolves();
                     Thread.sleep(30000);
                     choosePlayerWhoDies();
                     this.night = false;
+                    chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
+                    //sendPrivateMessage(victimName, (Colors.WHITE + " x.x You have been killed last night x.x"));
+                    //sendPrivateMessage(victimName, displaySkullImage());
+                    chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
+                    if(ifThereAreAliveWolves()){
+                        chat(Colors.WHITE + "Unfortunately, there are still wolves walking around. No one is safe");
+                    }
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
-                    System.out.println("Ja???");
                     resetUsedVision();
                 } else {
-                    chat("===== It's day time. Chat with the other players =====");
+                    chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
                     Thread.sleep(30000);
                     checkVotes();
                     this.night = true;
@@ -290,6 +315,9 @@ public class Server {
             killedPlayer.getCharacter().killPlayer();
         }
         wolvesChat("You have decided to kill... " + killedPlayer.NAME.toUpperCase());
+        chat("THIS IS DAY NUMBER " + ++numOfDays);
+        chat("Unfortunately, " + killedPlayer.NAME.toUpperCase() + " was killed by hungry wolves... Rest in peace, " +killedPlayer.NAME);
+
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -305,7 +333,6 @@ public class Server {
     }
 
     private boolean verifyIfGameContinues() {
-        //se não houver lobos vivos: todos os jogadores recebem uma mensagem “No more wolves left. game over”
         //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
         int wolfCount = 0;
         int nonWolfCount = 0;
@@ -324,7 +351,7 @@ public class Server {
             resetGame();
             return false;
         } else if (wolfCount == 0) {
-            chat("The villagers won!\nThere are no wolves left alive\nGAME OVER");
+            chat("The villagers won!\nThere are no wolves left alive\n" + Colors.RED + "GAME OVER");
             resetGame();
             return false;
         }
@@ -350,8 +377,8 @@ public class Server {
                 .stream().findAny();
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
-            highestVote.get().getCharacter().killPlayer();
-            chat(highestVote.get().NAME + " was tragically killed");
+            highestVote.get().killPlayer();
+            chat(Colors.WHITE + highestVote.get().NAME + " was tragically killed");
         }
         resetNumberOfVotes();
     }
