@@ -4,7 +4,6 @@ import game.Characters.Bot;
 import game.Characters.Character;
 import game.Characters.FortuneTeller;
 import game.EnumRole;
-import game.Game;
 import game.Helpers;
 import game.colors.Colors;
 import game.command.Command;
@@ -24,7 +23,7 @@ public class Server {
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
-    private String victimName;
+    private PlayerHandler victimName;
     private int numOfDays;
 
     public Server() {
@@ -254,13 +253,15 @@ public class Server {
                     Thread.sleep(30000);
                     choosePlayerWhoDies();
                     this.night = false;
+
                     chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
-                    //sendPrivateMessage(victimName, (Colors.WHITE + " x.x You have been killed last night x.x"));
-                    //sendPrivateMessage(victimName, displaySkullImage());
-                    //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
-                    /*if(ifThereAreAliveWolves()){
+                    sendPrivateMessage(victimName.name, (Colors.WHITE + " x.x You have been killed last night x.x"));
+                    sendPrivateMessage(victimName.name, displaySkullImage());
+                    chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
+                    if (ifThereAreAliveWolves()) {
                         chat(Colors.WHITE + "Unfortunately, there are still wolves walking around. No one is safe");
-                    }*/
+                    }
+
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
@@ -297,7 +298,6 @@ public class Server {
     //Mensagem para os lobos quando matam alguém
 
     private void choosePlayerWhoDies() {
-        PlayerHandler killedPlayer;
         this.wolvesVotes = this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
                         && x.getCharacter().isAlive() && x.vote != null)
@@ -307,16 +307,15 @@ public class Server {
             List<PlayerHandler> players = this.PLAYERS.values().stream()
                     .filter(x -> !x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .toList(); //se ninguém votar
-            killedPlayer = players.get((int) (Math.random() * players.size()));
-            killedPlayer.getCharacter().killPlayer(); //alive=false
+            this.victimName = players.get((int) (Math.random() * players.size()));
+            this.victimName.getCharacter().killPlayer(); //alive=false
         } else {
-            killedPlayer = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
-            killedPlayer.getCharacter().killPlayer();
+            this.victimName = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
+            this.victimName.getCharacter().killPlayer();
         }
-        wolvesChat("You have decided to kill... " + killedPlayer.name.toUpperCase());
+        wolvesChat("You have decided to kill... " + this.victimName.name.toUpperCase());
         chat("THIS IS DAY NUMBER " + ++numOfDays);
-        chat("Unfortunately, " + killedPlayer.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + killedPlayer.name);
-
+        chat("Unfortunately, " + this.victimName.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victimName.name);
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
