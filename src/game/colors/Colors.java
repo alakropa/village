@@ -2,7 +2,7 @@ package game.colors;
 
 public enum Colors {
     // Regular Colors. Normal color, no bold, background color etc.
-    //BLACK("\033[0;30m"),    // BLACK
+    BLACK("\033[0;30m"),    // BLACK
     RED("\033[0;31m"),      // RED
     GREEN("\033[0;32m"),    // GREEN
     YELLOW("\033[0;33m"),   // YELLOW
@@ -18,7 +18,7 @@ public enum Colors {
     YELLOW_BOLD("\033[1;33m"),  // YELLOW
     BLUE_BOLD("\033[1;34m"),    // BLUE
     MAGENTA_BOLD("\033[1;35m"), // MAGENTA
-//  CYAN_BOLD("\033[1;36m"),    // CYAN
+  CYAN_BOLD("\033[1;36m"),    // CYAN
     WHITE_BOLD("\033[1;37m"),   // WHITE       server
 
     // Underline

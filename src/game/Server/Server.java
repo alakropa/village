@@ -154,9 +154,18 @@ public class Server {
 
     public void startGame() {
         this.night = false;
+//        if (this.PLAYERS.size() < 5) {
+//            int missingBots = 5 - this.PLAYERS.size();
+//            for (int i = 0; i < missingBots; i++) {
+//                Bot bot = new Bot();
+//                PlayerHandler botPlayer = new PlayerHandler(null, bot.getNAME());
+//                this.PLAYERS.put(bot.getNAME(), botPlayer);
+//            }
+//        }
+
         //chat(displayVillageImage());
         chat(displayVillageImage2());
-        chat(displayVillageImage3());
+        //chat(displayWolfImage());
 
 
         chat("\n===== Welcome to the Spooky Village! =====\n");
@@ -169,6 +178,9 @@ public class Server {
         int count = 0;
         for (int i = 0; i < playersInGame; i++) {
             EnumRole newRole = roles.get(i);
+            sendPrivateMessage(playersList.get(i).name, "You are a " + newRole.toString() + "\n");
+            playersList.get(i).character = newRole.getCHARACTER();
+            playersList.get(i).character.setRole(newRole);
             if (i >= playersList.size()) {
                 Bot bot = new Bot(newRole);
                 this.bots.add(bot);
@@ -201,7 +213,7 @@ public class Server {
     }
 
     private String displayVillageImage2() {
-        return "                                                               \n" +
+        return Colors.CYAN + "                                                               \n" +
                 "                _ _ _     _                            _          _   _       \n" +
                 "               | | | |___| |___ ___ _____ ___         | |_ ___   | |_| |_ ___ \n" +
                 "               | | | | -_| |  _| . |     | -_|_ _ _   |  _| . |  |  _|   | -_|\n" +
@@ -212,11 +224,11 @@ public class Server {
                 "               |   __|___ ___ ___| |_ _ _|  |  |_| | |___ ___ ___ \n" +
                 "               |__   | . | . | . | '_| | |  |  | | | | .'| . | -_|\n" +
                 "               |_____|  _|___|___|_,_|_  |\\___/|_|_|_|__,|_  |___|\n" +
-                "                     |_|             |___|               |___|    ";
+                "                     |_|             |___|               |___|    " + Colors.RESET;
     }
 
-    private String displayVillageImage3() {
-        return "                                                                                                       \n" +
+    private String displayWolfImage() {
+        return Colors.BLUE + "                                                                                                       \n" +
                 " .         _  .          .          .    +     .          .          .      .                           \n" +
                 "        .          .            .            .            .       :               .           .         \n" +
                 "        .   .      .    .     .     .    .      .   .      . .  .  -+-        .                        \n" +
@@ -232,11 +244,11 @@ public class Server {
                 "  ________|   _/_  | |       .         _.--'                              `--./\\          .   .        \n" +
                 "<__________\\______)\\__) ._ - /~~\\/~\\ -                                        `-/~\\_            .      \n" +
                 " .      .-'                                                                           `-/\\_            \n" +
-                "  _/\\.-'                                                                                    __/~\\/\\-.__.";
+                "  _/\\.-'                                                                                    __/~\\/\\-.__." + Colors.RESET + "\n";
     }
 
     private String displaySkullImage() {
-        return Colors.BLACK_BOLD +
+        return Colors.BLACK +
                 "        _;~)                    (~;_   \n" +
                 "        (   |                  |   )   \n" +
                 "         ~', ',   ,''~'',   ,' ,'~     \n" +
@@ -248,7 +260,7 @@ public class Server {
                 "             ,' ,' ;~~~; ', ',         \n" +
                 "           ,' ,'    '''    ', ',       \n" +
                 "         (~  ;               ;  ~)     \n" +
-                "          -;_)               (_;-      \n";
+                "          -;_)               (_;-      \n" + Colors.RESET;
     }
 
 
@@ -256,9 +268,10 @@ public class Server {
         while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
-                    chat(Colors.BLUE + "\n===== It's dark already. Time to sleep =====\n");
+                    chat("\n===== It's dark already. Time to sleep =====");
+                    chat(displayWolfImage());
                     Thread.sleep(500);
-                    wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n");
+                    wolvesChat(Colors.RED + "===== Wolves chat is open! =====");
                     Thread.sleep(500);
                     printAliveWolves();
 
@@ -268,20 +281,20 @@ public class Server {
                     choosePlayerWhoDies();
                     this.night = false;
 
-                    chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
-                    sendPrivateMessage(victimName.name, (Colors.WHITE + " x.x You have been killed last night x.x"));
-                    sendPrivateMessage(victimName.name, displaySkullImage());
-                    chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
+                    //chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
+                    sendPrivateMessage(victimName.name, (Colors.BLACK + "\n x.x You have been killed last night x.x") + Colors.RESET);
+                    sendPrivateMessage(victimName.name, (displaySkullImage()));
+                    //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
                     if (ifThereAreAliveWolves()) {
-                        chat(Colors.WHITE + "Unfortunately, there are still wolves walking around. No one is safe");
+                        chat("Watch out! There are still wolves walking around. No one is safe\n");
                     }
 
-                    chat("THIS IS DAY NUMBER " + ++numOfDays);
+                    //chat(Colors.YELLOW + "THIS IS DAY NUMBER " + ++numOfDays);
                     //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
                     resetUsedVision();
                 } else {
-                    chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
+                    chat("\n===== It's day time. Chat with the other players =====\n");
                     Thread.sleep(30000);
                     checkVotes();
                     this.night = true;
@@ -346,8 +359,8 @@ public class Server {
             this.victimName = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
             this.victimName.getCharacter().killPlayer();
         }
-        wolvesChat("You have decided to kill... " + this.victimName.name.toUpperCase());
-        chat("THIS IS DAY NUMBER " + ++numOfDays);
+        wolvesChat(Colors.RED + "You have decided to kill... " + this.victimName.name.toUpperCase() + Colors.RESET + "\n");
+        chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
         chat("Unfortunately, " + this.victimName.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victimName.name);
     }
 
@@ -404,11 +417,11 @@ public class Server {
 
     private boolean checkWinner(int wolfCount, int nonWolfCount) {
         if (wolfCount >= nonWolfCount) {
-            chat("The wolves won!\nGame over");
+            chat("\nThe wolves won!\nGame over");
             resetGame();
             return false;
         } else if (wolfCount == 0) {
-            chat("The villagers won!\nThere are no wolves left alive\n" + Colors.RED + "GAME OVER");
+            chat("\nThe villagers won!\nThere are no wolves left alive\n" + "GAME OVER");
             resetGame();
             return false;
         }
@@ -435,7 +448,7 @@ public class Server {
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().getCharacter().killPlayer();
-            chat(Colors.WHITE + highestVote.get().name + " was tragically killed");
+            chat(highestVote.get().name + " was tragically killed by the Villagers, thinking it was a wolf");
         }
         resetNumberOfVotes();
     }

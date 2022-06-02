@@ -1,16 +1,18 @@
 package game.command;
 
+import game.colors.Colors;
+
 import java.util.Arrays;
 
 public enum Command {
-    START("/start", new StartHandler(), "Starts/Resarts the game"),
-    LIST("/list", new ListHandler(), "Lists the players in game"),
-    COMMAND_LIST("/cmd", new CommandListHandler(), "Lists the game commands"),
-    VOTE("/vote", new VoteHandler(), "Vote the player that you want to eliminate"),
-    KILL("/kill", new KillHandler(), "Choose the player that you want to kill (available to Wolfs only)"),
-    VISION("/vision", new VisionHandler(), "Once per night you can choose a player to check if it's a wolf (available to Furtune Teller only)"),
-    VISIONS_LIST("/visionsList", new VisionListHandler(), "Lists the previous visions (available to Furtune Teller only)"),
-    QUIT("/quit", new QuitHandler(), "Quit from the game");
+    START("/start", new StartHandler(), Colors.WHITE + "Starts/Resarts the game" + Colors.RESET),
+    LIST("/list", new ListHandler(), Colors.WHITE + "Lists the players in game" + Colors.RESET),
+    COMMAND_LIST("/cmd", new CommandListHandler(), Colors.WHITE + "Lists the game commands" + Colors.RESET),
+    VOTE("/vote", new VoteHandler(), Colors.WHITE + "Vote the player that you want to eliminate" + Colors.RESET),
+    KILL("/kill", new KillHandler(), Colors.WHITE + "Choose the player that you want to kill (available to Wolfs only)" + Colors.RESET),
+    VISION("/vision", new VisionHandler(), Colors.WHITE + "Once per night you can choose a player to check if it's a wolf (available to Furtune Teller only)" + Colors.RESET),
+    VISIONS_LIST("/visionsList", new VisionListHandler(), Colors.WHITE + "Lists the previous visions (available to Furtune Teller only)" + Colors.RESET),
+    QUIT("/quit", new QuitHandler(), Colors.WHITE + "Quit from the game" + Colors.RESET + "\n");
     //Fazer comando com as regras do jogo
 
     private final String COMMAND;

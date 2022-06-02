@@ -82,14 +82,14 @@ public class Main {
 
         //System.out.println(image2);
 
-        System.out.println(Colors.BLACK_BOLD + "ola");
-        System.out.println(Colors.RED + "ola");
-        System.out.println(Colors.GREEN + "ola");
-        System.out.println(Colors.YELLOW + "ola");
-        System.out.println(Colors.BLUE + "ola");
-        System.out.println(Colors.MAGENTA + "ola");
-        System.out.println(Colors.CYAN + "ola");
-        System.out.println(Colors.WHITE + "ola");
-        System.out.println(Colors.WHITE_BOLD + "ola");
+//        System.out.println(Colors.BLACK_BOLD + "ola");
+//        System.out.println(Colors.RED + "ola");
+//        System.out.println(Colors.GREEN + "ola");
+//        System.out.println(Colors.YELLOW + "ola");
+//        System.out.println(Colors.BLUE + "ola");
+//        System.out.println(Colors.MAGENTA + "ola");
+//        System.out.println(Colors.CYAN + "ola");
+//        System.out.println(Colors.WHITE + "ola");
+//        System.out.println(Colors.WHITE_BOLD + "ola");
     }
 }
