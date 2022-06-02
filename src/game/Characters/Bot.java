@@ -10,8 +10,9 @@ public class Bot extends Character {
     private final String NAME;
     private static int botNumber;
 
-    public Bot() {
+    public Bot(EnumRole role) {
         this.NAME = "Bot" + ++botNumber;
+        super.setRole(role);
     }
 
     public String getNAME() {
@@ -28,9 +29,15 @@ public class Bot extends Character {
 
     public Optional<Server.PlayerHandler> getNightVote(Server server) {
         List<Server.PlayerHandler> playersList = server.getPLAYERS().values().stream().toList();
-
         return playersList.stream()
                 .filter(x -> !x.getName().equals(this.NAME) && !x.getCharacter().getRole().equals(EnumRole.WOLF))
                 .findAny();
+    }
+
+    @Override
+    public String toString() {
+        return "Bot{" +
+                "NAME='" + NAME + '\'' + super.getRole() +
+                '}';
     }
 }
