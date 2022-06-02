@@ -288,8 +288,8 @@ public class Server {
         ArrayList<EnumRole> roles = new ArrayList<>(PLAYERS.size());
         for (int i = 0; i < this.PLAYERS.size(); i++) {
             switch (i) {
-                case 0, 6, 11 -> roles.add(i, EnumRole.WOLF);
-                case 1, 9 -> roles.add(i, EnumRole.FORTUNE_TELLER);
+                case 0, 9 -> roles.add(i, EnumRole.WOLF);
+                case 1, 6 -> roles.add(i, EnumRole.FORTUNE_TELLER);
                 default -> roles.add(i, EnumRole.VILLAGER);
             }
         }

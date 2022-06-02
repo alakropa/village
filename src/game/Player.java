@@ -8,7 +8,7 @@ public class Player {
     public static void main(String[] args) {
         Player player = new Player();
         try {
-            player.start("localhost", 8081);
+            player.start("10.21.226.132", 8081);
         } catch (IOException e) {
             e.printStackTrace();
         }
