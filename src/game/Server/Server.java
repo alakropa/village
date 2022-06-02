@@ -132,7 +132,7 @@ public class Server {
 
     /**
      * This method sends a private message to every player, except the one sending it
-     * @param name a String, the name of the person you want to send the message to
+     * @param name a String, the name of the player you want to send the message to
      * @param message a String, the message you want to send to the other players
      */
     public void chat(String name, String message) {
@@ -205,9 +205,9 @@ public class Server {
     }
 
     /**
-     *
-     * @param name
-     * @param message
+     * This method opens up a private chat between wolves. This method accepts two parameters
+     * @param name a String, the name of the wofl you want to send the message to
+     * @param message a String, the message you want to send to the other wolf
      */
     public void wolvesChat(String name, String message) {
         this.PLAYERS.values().stream()
@@ -216,12 +216,21 @@ public class Server {
                 .forEach(x -> x.send(name + ": " + message));
     }
 
+    /**
+     * This method opens up a private chat between wolves. This method only accepts the message parameter
+     * @param message a String, the message you want to send to the other wolf
+     */
     public void wolvesChat(String message) {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.isBot)
                 .forEach(x -> x.send(message));
     }
 
+    /**
+     *
+     * This method returns the names of all the players present in the game
+     * @return a String, with names
+     */
     public String playersInGame() {
         return this.PLAYERS.values().stream()
                 .map(x -> x.name +
@@ -230,6 +239,11 @@ public class Server {
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
+    /**
+     * This method allows a player to send a private message to another player
+     * @param name a String, the name of the player you want to send the message to
+     * @param message a String, the message you want to send to the othe player
+     */
     public void sendPrivateMessage(String name, String message) {
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (player.name.equals(name) && !player.isBot) {
@@ -284,20 +298,10 @@ public class Server {
         play();
     }
 
-    private String displayVillageImage() {
-        return "" +
-                " __        __   _                                  _          _   _          \n" +
-                " \\ \\      / /__| | ___ ___  _ __ ___   ___        | |_ ___   | |_| |__   ___ \n" +
-                "  \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\       | __/ _ \\  | __| '_ \\ / _ \\\n" +
-                "   \\ V  V /  __/ | (_| (_) | | | | | |  __/_ _ _  | || (_) | | |_| | | |  __/\n" +
-                "  __\\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___(_|_|_)_ \\__\\___/   \\__|_| |_|\\___|\n" +
-                " / ___| _ __   ___   ___ | | ___   _  \\ \\   / (_) | | __ _  __ _  ___| |     \n" +
-                " \\___ \\| '_ \\ / _ \\ / _ \\| |/ / | | |  \\ \\ / /| | | |/ _` |/ _` |/ _ \\ |     \n" +
-                "  ___) | |_) | (_) | (_) |   <| |_| |   \\ V / | | | | (_| | (_| |  __/_|     \n" +
-                " |____/| .__/ \\___/ \\___/|_|\\_\\\\__, |    \\_/  |_|_|_|\\__,_|\\__, |\\___(_)     \n" +
-                "       |_|                     |___/                       |___/             ";
-    }
-
+    /**
+     * This method displays the game's welcome message in ASCII Art, in the color CYAN
+     * @return a String, the ASCII Art
+     */
     private String displayVillageImage2() {
         return Colors.CYAN + "                                                               \n" +
                 "                _ _ _     _                            _          _   _       \n" +
@@ -313,6 +317,10 @@ public class Server {
                 "                     |_|             |___|               |___|    " + Colors.RESET;
     }
 
+    /**
+     * This method displays the game's night scenario in ASCII Art, in the color BLUE
+     * @return a String, the ASCII Art
+     */
     private String displayWolfImage() {
         return Colors.BLUE + "                                                                                                       \n" +
                 " .         _  .          .          .    +     .          .          .      .                           \n" +
@@ -333,6 +341,10 @@ public class Server {
                 "  _/\\.-'                                                                                    __/~\\/\\-.__." + Colors.RESET + "\n";
     }
 
+    /**
+     * This method displays the game's "you have been killed" message, in ASCII Art, in the color BLACK
+     * @return a String, the ASCII Art
+     */
     private String displaySkullImage() {
         return Colors.BLACK +
                 "        _;~)                    (~;_   \n" +
@@ -467,6 +479,10 @@ public class Server {
         notifyAll();
     } */
 
+
+    /**
+     * This method prints in the console of all the players the list of all the wolves that alive in the game
+     */
     private void printAliveWolves() {
         if (this.PLAYERS.size() >= 7) {
             String wolvesList = this.PLAYERS.values().stream()
@@ -477,6 +493,9 @@ public class Server {
         }
     }
 
+    /**
+     * This method resets the game, so when the game is over, players can restart it
+     */
     private void resetGame() {
         this.gameInProgress = false;
         this.numOfDays = 0;
@@ -529,6 +548,10 @@ public class Server {
         return roles;
     }
 
+    /**
+     * This method verifies whether there are wolves alive in the game. It also verifies the condition of the count between wolves and regular players: If the number of wolves is higher of equals to the number of regular players, the game cannot procede
+     * @return a boolean, if true, the game can continue. If false, the game cannot procede
+     */
     private boolean verifyIfGameContinues() {
         //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
         int wolfCount = 0;
@@ -548,6 +571,10 @@ public class Server {
         return checkWinner(wolfCount, nonWolfCount);
     }
 
+    /**
+     * This method verifies whether there are sill wolves left in the game
+     * @return a boolean, true if there are alive wolves. False, if all the wolves are dead
+     */
     private boolean ifThereAreAliveWolves() {
         //se o count de lobos for maior que villagers, true, else false
         int wolfCount = 0;
@@ -577,6 +604,11 @@ public class Server {
         return true;
     }
 
+    /**
+     * This method retrieves the PlayerHandler player, by a given name
+     * @param name a String, the name of the player we want to retrieve
+     * @return an Optional, it either returns a PlayerHander of a null, without breaking the code
+     */
     public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.PLAYERS.values().stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
@@ -602,6 +634,9 @@ public class Server {
         resetNumberOfVotes();
     }
 
+    /**
+     * This method checks whether all the players have voted, or not. If not, the vote goes to itself. This prevents the game from stopping, while waiting for a vote from all the players
+     */
     private void checkIfAllPlayersVoted() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.vote == null)
