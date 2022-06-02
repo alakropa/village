@@ -7,7 +7,7 @@ public class ServerLauncher {
         Server server = new Server();
 
         try {
-            server.start(8081);
+            server.start(8082);
         } catch (IOException e) {
             e.printStackTrace();
         }
