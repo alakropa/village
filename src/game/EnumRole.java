@@ -2,12 +2,10 @@ package game;
 
 import game.Characters.Character;
 import game.Characters.FortuneTeller;
-import game.Characters.Villager;
-import game.Characters.Wolf;
 
 public enum EnumRole {
-    WOLF("Wolf", "Wolves", new Wolf()),
-    VILLAGER("Villager", "Villagers", new Villager()),
+    WOLF("Wolf", "Wolves", new Character()),
+    VILLAGER("Villager", "Villagers", new Character()),
     FORTUNE_TELLER("Fortune Teller", "Fortune Tellers", new FortuneTeller());
 
     private final String NAME;

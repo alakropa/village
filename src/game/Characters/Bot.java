@@ -29,7 +29,9 @@ public class Bot extends Character {
     public Optional<Server.PlayerHandler> getNightVote(Server server) {
         List<Server.PlayerHandler> playersList = server.getPLAYERS().values().stream().toList();
         return playersList.stream()
-                .filter(x -> !x.getName().equals(this.NAME) && !x.getCharacter().getRole().equals(EnumRole.WOLF))
+                .filter(x -> x.isAlive() &&
+                        !x.getName().equals(this.NAME) &&
+                        !x.getCharacter().getRole().equals(EnumRole.WOLF))
                 .findAny();
     }
 

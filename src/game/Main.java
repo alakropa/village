@@ -13,8 +13,10 @@ public class Main {
         System.out.println(dsa.size());
 
 
+
         /*
         TO DO LIST:
+            Corrigir entrada quando jogo começou
             Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
            Elisa Mensagem para os lobos quando matam alguém
            Elisa Mensagem para a aldeia sobre quem morreu durante a noite

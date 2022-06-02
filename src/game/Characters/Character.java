@@ -9,8 +9,6 @@ public class Character {
     private Character previousVote;
     private boolean defended;
 
-
-
     public void increaseNumberOfVotes() {
         this.numberOfVotes++;
     }

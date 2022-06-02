@@ -9,11 +9,8 @@ public class StartHandler implements CommandHandler {
             player.send("Game has already started");
             return;
         }
-        System.out.println("Aqui?");
         server.setGameInProgress(true);
-        System.out.println("Aqui?2");
         new Thread(server::startGame).start();
-        System.out.println("Aqui?3");
         System.out.println(server.isGameInProgress());
     }
 }
