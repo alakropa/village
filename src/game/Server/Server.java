@@ -19,6 +19,7 @@ public class Server {
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
+    private String victimName;
     private int numOfDays;
 
     public Server() {
@@ -234,6 +235,7 @@ public class Server {
                     choosePlayerWhoDies();
                     this.night = false;
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
+                    chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
                     resetUsedVision();
                 } else {
@@ -273,11 +275,17 @@ public class Server {
         this.wolvesVotes = this.PLAYERS.values().stream()
                 .filter(x -> x.role.equals(EnumRole.WOLF) && x.alive && x.vote != null)
                 .map(x -> x.vote)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()); //List<PlayerHandler> wolvesVotes
         if (this.wolvesVotes.size() == 0) {
-            List<PlayerHandler> players = this.PLAYERS.values().stream().toList();
-            players.get((int) (Math.random() * players.size())).killPlayer();
-        } else this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer();
+            List<PlayerHandler> players = this.PLAYERS.values().stream().toList(); //se ninguém votar
+            players.get((int) (Math.random() * players.size())).killPlayer(); //alive=false
+        } else {
+            PlayerHandler victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
+            victimName = victim.NAME;
+            victim.killPlayer();
+            //this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer(); //random dos votados, mesmo q seja repetido
+            wolvesChat("You have decided to kill... " + victimName.toUpperCase());
+        }
     }
 
     //Responsável pelo desenrolar de to_do o jogo. OBRA DE ARTE!!!

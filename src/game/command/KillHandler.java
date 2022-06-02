@@ -8,13 +8,17 @@ import java.util.Optional;
 
 public class KillHandler implements CommandHandler {
     public void command(Server server, Server.PlayerHandler player) {
-        String chosenPName = Helpers.removeCommand(player.getMessage());
+        String chosenPName = Helpers.removeCommand(player.getMessage()); //msg do jogador que decidiram matar
         if (this.commandConditions(server, player, EnumRole.WOLF, chosenPName)) {
             Optional<Server.PlayerHandler> playerWhoDies = server.getPlayerByName(chosenPName);
             if (playerWhoDies.isPresent()) {
                 EnumRole chosenPRole = playerWhoDies.get().getRole();
-                if (chosenPRole.equals(EnumRole.WOLF)) player.send("You can't target a Wolf");
-                else if (playerWhoDies.get().isAlive()) player.setVote(playerWhoDies.get());
+                if (chosenPRole.equals(EnumRole.WOLF)){
+                    player.send("You can't target a Wolf");
+                }
+                else if (playerWhoDies.get().isAlive()){
+                    player.setVote(playerWhoDies.get()); //voto current
+                }
             } else {
                 player.send(chosenPName + " is unavailable");
             }

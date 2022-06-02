@@ -5,8 +5,8 @@ public class Main {
         /*
         TO DO LIST:
             Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
-            Mensagem para os lobos quando matam alguém
-            Mensagem para a aldeia sobre quem morreu durante a noite
+           Elisa Mensagem para os lobos quando matam alguém
+           Elisa Mensagem para a aldeia sobre quem morreu durante a noite
             Usar Thread.sleep() em várias zonas do código para que o código da consola seja mais intervalado
             Nas rondas em que o vidente já sabe quem são todos os lobos, o vidente não acorda mais (o chat noturno dele não abre mais, sendo tratado como um aldeão normal)
 
@@ -17,6 +17,8 @@ public class Main {
             Adicionar mais papeis (fairy/protect, procurar outros)
             Command /suicide
         */
+
+        //verificar se os sockets estão activos ou não ->
 
 
 
