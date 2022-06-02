@@ -22,7 +22,7 @@ public interface CommandHandler {
         } else if (chosenPName == null) {
             player.send("You need to write a name");
             return false;
-        } else if (chosenPName.equalsIgnoreCase(player.getNAME())) {
+        } else if (chosenPName.equalsIgnoreCase(player.getName())) {
             player.send("You can't target yourself");
             return false;
         }
@@ -45,7 +45,7 @@ public interface CommandHandler {
         } else if (votedPName == null) {
             player.send("You need to write a name");
             return false;
-        } else if (votedPName.equals(player.getNAME())) {
+        } else if (votedPName.equals(player.getName())) {
             player.send("You can't vote on yourself!");
             return false;
         }
