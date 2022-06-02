@@ -137,11 +137,12 @@ public class Server {
      */
     public void chat(String name, String message) {
 
-//        for (PlayerHandler player : this.PLAYERS.values()) {
-//            if (!player.name.equals(name) && !player.isBot)
-//                player.send(name + ": " + message);
-//        }
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.name.equals(name) && !player.isBot)
+                player.send(name + ": " + message);
+        }
 
+        /*
         //giveAColorToEachPlayer();
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (!player.name.equals(name) && !player.isBot) {
@@ -149,7 +150,7 @@ public class Server {
                 //colorList
                 player.send(player.textColor + name + ": " + message + ColorsRef.RESET.getCode());
             }
-        }
+        }*/
     }
 
     /**
