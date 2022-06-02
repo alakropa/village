@@ -235,7 +235,11 @@ public class Server {
                     choosePlayerWhoDies();
                     this.night = false;
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
+                    sendPrivateMessage(victimName, " x.x You have been killed last night x.x");
                     chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
+                    if(ifThereAreAliveWolves()){
+                        chat("Unfortunately, there are still wolves walking around. No one is safe");
+                    }
                     Thread.sleep(500);
                     resetUsedVision();
                 } else {
@@ -305,7 +309,6 @@ public class Server {
     }
 
     private boolean verifyIfGameContinues() {
-        //se não houver lobos vivos: todos os jogadores recebem uma mensagem “No more wolves left. game over”
         //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
         int wolfCount = 0;
         int nonWolfCount = 0;
@@ -316,6 +319,25 @@ public class Server {
             }
         }
         return checkWinner(wolfCount, nonWolfCount);
+    }
+
+    private boolean ifThereAreAliveWolves() {
+        //se o count de lobos for maior que villagers, true, else false
+        int wolfCount = 0;
+        int nonWolfCount = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (player.alive) {
+                if (player.role.equals(EnumRole.WOLF)){
+                    wolfCount++;
+                } else {
+                    nonWolfCount++;
+                }
+            }
+        }
+        if(wolfCount > 0) {
+            return true;
+        }
+        return false;
     }
 
     private boolean checkWinner(int wolfCount, int nonWolfCount) {
@@ -351,7 +373,7 @@ public class Server {
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().killPlayer();
-            chat(highestVote.get().NAME + " was tragically killed");
+            chat("The Villagers have decided to kill " + highestVote.get().NAME.toUpperCase() + " thinking that it was the wolf");
         }
         resetNumberOfVotes();
     }
