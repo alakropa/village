@@ -1,5 +1,6 @@
 package game.Server;
 
+import game.Characters.Bot;
 import game.Characters.Character;
 import game.Characters.FortuneTeller;
 import game.EnumRole;
@@ -22,7 +23,6 @@ public class Server {
     private boolean gameInProgress;
     private boolean night;
     private List<PlayerHandler> wolvesVotes;
-    private String victimName;
     private int numOfDays;
 
     public Server() {
@@ -53,12 +53,8 @@ public class Server {
                     out.flush();
                     String playerName = verifyIfNameIsAvailable(out, in);
 
-                    //addPlayer(new PlayerHandler(playerSocket, playerName));
-                    //System.out.println(playerName + " entered the chat"); //consola do servidor
-                    //String playerName = in.readLine(); //fica à espera do nome
-
                     if (!this.gameInProgress && this.PLAYERS.size() < 12) {
-                        System.out.println(playerName + " entered the chat"); //consola do servidor
+                        System.out.println(playerName + " entered the chat");
                         addPlayer(new PlayerHandler(playerSocket, playerName));
                         out.write(Command.getCommandList());
                         out.newLine();
@@ -90,8 +86,6 @@ public class Server {
     }
 
     private boolean checkIfNameIsAvailable(String playerName) {
-        // BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-        // BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (player.NAME.equals(playerName)) {
                 return false;
@@ -138,15 +132,6 @@ public class Server {
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
-    public void removePlayer(PlayerHandler playerHandler) {
-        try {
-            playerHandler.PLAYER_SOCKET.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.PLAYERS.remove(playerHandler.NAME, playerHandler);
-    }
-
     public void sendPrivateMessage(String name, String message) {
         for (PlayerHandler client : this.PLAYERS.values()) {
             if (client.NAME.equals(name)) {
@@ -159,10 +144,18 @@ public class Server {
         // Adicionar bots necessários
         Game game = new Game();
         this.night = false;
+        /*
+        if (this.PLAYERS.size() < 5) {
+            int missingBots = 5 - this.PLAYERS.size();
+            for (int i = 0; i < missingBots; i++) {
+                Bot bot = new Bot();
+                this.PLAYERS.put(bot.getNAME(), bot);
+            }
+            //bots
+        }*/
         //chat(displayVillageImage());
         chat(displayVillageImage2());
         chat(displayVillageImage3());
-        chat("A list of players starting the game", playersInGame());
 
         ArrayList<EnumRole> roles = generateEnumCards();
         Collections.shuffle(roles);
@@ -175,6 +168,8 @@ public class Server {
             playersList.get(i).character = newRole.getCHARACTER();
             playersList.get(i).character.setRole(newRole);
         }
+        setPlayersLife();
+        chat("A list of players starting the game", playersInGame());
         play();
     }
 
@@ -240,8 +235,9 @@ public class Server {
                     choosePlayerWhoDies();
                     this.night = false;
                     chat("THIS IS DAY NUMBER " + ++numOfDays);
-                    chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
+                    //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
                     Thread.sleep(500);
+                    System.out.println("Ja???");
                     resetUsedVision();
                 } else {
                     chat("===== It's day time. Chat with the other players =====");
@@ -277,21 +273,23 @@ public class Server {
     //Mensagem para os lobos quando matam alguém
 
     private void choosePlayerWhoDies() {
+        PlayerHandler killedPlayer;
         this.wolvesVotes = this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
                         && x.getCharacter().isAlive() && x.vote != null)
                 .map(x -> x.vote)
                 .collect(Collectors.toList()); //List<PlayerHandler> wolvesVotes
         if (this.wolvesVotes.size() == 0) {
-            List<PlayerHandler> players = this.PLAYERS.values().stream().toList(); //se ninguém votar
-            players.get((int) (Math.random() * players.size())).getCharacter().killPlayer(); //alive=false
+            List<PlayerHandler> players = this.PLAYERS.values().stream()
+                    .filter(x -> !x.getCharacter().getRole().equals(EnumRole.WOLF))
+                    .toList(); //se ninguém votar
+            killedPlayer = players.get((int) (Math.random() * players.size()));
+            killedPlayer.getCharacter().killPlayer(); //alive=false
         } else {
-            PlayerHandler victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
-            victimName = victim.NAME;
-            victim.getCharacter().killPlayer();
-            //this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size())).killPlayer(); //random dos votados, mesmo q seja repetido
-            wolvesChat("You have decided to kill... " + victimName.toUpperCase());
+            killedPlayer = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
+            killedPlayer.getCharacter().killPlayer();
         }
+        wolvesChat("You have decided to kill... " + killedPlayer.NAME.toUpperCase());
     }
 
     private ArrayList<EnumRole> generateEnumCards() {
@@ -380,7 +378,13 @@ public class Server {
     }
 
     public void setPlayersLife() {
+        System.out.println("bute");
+        for (String name : this.PLAYERS.keySet()) {
+            String value = String.valueOf(this.PLAYERS.get(name).getCharacter());
+            System.out.println(name + " " + value);
+        }
         this.PLAYERS.values().forEach(x -> x.getCharacter().healPlayer());
+        System.out.println("bute2");
     }
 
     public boolean isNight() {
@@ -392,7 +396,9 @@ public class Server {
     }
 
     private void resetUsedVision() {
-        this.PLAYERS.values().forEach(x -> ((FortuneTeller) x.getCharacter()).setUsedVision(false));
+        this.PLAYERS.values().stream()
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.FORTUNE_TELLER))
+                .forEach(x -> ((FortuneTeller) x.getCharacter()).setUsedVision(false));
     }
 
     public class PlayerHandler implements Runnable {
@@ -425,7 +431,12 @@ public class Server {
                                 else wolvesChat(this.NAME, this.message);
                             }
                             case FORTUNE_TELLER -> dealWithCommand(this.message);
-                            default -> send("You are sleeping");
+                            default -> {
+                                if (!this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()))
+                                    send("You are sleeping");
+                                else dealWithCommand(this.message);
+                            }
+
                         }
                     } else {
                         if (isCommand(this.message.trim())) {
@@ -442,7 +453,7 @@ public class Server {
         private void dealWithCommand(String message) throws IOException {
             Command command = Command.getCommandFromDescription(message.split(" ")[0]);
             if (command == null) {
-                send("Command unavailable");
+                send("Unavailable command");
                 return;
             }
             command.getHANDLER().command(Server.this, this);
@@ -487,6 +498,13 @@ public class Server {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        }
+
+        @Override
+        public String toString() {
+            return "PlayerHandler{" +
+                    "NAME='" + NAME + '\'' +
+                    '}';
         }
     }
 }

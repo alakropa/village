@@ -2,6 +2,7 @@ package game;
 
 public class Main {
     public static void main(String[] args) {
+
         /*
         TO DO LIST:
             Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
@@ -147,7 +148,6 @@ public class Main {
 "     (_/                                    \\_)  "
 
 */
-
 
     }
 }

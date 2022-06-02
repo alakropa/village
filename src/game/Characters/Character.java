@@ -52,4 +52,11 @@ public class Character {
     public void setRole(EnumRole role) {
         this.role = role;
     }
+
+    @Override
+    public String toString() {
+        return "Character{" +
+                "role=" + role +
+                '}';
+    }
 }

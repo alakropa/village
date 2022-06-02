@@ -32,6 +32,10 @@ public enum Command {
         return null;
     }
 
+    public String getCOMMAND() {
+        return COMMAND;
+    }
+
     public CommandHandler getHANDLER() {
         return this.HANDLER;
     }
