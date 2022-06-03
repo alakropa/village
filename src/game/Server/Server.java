@@ -5,6 +5,7 @@ import game.Characters.Character;
 import game.Characters.FortuneTeller;
 import game.EnumRole;
 import game.Helpers;
+import game.Images;
 import game.colors.Colors;
 
 import game.colors.ColorsRef;
@@ -28,7 +29,6 @@ public class Server {
     private List<PlayerHandler> wolvesVotes;
     private PlayerHandler victim;
     private int numOfDays;
-    private boolean stopTimer;
     private ArrayList<String> colorList;
 
     public Server() {
@@ -46,32 +46,22 @@ public class Server {
         }
     }
 
-    public HashMap<String, PlayerHandler> getPLAYERS() {
-        return PLAYERS;
-    }
-
     public void acceptConnection() throws IOException {
         Socket playerSocket = this.serverSocket.accept();
-        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        PlayerHandler newPlayer = new PlayerHandler(playerSocket);
         if (!this.gameInProgress && this.PLAYERS.size() < 12) {
-            new Thread(() -> { //serve para varios jogadores poderem escrever o nome ao mesmo tempo
+            new Thread(() -> {
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-                    out.write("Write your name");
-                    out.newLine();
-                    out.flush();
-                    String playerName = verifyIfNameIsAvailable(out, in);
+                    newPlayer.send("Write your name");
+                    String playerName = verifyIfNameIsAvailable(newPlayer, in);
 
                     if (!this.gameInProgress && this.PLAYERS.size() < 12) {
                         System.out.println(playerName + " entered the chat");
                         addPlayer(new PlayerHandler(playerSocket, playerName));
-                        out.write(Command.getCommandList());
-                        out.newLine();
-                        out.flush();
+                        newPlayer.send("Welcome to our chat!\nType /cmd to open the comand list");
                     } else {
-                        out.write("The game is unavailable");
-                        out.newLine();
-                        out.flush();
+                        newPlayer.send("The game is unavailable");
                         playerSocket.close();
                     }
                 } catch (IOException e) {
@@ -79,9 +69,7 @@ public class Server {
                 }
             }).start();
         } else {
-            out.write("The game has already started");
-            out.newLine();
-            out.flush();
+            newPlayer.send("The game has already started");
             playerSocket.close();
         }
     }
@@ -89,17 +77,15 @@ public class Server {
     /**
      * This method allows the player to enter a name and check if that name is available or not. If not, the player can insert another name until he has chosen an available one
      *
-     * @param out BufferedWriter - writes message from the server in the console of the player
-     * @param in  BufferedReader - reads from the console of the player
+     * @param newPlayer PlayerHandler - contains a PlayerHandler instance
+     * @param in        BufferedReader - reads from the console of the player
      * @return a String, the player name
      * @throws IOException
      */
-    private String verifyIfNameIsAvailable(BufferedWriter out, BufferedReader in) throws IOException {
-        String playerName = in.readLine(); //fica à espera do nome
-        while (!checkIfNameIsAvailable(playerName) || playerName.startsWith("/") || playerName.equals("")) { //false
-            out.write("You can't choose this name. Try another one");
-            out.newLine();
-            out.flush();
+    private String verifyIfNameIsAvailable(PlayerHandler newPlayer, BufferedReader in) throws IOException {
+        String playerName = in.readLine();
+        while (!checkIfNameIsAvailable(playerName) || playerName.startsWith("/") || playerName.equals("")) {
+            newPlayer.send("You can't choose this name. Try another one");
             playerName = in.readLine();
         }
         return playerName;
@@ -127,47 +113,97 @@ public class Server {
      */
     private void addPlayer(PlayerHandler playerHandler) {
         this.PLAYERS.put(playerHandler.name, playerHandler);
-        this.service.submit(playerHandler); //mandar para a threadpool
-        chat(playerHandler.name, "joined the chat"); //msg para os outros players
-        // giveAColorToEachPlayer();
-        //add textColor to everyplayer
+        this.service.submit(playerHandler);
+        chat(playerHandler.name, "joined the chat");
+    }
+
+    public void startGame() throws InterruptedException {
+        this.night = false;
+        chat(Images.displayVillageImage2());
+        chat("\n===== Welcome to the Spooky Village! =====\n");
+        Thread.sleep(1200);
+
+        getRoles();
+        setPlayersLife();
+        Thread.sleep(1500);
+        chat(playersInGame());
+        Thread.sleep(2000);
+
+        play();
     }
 
     /**
      * This method sends a private message to every player, except the one sending it
      *
-     * @param name    a String, the name of the player you want to send the message to
+     * @param name    a String, the name of the person you want to send the message to
      * @param message a String, the message you want to send to the other players
      */
     public void chat(String name, String message) {
-
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            if (!player.name.equals(name) && !player.isBot)
-                player.send(name + ": " + message);
-        }
-
-        /*
-        //giveAColorToEachPlayer();
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (!player.name.equals(name) && !player.isBot) {
-                //String color = null;
-                //colorList
                 player.send(player.textColor + name + ": " + message + ColorsRef.RESET.getCode());
             }
-        }*/
+        }
+    }
+
+    /**
+     * This method sends a private message to every player, except the one sending it
+     *
+     * @param message a String, the message you want to send to the other players
+     */
+    public void chat(String message) {
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.isBot) player.send(message);
+        }
+    }
+
+    private void getRoles() {
+        List<PlayerHandler> playersList = new ArrayList<>();
+
+        int nonBots = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.isBot) {
+                nonBots++;
+                playersList.add(player);
+            }
+        }
+        int playersInGame = Math.max(nonBots, 5);
+        System.out.println(playersInGame);
+
+        ArrayList<EnumRole> roles = Helpers.generateEnumCards(this.PLAYERS, playersInGame);
+        Collections.shuffle(roles);
+
+        for (int i = 0; i < playersInGame; i++) {
+            EnumRole newRole = roles.get(i);
+
+            if (i >= playersList.size()) {
+                Bot bot = new Bot();
+                PlayerHandler botPlayer = new PlayerHandler(bot);
+                botPlayer.character.setRole(newRole);
+                playersList.add(botPlayer);
+            } else {
+                playersList.get(i).send("You are a " + newRole.toString() + "!\n");
+                playersList.get(i).character = newRole.getCHARACTER();
+                playersList.get(i).character.setRole(newRole);
+            }
+        }
+        this.PLAYERS = new HashMap<>();
+        for (PlayerHandler player : playersList) {
+            this.PLAYERS.put(player.name, player);
+        }
     }
 
     /**
      * This method assigns one of the 12 chat colors available to each player
      */
-    /*private void giveAColorToEachPlayer() { //onde por esta função? está no addPlayer
+    private void giveAColorToEachPlayer() {
         putEnumColorInArrayList();
-        List<PlayerHandler> playersList = new ArrayList<>();
-        // for (PlayerHandler player : this.PLAYERS.values()) {
-        for (int i = 0; i < this.PLAYERS.values().size(); i++) {
-            playersList.get(i).textColor = colorList.get(i);
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            for (int i = 0; i < this.PLAYERS.values().size(); i++) {
+                player.textColor = colorList.get(i);
+            }
         }
-    } */
+    }
 
     /**
      * This method puts all 12 available chat colors, inside an Enum, into an ArrayList
@@ -199,46 +235,6 @@ public class Server {
         }
     }
 
-    /**
-     * This method sends a private message to every player, except the one sending it
-     *
-     * @param message a String, the message you want to send to the other players
-     */
-    public void chat(String message) {
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            if (!player.isBot) player.send(message);
-        }
-    }
-
-    /**
-     * This method opens up a private chat between wolves. This method accepts two parameters
-     *
-     * @param name    a String, the name of the wofl you want to send the message to
-     * @param message a String, the message you want to send to the other wolf
-     */
-    public void wolvesChat(String name, String message) {
-        this.PLAYERS.values().stream()
-                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
-                        && !x.name.equals(name) && !x.isBot)
-                .forEach(x -> x.send(name + ": " + message));
-    }
-
-    /**
-     * This method opens up a private chat between wolves. This method only accepts the message parameter
-     *
-     * @param message a String, the message you want to send to the other wolf
-     */
-    public void wolvesChat(String message) {
-        this.PLAYERS.values().stream()
-                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.isBot)
-                .forEach(x -> x.send(message));
-    }
-
-    /**
-     * This method returns the names of all the players present in the game
-     *
-     * @return a String, with names
-     */
     public String playersInGame() {
         return this.PLAYERS.values().stream()
                 .map(x -> x.name +
@@ -410,68 +406,71 @@ public class Server {
     }
 
 
-    private void play() {
+    private void play() throws InterruptedException {
         while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
-                    chat("\n===== It's dark already. Time to sleep =====");
-                    chat(displayWolfImage());
-                    Thread.sleep(500);
-
-                    wolvesChat(Colors.RED + "===== Wolves chat is open! =====");
-                    Thread.sleep(500);
-                    printAliveWolves();
-                    new Thread(this::botsNightVotes);
-                    Thread.sleep(20000);
-                    if (!stopTimer) {
-                        for (int seconds = 5; seconds > 0; seconds--) {
-                            chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the night...");
-                            Thread.sleep(1000);
-                        }
-                        chat("The night is over..." + playersInGame());
-                        stopTimer = true;
-                    }
+                    nightShift();
                     choosePlayerWhoDies();
-                    sendPrivateMessage(this.victim.name, (Colors.RED + "\n x.x You have been killed last night x.x") + Colors.RESET);
-                    sendPrivateMessage(this.victim.name, (displaySkullImage()));
-                    //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
-                    //chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
-                    //sendPrivateMessage(victimName.name, (Colors.WHITE + " x.x You have been killed last night x.x"));
-                    //sendPrivateMessage(victimName.name, displaySkullImage());
-                    //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
-                    if (ifThereAreAliveWolves()) {
-                        chat("Watch out! There are still wolves walking around. No one is safe!\nIt's time to vote and then kill the one that seems to be the wolf...");
-                    }
-
-                    //chat("The village has woken up with the terrible news that " + victimName.toUpperCase() + " was killed last night");
-                    Thread.sleep(500);
                     resetUsedVision();
                     resetDefense();
                     this.night = false;
                 } else {
-                    chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====" + Colors.RESET);
-                    Thread.sleep(20000);
-                    stopTimer = false;
-                    if (!stopTimer) {
-                        for (int seconds = 5; seconds > 0; seconds--) {
-                            chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the day...");
-                            Thread.sleep(1000);
-                        }
-                        chat("The day is over...");
-                        stopTimer = true;
-                    }
-                    if (numOfDays != 0) {
-                        Thread.sleep(1000);
-                        botsDayVotes();
-                        checkVotes();
-                    }
-                    this.night = true;
+                    dayShift();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
         resetGame();
+    }
+
+    private void nightShift() throws InterruptedException {
+        chat("\n===== It's dark already. Time to sleep... =====");
+        Thread.sleep(1800);
+        chat(Images.displayWolfImage());
+        Thread.sleep(1000);
+
+        wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n");
+        Thread.sleep(1000);
+        printAliveWolves();
+        new Thread(this::botsNightVotes);
+        Thread.sleep(10000);
+
+        chat("10 seconds left until the end of the night...");
+        Thread.sleep(10000);
+
+        chat("The night is over...");
+        Thread.sleep(1000);
+    }
+
+    private void dayShift() throws InterruptedException {
+        chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n");
+        Thread.sleep(10000);
+
+        chat("10 seconds left until the end of the day...");
+        Thread.sleep(10000);
+        chat("The day is over...");
+        Thread.sleep(1600);
+
+        if (numOfDays != 0) {
+            botsDayVotes();
+            checkVotes();
+        }
+        this.night = true;
+    }
+
+    public void wolvesChat(String name, String message) {
+        this.PLAYERS.values().stream()
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
+                        && !x.name.equals(name) && !x.isBot)
+                .forEach(x -> x.send(name + ": " + message));
+    }
+
+    public void wolvesChat(String message) {
+        this.PLAYERS.values().stream()
+                .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.isBot)
+                .forEach(x -> x.send(message));
     }
 
     private void botsNightVotes() {
@@ -507,30 +506,6 @@ public class Server {
         }
     }
 
-   /* Thread timer = new Thread(() -> {
-            try {
-
-                // Thread.sleep(2000);
-                stopTimer = false;
-                for (int seconds = 5; seconds > 0; seconds--) {
-                    chat(seconds + " second" + (seconds == 1 ? "" : "s") + " left until the end of the night...");
-                    Thread.sleep(1000);
-                }
-                chat("The night is over..." + playersInGame());
-                notifyTimer();
-            } catch (InterruptedException weCanIgnoreThisException) {
-            }
-    });
-
-    public synchronized void notifyTimer(){
-        stopTimer = true;
-        notifyAll();
-    } */
-
-
-    /**
-     * This method prints in the console of all the players the list of all the wolves that alive in the game
-     */
     private void printAliveWolves() {
         if (this.PLAYERS.size() >= 7) {
             String wolvesList = this.PLAYERS.values().stream()
@@ -551,58 +526,61 @@ public class Server {
         Bot.resetBotNumber();
     }
 
-    //Mensagem para os lobos quando matam alguém
-
-    private void choosePlayerWhoDies() {
+    private void choosePlayerWhoDies() throws InterruptedException {
         this.wolvesVotes = this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
                         && x.alive && x.vote != null)
                 .map(x -> x.vote)
-                .collect(Collectors.toList()); //List<PlayerHandler> wolvesVotes
+                .collect(Collectors.toList());
 
         botsNightVotes();
         if (this.wolvesVotes.size() == 0) {
             List<PlayerHandler> players = this.PLAYERS.values().stream()
-                    .filter(x -> !x.getCharacter().getRole().equals(EnumRole.WOLF))
+                    .filter(x -> x.alive && !x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .toList();
             this.victim = players.get((int) (Math.random() * players.size()));
 
         } else {
             this.victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
         }
+        this.victim.alive = false;
+        wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name + Colors.RESET);
+        Thread.sleep(1800);
+
+        printNightDayTransition();
+    }
+
+    private void printNightDayTransition() throws InterruptedException {
         if (!this.victim.getCharacter().isDefended()) {
             this.victim.alive = false;
-            wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name.toUpperCase() + Colors.RESET + "\n");
-            chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
-            chat("Unfortunately, " + this.victim.name.toUpperCase() + " was killed by hungry wolves... Rest in peace, " + this.victim.name.toUpperCase() + "\n");
-        } else {
-            wolvesChat(Colors.RED + "You have decided to kill " + this.victim.name.toUpperCase() + "... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
-            chat("\nTHIS IS DAY NUMBER " + ++numOfDays + "\n");
-            chat("HURRAYYYY! The guard bravely protected the village, so everyone survived the last night!");
-        }
-        chat("Check out the latest update of the " + playersInGame());
-    }
+            this.victim.send(Images.displaySkullImage());
+            Thread.sleep(500);
+            this.victim.send((Colors.WHITE + "\n x.x You have been killed last night x.x") + Colors.RESET);
+            Thread.sleep(2200);
 
-    private ArrayList<EnumRole> generateEnumCards(int playersInGame) {
-        ArrayList<EnumRole> roles = new ArrayList<>(PLAYERS.size());
-        for (int i = 0; i < playersInGame; i++) {
-            switch (i) {
-                case 0, 11 -> roles.add(i, EnumRole.WOLF);
-                case 1, 9 -> roles.add(i, EnumRole.FORTUNE_TELLER);
-                case 5 -> roles.add(i, EnumRole.GUARD);
-                default -> roles.add(i, EnumRole.VILLAGER);
+            if (verifyIfGameContinues()) {
+                chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
+                Thread.sleep(2200);
+                chat("Unfortunately, " + this.victim.name + " was killed by hungry wolves... Rest in peace, " + this.victim.name);
+                Thread.sleep(3000);
+                chat("(Type /list to check out the latest update)");
+                Thread.sleep(2200);
+                chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+                Thread.sleep(2400);
             }
+        } else {
+            wolvesChat("... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
+            Thread.sleep(1800);
+            chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
+            Thread.sleep(2200);
+            chat("===== HURRAYYYY! The guard bravely protected the village, so everyone survived the last night! =====");
+            Thread.sleep(2400);
+            chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+            Thread.sleep(2400);
         }
-        return roles;
     }
 
-    /**
-     * This method verifies whether there are wolves alive in the game. It also verifies the condition of the count between wolves and regular players: If the number of wolves is higher of equals to the number of regular players, the game cannot procede
-     *
-     * @return a boolean, if true, the game can continue. If false, the game cannot procede
-     */
-    private boolean verifyIfGameContinues() {
-        //O número de lobos não pode ser superior ou igual ao número dos jogadores não-lobos
+    private boolean verifyIfGameContinues() throws InterruptedException {
         int wolfCount = 0;
         int nonWolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
@@ -611,12 +589,6 @@ public class Server {
                 else nonWolfCount++;
             }
         }
-        /*for (Bot bot : this.bots) {
-            if (bot.alive) {
-                if (bot.getRole().equals(EnumRole.WOLF)) wolfCount++;
-                else nonWolfCount++;
-            }
-        }*/
         return checkWinner(wolfCount, nonWolfCount);
     }
 
@@ -626,26 +598,28 @@ public class Server {
      * @return a boolean, true if there are alive wolves. False, if all the wolves are dead
      */
     private boolean ifThereAreAliveWolves() {
-        //se o count de lobos for maior que villagers, true, else false
-        int wolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.alive) {
-                if (player.getCharacter().getRole().equals(EnumRole.WOLF))
-                    wolfCount++;
-            }
+            if (player.alive && player.getCharacter().getRole().equals(EnumRole.WOLF))
+                return true;
         }
-        return (wolfCount > 0);
+        return false;
     }
 
-    private boolean checkWinner(int wolfCount, int nonWolfCount) {
+    private boolean checkWinner(int wolfCount, int nonWolfCount) throws InterruptedException {
         if (wolfCount >= nonWolfCount) {
-            chat("\nWolves took over the village... Anyone who's letf alive, will be eaten tonight.\nWolves won!\nGAME OVER");
+            chat("\nWolves took over the village... Anyone who's letf alive, will be eaten tonight... MUAHAHAHAHAHAH\n");
+            Thread.sleep(2400);
+            chat("===== GAME OVER =====");
+            Thread.sleep(500);
             resetGame();
             this.PLAYERS.values().forEach(System.out::println);
             System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         } else if (wolfCount == 0) {
-            chat("\nThe villagers won!\nThere are no wolves left alive.\n" + "GAME OVER");
+            chat("\nThere are no wolves left alive! Villagers can now sleep deeply\n");
+            Thread.sleep(2400);
+            chat("===== GAME OVER =====");
+            Thread.sleep(500);
             resetGame();
             this.PLAYERS.values().forEach(System.out::println);
             System.out.println(wolfCount + " " + nonWolfCount);
@@ -671,7 +645,7 @@ public class Server {
         this.PLAYERS.values().forEach(x -> x.vote = null);
     }
 
-    private void checkVotes() {
+    private void checkVotes() throws InterruptedException {
         checkIfAllPlayersVoted();
         Optional<PlayerHandler> highestVote = PLAYERS.values().stream()
                 .filter(player -> player.alive)
@@ -680,7 +654,8 @@ public class Server {
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().alive = false;
-            chat(highestVote.get().name + " was tragically killed by the Villagers, thinking it was a wolf");
+            chat("\n" + highestVote.get().name + " was tragically killed by the Villagers, thinking it was a wolf");
+            Thread.sleep(2500);
         }
         resetNumberOfVotes();
     }
@@ -727,6 +702,10 @@ public class Server {
                 .forEach(x -> ((FortuneTeller) x.getCharacter()).setUsedVision(false));
     }
 
+    public HashMap<String, PlayerHandler> getPLAYERS() {
+        return PLAYERS;
+    }
+
     private void resetDefense() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().isDefended())
@@ -744,9 +723,14 @@ public class Server {
         private boolean alive;
         private String textColor;
 
-        private int ID;
-
-        private PlayerHandler defend;
+        public PlayerHandler(Socket clientSocket) {
+            try {
+                this.playerSocket = clientSocket;
+                this.out = new BufferedWriter(new OutputStreamWriter(this.playerSocket.getOutputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         public PlayerHandler(Socket clientSocket, String name) {
             try {
@@ -771,7 +755,7 @@ public class Server {
                 in = new BufferedReader(new InputStreamReader(this.playerSocket.getInputStream()));
                 while (!this.playerSocket.isClosed()) {
                     this.message = in.readLine();
-                    System.out.println(name + ": " + this.message); //imprime no server as msg q recebe dos clients
+                    System.out.println(name + ": " + this.message);
 
                     if (Server.this.night) {
                         switch (this.character.getRole()) {
@@ -781,10 +765,10 @@ public class Server {
                             }
                             case FORTUNE_TELLER, GUARD -> dealWithCommand(this.message);
                             default -> {
-                                if (!this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()) ||
-                                        !this.message.split(" ")[0].equals(Command.COMMAND_LIST.getCOMMAND()))
-                                    send("You are sleeping");
-                                else dealWithCommand(this.message);
+                                if (this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()) ||
+                                        this.message.split(" ")[0].equals(Command.COMMAND_LIST.getCOMMAND()))
+                                    dealWithCommand(this.message);
+                                else send("You are sleeping");
                             }
                         }
                     } else {
@@ -813,6 +797,7 @@ public class Server {
         }
 
         public void send(String message) {
+            if (this.isBot) return;
             try {
                 this.out.write(message);
                 this.out.newLine();
@@ -849,27 +834,8 @@ public class Server {
             }
         }
 
-        @Override
-        public String toString() {
-            return "PlayerHandler{" +
-                    "NAME='" + name + '\'' + this.alive +
-                    '}';
-        }
-
         public boolean isAlive() {
             return alive;
         }
-
-        public void setDefend(PlayerHandler defend) {
-            this.defend = defend;
-        }
-
-      /* public void setTextColor(String textColor) {
-            this.textColor = textColor;
-        } */
     }
-
-
 }
-
-

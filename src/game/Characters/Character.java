@@ -12,7 +12,6 @@ public class Character {
     private int numberOfVotes;
     private Character previousVote;
     private boolean defended;
-
     private Character previousDefend;
 
     public void increaseNumberOfVotes() {

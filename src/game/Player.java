@@ -10,7 +10,7 @@ public class Player {
         try {
             player.start("localhost", 8082);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("The server is down");
         }
     }
 
@@ -38,7 +38,6 @@ public class Player {
 
         @Override
         public void run() {
-            //ler
             new Thread(() -> {
                 while (!this.SOCKET.isClosed()) {
                     try {
@@ -50,7 +49,7 @@ public class Player {
                         System.out.println(message); //imprime a msg que escreve na consola
                     } catch (IOException e) {
                         try {
-                            System.out.println("You disconnected from chat");
+                            System.out.println("You were disconnected from chat");
                             this.SOCKET.close();
                             Thread.currentThread().interrupt();
                         } catch (IOException ex) {
@@ -60,11 +59,10 @@ public class Player {
                 }
             }).start();
 
-            //escrever
             while (!this.SOCKET.isClosed()) {
                 try {
                     String message = this.consoleReader.readLine();
-                    this.out.write(message); //escreve o input da consola
+                    this.out.write(message);
                     this.out.newLine();
                     this.out.flush();
 
@@ -72,10 +70,9 @@ public class Player {
                         this.SOCKET.close();
                     }
                 } catch (IOException e) {
-                    System.out.println("You disconnected from chat");
+                    System.out.println("You were disconnected from chat");
                 }
             }
         }
     }
 }
-

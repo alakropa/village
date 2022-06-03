@@ -10,7 +10,12 @@ public class StartHandler implements CommandHandler {
             return;
         }
         server.setGameInProgress(true);
-        new Thread(server::startGame).start();
-        System.out.println(server.isGameInProgress());
+        new Thread(() -> {
+            try {
+                server.startGame();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

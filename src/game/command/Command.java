@@ -15,9 +15,6 @@ public enum Command {
     VISIONS_LIST("/visionsList", new VisionListHandler(), Colors.WHITE + "Lists the previous visions (available to Furtune Teller only)" + Colors.RESET),
     QUIT("/quit", new QuitHandler(), Colors.WHITE + "Quit from the game" + Colors.RESET + "\n");
 
-
-    //Fazer comando com as regras do jogo
-
     private final String COMMAND;
     private final CommandHandler HANDLER;
     private final String DESCRIPTION;
@@ -46,7 +43,7 @@ public enum Command {
     }
 
     public static String getCommandList() {
-        return "Commands list:" + Arrays.stream(Command.values())
+        return "Command list:" + Arrays.stream(Command.values())
                 .map(x -> x.COMMAND + " - " + x.DESCRIPTION)
                 .reduce("", (a, b) -> a + "\n" + b);
     }
