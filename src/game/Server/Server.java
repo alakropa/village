@@ -135,7 +135,9 @@ public class Server {
     public void startGame() throws InterruptedException {
         this.night = false;
         this.numOfDays = 0;
-        this.delay = PLAYERS.size() * 1000;
+        this.delay = PLAYERS.size() * 20000;
+        chat(Images.welcomeTo());
+        chat(Images.displaySpookyVillage());
 
         chat(Images.welcomeTo());
         chat(Images.displaySpookyVillage());
@@ -190,6 +192,7 @@ public class Server {
                 playersList.add(player);
             }
         }
+
         int playersInGame = Math.max(nonBots, 5);
         System.out.println(playersInGame);
 
@@ -210,6 +213,7 @@ public class Server {
                 playersList.get(i).character.setRole(newRole);
             }
         }
+
         this.PLAYERS = new HashMap<>();
         for (PlayerHandler player : playersList) {
             this.PLAYERS.put(player.name, player);
@@ -435,7 +439,7 @@ public class Server {
     }
 
     /**
-     * Resets the gameInProgress and the botNumber.
+     * This method resets the game, so when the game is over, players can restart it
      */
     private void resetGame() {
         this.gameInProgress = false;
@@ -525,6 +529,12 @@ public class Server {
         return true;
     }
 
+    /**
+     * This method retrieves the PlayerHandler player, by a given name
+     *
+     * @param name a String, the name of the player we want to retrieve
+     * @return an Optional, it either returns a PlayerHander of a null, without breaking the code
+     */
     public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.PLAYERS.values().stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
@@ -552,6 +562,9 @@ public class Server {
         resetNumberOfVotes();
     }
 
+    /**
+     * This method checks whether all the players have voted, or not. If not, the vote goes to itself. This prevents the game from stopping, while waiting for a vote from all the players
+     */
     private void checkIfAllPlayersVoted() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.vote == null)
