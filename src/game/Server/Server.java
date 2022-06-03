@@ -7,12 +7,15 @@ import game.EnumRole;
 import game.Helpers;
 import game.Images;
 import game.colors.Colors;
+
+import game.colors.ColorsRef;
 import game.command.Command;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -26,6 +29,7 @@ public class Server {
     private List<PlayerHandler> wolvesVotes;
     private PlayerHandler victim;
     private int numOfDays;
+    private ArrayList<String> colorList;
 
     public Server() {
         this.PLAYERS = new HashMap<>();
@@ -70,6 +74,13 @@ public class Server {
         }
     }
 
+    /**
+     * This method allows the player to enter a name and check if that name is available or not. If not, the player can insert another name until he has chosen an available one
+     *
+     * @param newPlayer PlayerHandler - contains a PlayerHandler instance
+     * @param in        BufferedReader - reads from the console of the player
+     * @return a String, the player name
+     */
     private String verifyIfNameIsAvailable(PlayerHandler newPlayer, BufferedReader in) throws IOException {
         String playerName = in.readLine();
         while (!checkIfNameIsAvailable(playerName) || playerName.startsWith("/") || playerName.equals("")) {
@@ -79,6 +90,12 @@ public class Server {
         return playerName;
     }
 
+    /**
+     * This method verifies if the given name is already in use or not
+     *
+     * @param playerName a String, the player name
+     * @return returns a boolean. If true, the name is available. If false, the name is taken.
+     */
     private boolean checkIfNameIsAvailable(String playerName) {
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (player.name.equals(playerName)) {
@@ -88,10 +105,16 @@ public class Server {
         return true;
     }
 
+    /**
+     * This method adds the player to the XXXXX, and submits it into the Thread Pool. It also sends a message to all the other players informing them that this particular player joined the game.
+     *
+     * @param playerHandler receives a PlayerHander, an inner class from the Server, that deals with the players, and its attributes
+     */
     private void addPlayer(PlayerHandler playerHandler) {
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler);
         chat(playerHandler.name, "joined the chat");
+        giveAColorToEachPlayer();
     }
 
     public void startGame() throws InterruptedException {
@@ -109,13 +132,25 @@ public class Server {
         play();
     }
 
+    /**
+     * This method sends a private message to every player, except the one sending it
+     *
+     * @param name    a String, the name of the person you want to send the message to
+     * @param message a String, the message you want to send to the other players
+     */
     public void chat(String name, String message) {
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (!player.name.equals(name) && !player.isBot)
-                player.send(name + ": " + message);
+            if (!player.name.equals(name) && !player.isBot) {
+                player.send(player.textColor + name + ": " + message + ColorsRef.RESET.getCode());
+            }
         }
     }
 
+    /**
+     * This method sends a private message to every player, except the one sending it
+     *
+     * @param message a String, the message you want to send to the other players
+     */
     public void chat(String message) {
         for (PlayerHandler player : this.PLAYERS.values()) {
             if (!player.isBot) player.send(message);
@@ -124,7 +159,16 @@ public class Server {
 
     private void getRoles() {
         List<PlayerHandler> playersList = new ArrayList<>();
-        int playersInGame = checkNumberOfPlayers(playersList);
+
+        int nonBots = 0;
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (!player.isBot) {
+                nonBots++;
+                playersList.add(player);
+            }
+        }
+        int playersInGame = Math.max(nonBots, 5);
+        System.out.println(playersInGame);
 
         ArrayList<EnumRole> roles = Helpers.generateEnumCards(this.PLAYERS, playersInGame);
         Collections.shuffle(roles);
@@ -149,6 +193,48 @@ public class Server {
         }
     }
 
+    /**
+     * This method assigns one of the 12 chat colors available to each player
+     */
+    private void giveAColorToEachPlayer() {
+        putEnumColorInArrayList();
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            for (int i = 0; i < this.PLAYERS.values().size(); i++) {
+                player.textColor = colorList.get(i);
+            }
+        }
+    }
+
+    /**
+     * This method puts all 12 available chat colors, inside an Enum, into an ArrayList
+     */
+    public void putEnumColorInArrayList() {
+//        private ArrayList<String> colorList;
+//        ArrayList<ColorsRef> colorEnumList = new ArrayList<>();
+//        colorEnumList.add(ColorsRef.BLUE);
+        //private ArrayList<String> colorList;
+        //private String textColor;
+
+        colorList = new ArrayList<>(PLAYERS.size());
+        for (int i = 0; i < this.playersInGame().length(); i++) {
+            switch (i) {
+                case 0 -> colorList.add(ColorsRef.RED.getCode());
+                case 1 -> colorList.add(ColorsRef.GREEN.getCode());
+                case 2 -> colorList.add(ColorsRef.YELLOW.getCode());
+                case 3 -> colorList.add(ColorsRef.BLUE.getCode());
+                case 4 -> colorList.add(ColorsRef.MAGENTA.getCode());
+                case 5 -> colorList.add(ColorsRef.CYAN.getCode());
+                case 6 -> colorList.add(ColorsRef.WHITE.getCode());
+                case 7 -> colorList.add(ColorsRef.RED_UNDERLINED.getCode());
+                case 8 -> colorList.add(ColorsRef.GREEN_UNDERLINED.getCode());
+                case 9 -> colorList.add(ColorsRef.YELLOW_UNDERLINED.getCode());
+                case 10 -> colorList.add(ColorsRef.BLUE_UNDERLINED.getCode());
+                case 11 -> colorList.add(ColorsRef.MAGENTA_UNDERLINED.getCode());
+                default -> colorList.add(ColorsRef.RESET.getCode());
+            }
+        }
+    }
+
     public String playersInGame() {
         return this.PLAYERS.values().stream()
                 .map(x -> x.name +
@@ -157,11 +243,15 @@ public class Server {
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
-    private void play() {
+    private void play() throws InterruptedException {
         while (verifyIfGameContinues()) {
             try {
                 if (this.night) {
                     nightShift();
+                    choosePlayerWhoDies();
+                    resetUsedVision();
+                    resetDefense();
+                    this.night = false;
                 } else {
                     dayShift();
                 }
@@ -176,7 +266,7 @@ public class Server {
         chat("\n===== It's dark already. Time to sleep... =====");
         Thread.sleep(1800);
         chat(Images.displayWolfImage());
-        Thread.sleep(1200);
+        Thread.sleep(1000);
 
         wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n");
         Thread.sleep(1000);
@@ -188,33 +278,22 @@ public class Server {
         Thread.sleep(10000);
 
         chat("The night is over...");
-        Thread.sleep(1800);
-
-        choosePlayerWhoDies();
-
-        if (ifThereAreAliveWolves()) {
-            chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
-            Thread.sleep(2400);
-        }
-
-        resetUsedVision();
-        this.night = false;
+        Thread.sleep(1000);
     }
 
     private void dayShift() throws InterruptedException {
         chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n");
         Thread.sleep(10000);
 
-
-        chat("10 seconds left until the end of the night...");
+        chat("10 seconds left until the end of the day...");
         Thread.sleep(10000);
         chat("The day is over...");
+        Thread.sleep(1600);
 
         if (numOfDays != 0) {
             botsDayVotes();
             checkVotes();
         }
-        Thread.sleep(1500);
         this.night = true;
     }
 
@@ -229,17 +308,6 @@ public class Server {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.isBot)
                 .forEach(x -> x.send(message));
-    }
-
-    private int checkNumberOfPlayers(List<PlayerHandler> playersList) {
-        int nonBots = 0;
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            if (!player.isBot) {
-                nonBots++;
-                playersList.add(player);
-            }
-        }
-        return Math.max(nonBots, 5);
     }
 
     private void botsNightVotes() {
@@ -310,20 +378,43 @@ public class Server {
             this.victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
         }
         this.victim.alive = false;
-        wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name + Colors.RESET + "\n");
-        Thread.sleep(1500);
-        this.victim.send(Images.displaySkullImage());
-        this.victim.send((Colors.BLACK + "\n x.x You have been killed last night x.x") + Colors.RESET);
-        Thread.sleep(1600);
-        chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
-        Thread.sleep(1600);
-        chat("Unfortunately, " + this.victim.name + " was killed by hungry wolves... Rest in peace, " + this.victim.name);
-        Thread.sleep(2400);
-        chat("(Type /list to check out the latest update)");
+        wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name + Colors.RESET);
         Thread.sleep(1800);
+
+        printNightDayTransition();
     }
 
-    private boolean verifyIfGameContinues() {
+    private void printNightDayTransition() throws InterruptedException {
+        if (!this.victim.getCharacter().isDefended()) {
+            this.victim.alive = false;
+            this.victim.send(Images.displaySkullImage());
+            Thread.sleep(500);
+            this.victim.send((Colors.WHITE + "\n x.x You have been killed last night x.x") + Colors.RESET);
+            Thread.sleep(2200);
+
+            if (verifyIfGameContinues()) {
+                chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
+                Thread.sleep(2200);
+                chat("Unfortunately, " + this.victim.name + " was killed by hungry wolves... Rest in peace, " + this.victim.name);
+                Thread.sleep(3000);
+                chat("(Type /list to check out the latest update)");
+                Thread.sleep(2200);
+                chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+                Thread.sleep(2400);
+            }
+        } else {
+            wolvesChat("... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
+            Thread.sleep(1800);
+            chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
+            Thread.sleep(2200);
+            chat("===== HURRAYYYY! The guard bravely protected the village, so everyone survived the last night! =====");
+            Thread.sleep(2400);
+            chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+            Thread.sleep(2400);
+        }
+    }
+
+    private boolean verifyIfGameContinues() throws InterruptedException {
         int wolfCount = 0;
         int nonWolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
@@ -336,25 +427,28 @@ public class Server {
     }
 
     private boolean ifThereAreAliveWolves() {
-        int wolfCount = 0;
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.alive) {
-                if (player.getCharacter().getRole().equals(EnumRole.WOLF))
-                    wolfCount++;
-            }
+            if (player.alive && player.getCharacter().getRole().equals(EnumRole.WOLF))
+                return true;
         }
-        return (wolfCount > 0);
+        return false;
     }
 
-    private boolean checkWinner(int wolfCount, int nonWolfCount) {
+    private boolean checkWinner(int wolfCount, int nonWolfCount) throws InterruptedException {
         if (wolfCount >= nonWolfCount) {
-            chat("\nThe wolves won!\nGame over");
+            chat("\nWolves took over the village... Anyone who's letf alive, will be eaten tonight... MUAHAHAHAHAHAH\n");
+            Thread.sleep(2400);
+            chat("===== GAME OVER =====");
+            Thread.sleep(500);
             resetGame();
             this.PLAYERS.values().forEach(System.out::println);
             System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         } else if (wolfCount == 0) {
-            chat("\nThe villagers won!\nThere are no wolves left alive\n" + "GAME OVER");
+            chat("\nThere are no wolves left alive! Villagers can now sleep deeply\n");
+            Thread.sleep(2400);
+            chat("===== GAME OVER =====");
+            Thread.sleep(500);
             resetGame();
             this.PLAYERS.values().forEach(System.out::println);
             System.out.println(wolfCount + " " + nonWolfCount);
@@ -383,11 +477,10 @@ public class Server {
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().alive = false;
-            chat(highestVote.get().name + " was tragically killed by the Villagers, thinking it was a wolf");
+            chat("\n" + highestVote.get().name + " was tragically killed by the Villagers, thinking it was a wolf");
             Thread.sleep(2500);
         }
         resetNumberOfVotes();
-        this.PLAYERS.values().stream().toList().forEach(System.out::println);
     }
 
     private void checkIfAllPlayersVoted() {
@@ -433,6 +526,12 @@ public class Server {
         return PLAYERS;
     }
 
+    private void resetDefense() {
+        this.PLAYERS.values().stream()
+                .filter(x -> x.getCharacter().isDefended())
+                .forEach(x -> (x.getCharacter()).setDefended(false));
+    }
+
     public class PlayerHandler implements Runnable {
         private String name;
         private Socket playerSocket;
@@ -442,6 +541,7 @@ public class Server {
         private Character character;
         private boolean isBot;
         private boolean alive;
+        private String textColor;
 
         public PlayerHandler(Socket clientSocket) {
             try {
@@ -475,7 +575,7 @@ public class Server {
                 in = new BufferedReader(new InputStreamReader(this.playerSocket.getInputStream()));
                 while (!this.playerSocket.isClosed()) {
                     this.message = in.readLine();
-                    System.out.println(name + ": " + this.message); //imprime no server as msg q recebe dos clients
+                    System.out.println(name + ": " + this.message);
 
                     if (Server.this.night) {
                         switch (this.character.getRole()) {
@@ -483,12 +583,12 @@ public class Server {
                                 if (isCommand(this.message)) dealWithCommand(this.message);
                                 else wolvesChat(this.name, this.message);
                             }
-                            case FORTUNE_TELLER -> dealWithCommand(this.message);
+                            case FORTUNE_TELLER, GUARD -> dealWithCommand(this.message);
                             default -> {
-                                if (!this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()) ||
-                                        !this.message.split(" ")[0].equals(Command.COMMAND_LIST.getCOMMAND()))
-                                    send("You are sleeping");
-                                else dealWithCommand(this.message);
+                                if (this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()) ||
+                                        this.message.split(" ")[0].equals(Command.COMMAND_LIST.getCOMMAND()))
+                                    dealWithCommand(this.message);
+                                else send("You are sleeping");
                             }
                         }
                     } else {
@@ -552,13 +652,6 @@ public class Server {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
-
-        @Override
-        public String toString() {
-            return "PlayerHandler{" +
-                    "NAME='" + name + '\'' + this.alive +
-                    '}';
         }
 
         public boolean isAlive() {

@@ -19,7 +19,10 @@ public class KillHandler implements CommandHandler {
                     player.send("You can't target a Wolf");
                 else if (!playerWhoDies.get().isAlive())
                     player.send("This player is already dead");
-                else player.setVote(playerWhoDies.get());
+                else {
+                    player.setVote(playerWhoDies.get());
+                    player.send("You voted to kill " + playerWhoDies.get().getName());
+                }
             } else player.send(chosenPName + " is unavailable");
         }
     }

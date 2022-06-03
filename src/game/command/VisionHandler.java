@@ -9,12 +9,13 @@ import java.util.Optional;
 
 public class VisionHandler implements CommandHandler {
     public void command(Server server, Server.PlayerHandler player) {
-        FortuneTeller playerCharacter = ((FortuneTeller) player.getCharacter());
         String chosenPName = Helpers.removeCommand(player.getMessage());
         EnumRole role = EnumRole.FORTUNE_TELLER;
 
         if (this.commandConditions(server, player, role, chosenPName)) {
             Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
+            FortuneTeller playerCharacter = ((FortuneTeller) player.getCharacter());
+
             if (playerCharacter.hasUsedVision()) player.send("You have already used this hability");
             else if (chosenPlayer.isPresent()) {
                 EnumRole chosenPRole = chosenPlayer.get().getCharacter().getRole();

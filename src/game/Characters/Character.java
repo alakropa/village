@@ -1,6 +1,10 @@
 package game.Characters;
 
 import game.EnumRole;
+import game.Server.Server;
+
+import java.util.List;
+import java.util.Optional;
 
 public class Character {
 
@@ -8,6 +12,7 @@ public class Character {
     private int numberOfVotes;
     private Character previousVote;
     private boolean defended;
+    private Character previousDefend;
 
     public void increaseNumberOfVotes() {
         this.numberOfVotes++;
@@ -55,5 +60,13 @@ public class Character {
 
     public void setDefended(boolean defended) {
         this.defended = defended;
+    }
+
+    public Character getPreviousDefend() {
+        return previousDefend;
+    }
+
+    public void setPreviousDefend(Character previousDefend) {
+        this.previousDefend = previousDefend;
     }
 }

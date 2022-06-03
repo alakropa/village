@@ -53,7 +53,7 @@ public class Images {
     }
 
     public static String displaySkullImage() {
-        return Colors.BLACK +
+        return Colors.WHITE +
                 "        _;~)                    (~;_   \n" +
                 "        (   |                  |   )   \n" +
                 "         ~', ',   ,''~'',   ,' ,'~     \n" +
