@@ -1,6 +1,5 @@
 package game.command;
 
-import game.Characters.Character;
 import game.Helpers;
 import game.Server.Server;
 
@@ -17,9 +16,8 @@ public class VoteHandler implements CommandHandler {
                 if (player.getPreviousVote() != null) {
                     player.getPreviousVote().decreaseNumberOfVotes();
                 }
-                Character votedPCharacter = votedPlayer.get().getCharacter();
-                player.setPreviousVote(votedPCharacter);
-                votedPCharacter.increaseNumberOfVotes();
+                player.setPreviousVote(votedPlayer.get());
+                votedPlayer.get().increaseNumberOfVotes();
 
                 player.setVote(votedPlayer.get());
                 server.chat(player.getName(), " voted for " + votedPName);

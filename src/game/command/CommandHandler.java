@@ -13,7 +13,7 @@ public interface CommandHandler {
         } else if (!player.isAlive()) {
             player.send("You are dead");
             return false;
-        } else if (!player.getCharacter().getRole().equals(role)) {
+        } else if (!player.getRole().equals(role)) {
             player.send("Only " + role.getPLURAL() + " can use this command");
             return false;
         } else if (!server.isNight()) {

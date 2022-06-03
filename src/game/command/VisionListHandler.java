@@ -1,6 +1,5 @@
 package game.command;
 
-import game.Characters.FortuneTeller;
 import game.EnumRole;
 import game.Server.Server;
 
@@ -11,12 +10,11 @@ public class VisionListHandler implements CommandHandler {
 
         if (!server.isGameInProgress()) player.send("You must start the game first");
         else if (!player.isAlive()) player.send("You are dead");
-        else if (!player.getCharacter().getRole().equals(role))
+        else if (!player.getRole().equals(role))
             player.send("Only " + role.getPLURAL() + " can use this command");
         else {
-            FortuneTeller playerCharacter = (FortuneTeller) player.getCharacter();
             player.send("Visions list:");
-            playerCharacter.getVISIONS()
+            player.getVisions()
                     .forEach((key, value) -> player.send(key + " - " + value));
         }
     }
