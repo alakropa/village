@@ -133,7 +133,7 @@ public class Server {
     public void startGame() throws InterruptedException {
         this.night = false;
         this.numOfDays = 0;
-        this.delay = PLAYERS.size() * 1000;
+        this.delay = PLAYERS.size() * 20000;
         chat(Images.welcomeTo());
         chat(Images.displaySpookyVillage());
         chat("\n===== Welcome to the Spooky Village! =====\n");
