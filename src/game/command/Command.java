@@ -9,9 +9,10 @@ public enum Command {
     LIST("/list", new ListHandler(), Colors.WHITE + "Lists the players in game" + Colors.RESET),
     COMMAND_LIST("/cmd", new CommandListHandler(), Colors.WHITE + "Lists the game commands" + Colors.RESET),
     VOTE("/vote", new VoteHandler(), Colors.WHITE + "Vote the player that you want to eliminate" + Colors.RESET),
+    ROLE("/role", new RoleHandler(), Colors.WHITE + "Prints your game role" + Colors.RESET),
     KILL("/kill", new KillHandler(), Colors.WHITE + "Choose the player that you want to kill (available to Wolfs only)" + Colors.RESET),
     VISION("/vision", new VisionHandler(), Colors.WHITE + "Once per night you can choose a player to check if it's a wolf (available to Furtune Teller only)" + Colors.RESET),
-    DEFEND("/defend", new DefendHandler(),Colors.WHITE +"Once per night you can choose a player to protect, so surely it won't be attacked by wolves (available to Guard only)" + Colors.RESET),
+    DEFEND("/defend", new DefendHandler(), Colors.WHITE + "Once per night you can choose a player to protect, so surely it won't be attacked by wolves (available to Guard only)" + Colors.RESET),
     VISIONS_LIST("/visionsList", new VisionListHandler(), Colors.WHITE + "Lists the previous visions (available to Furtune Teller only)" + Colors.RESET),
     QUIT("/quit", new QuitHandler(), Colors.WHITE + "Quit from the game" + Colors.RESET + "\n");
 

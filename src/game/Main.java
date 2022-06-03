@@ -1,41 +1,23 @@
 package game;
 
-import java.util.HashMap;
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
-        HashMap<Integer, String> asd = new HashMap<>();
-        asd.put(1, "a");
-        List<String> dsa = asd.values().stream().filter(x -> x.equals("b")).toList();
-        System.out.println(dsa.size());
-
-
-
         /*
         TO DO LIST:
-            VER TRIM() E IGNORE CASE NOS NOMES
-            VisionsList bug quando se reinicia o jogo
-            Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
-           Elisa Mensagem para os lobos quando matam alguém
-           Elisa Mensagem para a aldeia sobre quem morreu durante a noite
-            Usar Thread.sleep() em várias zonas do código para que o código da consola seja mais intervalado
-            Nas rondas em que o vidente já sabe quem são todos os lobos, o vidente não acorda mais (o chat noturno dele não abre mais, sendo tratado como um aldeão normal)
-
             Extras:
             Usar a voz como imput e output stream do chat
-            Criar bots (criação do bot, verificação, no start do jogo, se e preciso fazer bots)
-            Imagens (noite, dia, lobo, aldeao, fortuneteller)
-            Adicionar mais papeis (fairy/protect, procurar outros)
             Command /suicide
-        */
 
-        //verificar se os sockets estão activos ou não ->
-
-
-
-        /*
         DONE LIST:
+            DONE Ver ignore case nos nomes
+            DONE VisionsList bug quando se reinicia o jogo
+            DONE Manter o esquema de matar uma pessoa aleatória durante o dia (com 12 players, o jogo acaba em 3 rodadas caso os 3 lobos sobrevivam) ???
+            DONE Mensagem para os lobos quando matam alguém
+            DONE Mensagem para a aldeia sobre quem morreu durante a noite
+            DONE Usar Thread.sleep() em várias zonas do código para que o código da consola seja mais intervalado
+            DONE Criar bots (criação do bot, verificação, no start do jogo, se e preciso fazer bots)
+            DONE Imagens (noite, dia, lobo, aldeao, fortuneteller)
+            DONE Adicionar mais papeis (fairy/protect, procurar outros)
             DONE O vidente só consegue ter uma visão por noite
             DONE Wolves não conseguem matar-se uns aos outros
             DONE Fortune Tellers não conseguem usar /vision no seu próprio nome
@@ -148,11 +130,5 @@ public class Main {
 //                        this.PLAYERS.get(i).send(ColorsRef.BLUE_UNDERLINED + name + ": " + message + ColorsRef.RESET);
 //                    case 11:
 //                        this.PLAYERS.get(i).send(ColorsRef.MAGENTA_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-
-
-
-
-
-
     }
 }

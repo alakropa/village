@@ -1,10 +1,6 @@
 package game.Characters;
 
 import game.EnumRole;
-import game.Server.Server;
-
-import java.util.List;
-import java.util.Optional;
 
 public class Character {
 

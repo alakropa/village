@@ -80,7 +80,6 @@ public class Server {
      * @param newPlayer PlayerHandler - contains a PlayerHandler instance
      * @param in        BufferedReader - reads from the console of the player
      * @return a String, the player name
-     * @throws IOException
      */
     private String verifyIfNameIsAvailable(PlayerHandler newPlayer, BufferedReader in) throws IOException {
         String playerName = in.readLine();
@@ -115,10 +114,12 @@ public class Server {
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler);
         chat(playerHandler.name, "joined the chat");
+        giveAColorToEachPlayer();
     }
 
     public void startGame() throws InterruptedException {
         this.night = false;
+        this.numOfDays = 0;
         chat(Images.displayVillageImage2());
         chat("\n===== Welcome to the Spooky Village! =====\n");
         Thread.sleep(1200);
@@ -243,169 +244,6 @@ public class Server {
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
-    /**
-     * This method allows a player to send a private message to another player
-     *
-     * @param name    a String, the name of the player you want to send the message to
-     * @param message a String, the message you want to send to the othe player
-     */
-    public void sendPrivateMessage(String name, String message) {
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.name.equals(name) && !player.isBot) {
-                player.send(message);
-            }
-        }
-    }
-
-    public void startGame() {
-        this.night = false;
-        //chat(displayVillageImage());
-       // chat(displayVillageImage2());
-        //chat(displayWolfImage());
-        chat(displayeVillage2());
-        chat(displayeVillage());
-
-        chat("\n===== Welcome to the Spooky Village! =====\n");
-        List<PlayerHandler> playersList = new ArrayList<>();
-        //int playersInGame = Math.max(playersList.size(), 5);
-
-        int nonBots = 0;
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            if (!player.isBot) {
-                nonBots++;
-                playersList.add(player);
-            }
-        }
-        putEnumColorInArrayList();
-        for (int i = 0; i < this.PLAYERS.values().size(); i++) {
-            playersList.get(i).textColor = colorList.get(i);
-        }
-        int playersInGame = Math.max(nonBots, 5);
-        System.out.println(playersInGame);
-
-        ArrayList<EnumRole> roles = generateEnumCards(playersInGame);
-        Collections.shuffle(roles);
-
-        for (int i = 0; i < playersInGame; i++) {
-            EnumRole newRole = roles.get(i);
-
-            if (i >= playersList.size()) {
-                Bot bot = new Bot();
-                PlayerHandler botPlayer = new PlayerHandler(bot);
-                botPlayer.character.setRole(newRole);
-                playersList.add(botPlayer);
-            } else {
-                sendPrivateMessage(playersList.get(i).name, "You are a " + newRole.toString() + "\n");
-                playersList.get(i).character = newRole.getCHARACTER();
-                playersList.get(i).character.setRole(newRole);
-            }
-        }
-        this.PLAYERS = new HashMap<>();
-        for (PlayerHandler player : playersList) {
-            this.PLAYERS.put(player.name, player);
-        }
-        setPlayersLife();
-        chat(playersInGame());
-        play();
-    }
-
-    /**
-     * This method displays the game's welcome message in ASCII Art, in the color CYAN
-     *
-     * @return a String, the ASCII Art
-     */
-    private String displayVillageImage2() {
-        return Colors.CYAN + "                                                               \n" +
-                "                _ _ _     _                            _          _   _       \n" +
-                "               | | | |___| |___ ___ _____ ___         | |_ ___   | |_| |_ ___ \n" +
-                "               | | | | -_| |  _| . |     | -_|_ _ _   |  _| . |  |  _|   | -_|\n" +
-                "               |_____|___|_|___|___|_|_|_|___|_|_|_|  |_| |___|  |_| |_|_|___|\n" +
-                "                                                               " +
-                "                                                   \n" +
-                "                _____             _       _____ _ _ _             \n" +
-                "               |   __|___ ___ ___| |_ _ _|  |  |_| | |___ ___ ___ \n" +
-                "               |__   | . | . | . | '_| | |  |  | | | | .'| . | -_|\n" +
-                "               |_____|  _|___|___|_,_|_  |\\___/|_|_|_|__,|_  |___|\n" +
-                "                     |_|             |___|               |___|    " + Colors.RESET;
-    }
-
-    /**
-     * This method displays the game's night scenario in ASCII Art, in the color BLUE
-     *
-     * @return a String, the ASCII Art
-     */
-    private String displayWolfImage() {
-        return Colors.BLUE + "                                                                                                       \n" +
-                " .         _  .          .          .    +     .          .          .      .                           \n" +
-                "        .          .            .            .            .       :               .           .         \n" +
-                "        .   .      .    .     .     .    .      .   .      . .  .  -+-        .                        \n" +
-                "                      .           .           .   .        .           .          /         :  .       \n" +
-                "           .        / V\\    . .        .  .      / .   .    .    .     .      .  / .      . ' .        \n" +
-                "    .             / `  /        .  +       .    /     .          .          .   /      .               \n" +
-                "           *     <<   |       .             .  /         .            .        *   .         .     .    \n" +
-                "                 /    |      .   .       .    *     .     .    .      .   .       .  .                 \n" +
-                "       .       /      |          .           .           .           .           .         +  .        \n" +
-                "    .        /        |  . .        .  .       .   .      .    .     .     .    .      .   .           \n" +
-                "           /    \\  \\ /                                                                                 \n" +
-                "          (      ) | | .   +      .          ___/\\_._/~~\\_...__/\\__.._._/~\\        .         .   .     \n" +
-                "  ________|   _/_  | |       .         _.--'                              `--./\\          .   .        \n" +
-                "<__________\\______)\\__) ._ - /~~\\/~\\ -                                        `-/~\\_            .      \n" +
-                " .      .-'                                                                           `-/\\_            \n" +
-                "  _/\\.-'                                                                                    __/~\\/\\-.__." + Colors.RESET + "\n";
-    }
-
-
-    private String displayeVillage2() {
-        return Colors.WHITE +
-                "\n" +
-                "'  ██╗    █╗███████║██╗     █████═╗██████╗███╗   ██║███████╗    ████████╗██████╗ \n" +
-                "'  ██║    █║███╔════██║    ██╔════██╔═══█║████╗ ███║██╔════╝    ╚══██╔══██╔═══██╗\n" +
-                "'  ██║ █╗ █║██████╗ ██║    ██║    ██║   █║██╔████╔█║█████╗         ██║  ██║   ██║\n" +
-                "'  ██║███╗█║███╔══╝ ██║    ██║    ██║   █║██║╚██╔╝█║██╔══╝         ██║  ██║   ██║\n" +
-                "'   ╚███╔███╔███████║██████╚██████╚██████╔██║ ╚═ ██║██████╗        ██║  ╚██████╔╝\n" +
-                "'    ╚══╝╚══╝╚══════╚══════╝╚═════╝╚═════╝╚═╝     ╚═╚══════╝       ╚═╝   ╚═════╝ \n" +
-                Colors.RESET;
-    }
-
-
-
-    private String displayeVillage() {
-        return Colors.RED +
-                "'    ██████ ██▓███  ▒█████  ▒█████  ██ ▄█ ██   ██▓    ██▒   █ ██ ██▓    ██▓   ▄▄▄       ▄████ █████ \n" +
-                "'  ▒██    ▒ ██░  ██ ██▒  ██ ██▒  ██ ██▄█   ██  ██▒    ██░   █ ██ ██▒   ▓██▒  ▒████▄    ██▒ ▀█ █   ▀ \n" +
-                "'  ░ ▓██▄   ██░ ██▓ ██░  ██ ██░  ██ ███▄    ██ ██░     ██  █▒ ██ ██░   ▒██░  ▒██  ▀█▄  ██░▄▄▄ ███   \n" +
-                "'        ██ ██▄█▓▒  ██   ██ ██   ██ ██ █▄    ▐██▓░      ██ █░ ██ ██░   ▒██░  ░██▄▄▄▄██ ▓█  ██ ▓█  ▄ \n" +
-                "'  ▒██████▒ ██▒ ░  ░ ████▓▒  ████▓▒ ██  █▄   ██▒▓░       ▀█░  ██░██████░██████▓█   ▓██░▒▓███▀ ▒████▒\n" +
-                "'  ▒ ▒▓▒ ▒  ▓▒░ ░  ░ ▒░▒░▒░  ▒░▒░▒░  ▒▒ ▓▒  ██▒▒▒       ░ ▐░ ░▓ ░ ▒░▓  ░ ▒░▓  ▒▒   ▓▒█░░▒   ▒ ░ ▒░ ░\n" +
-                "'  ░ ░▒  ░  ▒ ░      ░ ▒ ▒░  ░ ▒ ▒░  ░▒ ▒░▓██ ░▒░       ░ ░░  ▒ ░ ░ ▒  ░ ░ ▒  ░▒   ▒▒ ░ ░   ░ ░ ░  ░\n" +
-                "'  ░  ░  ░  ░      ░ ░ ░ ▒   ░ ░ ▒   ░░ ░ ▒ ▒ ░░          ░░  ▒ ░ ░ ░    ░ ░   ░   ▒  ░ ░   ░   ░   \n" +
-                "'        ░             ░ ░     ░ ░    ░   ░ ░              ░  ░     ░  ░   ░  ░    ░  ░     ░   ░  ░\n" +
-                "'                                         ░ ░             ░                                         \n"
-
-                + Colors.RESET + "\n";
-    }
-    /**
-     * This method displays the game's "you have been killed" message, in ASCII Art, in the color BLACK
-     *
-     * @return a String, the ASCII Art
-     */
-    private String displaySkullImage() {
-        return Colors.BLACK +
-                "        _;~)                    (~;_   \n" +
-                "        (   |                  |   )   \n" +
-                "         ~', ',   ,''~'',   ,' ,'~     \n" +
-                "            ', ','       ',' ,'        \n" +
-                "              ',: {'} {'} :,'          \n" +
-                "                ;   /^\\   ;            \n" +
-                "                 ~\\  ~  /~             \n" +
-                "               ,' ,~~~~~, ',           \n" +
-                "             ,' ,' ;~~~; ', ',         \n" +
-                "           ,' ,'    '''    ', ',       \n" +
-                "         (~  ;               ;  ~)     \n" +
-                "          -;_)               (_;-      \n" + Colors.RESET;
-    }
-
-
     private void play() throws InterruptedException {
         while (verifyIfGameContinues()) {
             try {
@@ -445,9 +283,9 @@ public class Server {
     }
 
     private void dayShift() throws InterruptedException {
+        if (this.numOfDays != 0) printBeginingOfTheDay();
         chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n");
         Thread.sleep(10000);
-
         chat("10 seconds left until the end of the day...");
         Thread.sleep(10000);
         chat("The day is over...");
@@ -458,6 +296,19 @@ public class Server {
             checkVotes();
         }
         this.night = true;
+        this.numOfDays++;
+    }
+
+    private void printBeginingOfTheDay() throws InterruptedException {
+        chat("\n===== THIS IS DAY NUMBER " + numOfDays + " =====\n");
+        Thread.sleep(2200);
+        chat("Unfortunately, " + this.victim.textColor + this.victim.name + ColorsRef.RESET.getCode() +
+                " was killed by hungry wolves... Rest in peace, " + this.victim.textColor + this.victim.name + ColorsRef.RESET.getCode());
+        Thread.sleep(3000);
+        chat("(Type /list to check out the latest update)");
+        Thread.sleep(2200);
+        chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+        Thread.sleep(2400);
     }
 
     public void wolvesChat(String name, String message) {
@@ -516,13 +367,8 @@ public class Server {
         }
     }
 
-    /**
-     * This method resets the game, so when the game is over, players can restart it
-     */
     private void resetGame() {
         this.gameInProgress = false;
-        this.numOfDays = 0;
-        this.night = false;
         Bot.resetBotNumber();
     }
 
@@ -557,17 +403,6 @@ public class Server {
             Thread.sleep(500);
             this.victim.send((Colors.WHITE + "\n x.x You have been killed last night x.x") + Colors.RESET);
             Thread.sleep(2200);
-
-            if (verifyIfGameContinues()) {
-                chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
-                Thread.sleep(2200);
-                chat("Unfortunately, " + this.victim.name + " was killed by hungry wolves... Rest in peace, " + this.victim.name);
-                Thread.sleep(3000);
-                chat("(Type /list to check out the latest update)");
-                Thread.sleep(2200);
-                chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
-                Thread.sleep(2400);
-            }
         } else {
             wolvesChat("... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
             Thread.sleep(1800);
@@ -592,22 +427,9 @@ public class Server {
         return checkWinner(wolfCount, nonWolfCount);
     }
 
-    /**
-     * This method verifies whether there are sill wolves left in the game
-     *
-     * @return a boolean, true if there are alive wolves. False, if all the wolves are dead
-     */
-    private boolean ifThereAreAliveWolves() {
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            if (player.alive && player.getCharacter().getRole().equals(EnumRole.WOLF))
-                return true;
-        }
-        return false;
-    }
-
     private boolean checkWinner(int wolfCount, int nonWolfCount) throws InterruptedException {
         if (wolfCount >= nonWolfCount) {
-            chat("\nWolves took over the village... Anyone who's letf alive, will be eaten tonight... MUAHAHAHAHAHAH\n");
+            chat(Colors.RED + "\nWolves took over the village... Anyone who's letf alive, will be eaten tonight... MUAHAHAHAHAHAH\n" + Colors.RESET);
             Thread.sleep(2400);
             chat("===== GAME OVER =====");
             Thread.sleep(500);
@@ -616,7 +438,7 @@ public class Server {
             System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         } else if (wolfCount == 0) {
-            chat("\nThere are no wolves left alive! Villagers can now sleep deeply\n");
+            chat(Colors.GREEN + "\nThere are no wolves left alive! Villagers can now sleep deeply...\n" + Colors.RESET);
             Thread.sleep(2400);
             chat("===== GAME OVER =====");
             Thread.sleep(500);
@@ -628,12 +450,6 @@ public class Server {
         return true;
     }
 
-    /**
-     * This method retrieves the PlayerHandler player, by a given name
-     *
-     * @param name a String, the name of the player we want to retrieve
-     * @return an Optional, it either returns a PlayerHander of a null, without breaking the code
-     */
     public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.PLAYERS.values().stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
@@ -660,9 +476,6 @@ public class Server {
         resetNumberOfVotes();
     }
 
-    /**
-     * This method checks whether all the players have voted, or not. If not, the vote goes to itself. This prevents the game from stopping, while waiting for a vote from all the players
-     */
     private void checkIfAllPlayersVoted() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.vote == null)
@@ -766,6 +579,7 @@ public class Server {
                             case FORTUNE_TELLER, GUARD -> dealWithCommand(this.message);
                             default -> {
                                 if (this.message.split(" ")[0].equals(Command.QUIT.getCOMMAND()) ||
+                                        this.message.split(" ")[0].equals(Command.ROLE.getCOMMAND()) ||
                                         this.message.split(" ")[0].equals(Command.COMMAND_LIST.getCOMMAND()))
                                     dealWithCommand(this.message);
                                 else send("You are sleeping");
@@ -774,8 +588,7 @@ public class Server {
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat(this.textColor + this.name, this.message + Colors.RESET);
-
+                        } else chat(this.name, this.message);
                     }
                 }
             } catch (IOException e) {
