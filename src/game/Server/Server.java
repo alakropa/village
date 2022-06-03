@@ -88,8 +88,9 @@ public class Server {
 
     /**
      * This method allows the player to enter a name and check if that name is available or not. If not, the player can insert another name until he has chosen an available one
+     *
      * @param out BufferedWriter - writes message from the server in the console of the player
-     * @param in BufferedReader - reads from the console of the player
+     * @param in  BufferedReader - reads from the console of the player
      * @return a String, the player name
      * @throws IOException
      */
@@ -106,6 +107,7 @@ public class Server {
 
     /**
      * This method verifies if the given name is already in use or not
+     *
      * @param playerName a String, the player name
      * @return returns a boolean. If true, the name is available. If false, the name is taken.
      */
@@ -120,19 +122,21 @@ public class Server {
 
     /**
      * This method adds the player to the XXXXX, and submits it into the Thread Pool. It also sends a message to all the other players informing them that this particular player joined the game.
+     *
      * @param playerHandler receives a PlayerHander, an inner class from the Server, that deals with the players, and its attributes
      */
     private void addPlayer(PlayerHandler playerHandler) {
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler); //mandar para a threadpool
         chat(playerHandler.name, "joined the chat"); //msg para os outros players
-        giveAColorToEachPlayer();
+        // giveAColorToEachPlayer();
         //add textColor to everyplayer
     }
 
     /**
      * This method sends a private message to every player, except the one sending it
-     * @param name a String, the name of the player you want to send the message to
+     *
+     * @param name    a String, the name of the player you want to send the message to
      * @param message a String, the message you want to send to the other players
      */
     public void chat(String name, String message) {
@@ -156,14 +160,14 @@ public class Server {
     /**
      * This method assigns one of the 12 chat colors available to each player
      */
-    private void giveAColorToEachPlayer() { //onde por esta função? está no addPlayer
+    /*private void giveAColorToEachPlayer() { //onde por esta função? está no addPlayer
         putEnumColorInArrayList();
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            for (int i = 0; i < this.PLAYERS.values().size(); i++) {
-                player.textColor = colorList.get(i);
-            }
+        List<PlayerHandler> playersList = new ArrayList<>();
+        // for (PlayerHandler player : this.PLAYERS.values()) {
+        for (int i = 0; i < this.PLAYERS.values().size(); i++) {
+            playersList.get(i).textColor = colorList.get(i);
         }
-    }
+    } */
 
     /**
      * This method puts all 12 available chat colors, inside an Enum, into an ArrayList
@@ -197,6 +201,7 @@ public class Server {
 
     /**
      * This method sends a private message to every player, except the one sending it
+     *
      * @param message a String, the message you want to send to the other players
      */
     public void chat(String message) {
@@ -207,7 +212,8 @@ public class Server {
 
     /**
      * This method opens up a private chat between wolves. This method accepts two parameters
-     * @param name a String, the name of the wofl you want to send the message to
+     *
+     * @param name    a String, the name of the wofl you want to send the message to
      * @param message a String, the message you want to send to the other wolf
      */
     public void wolvesChat(String name, String message) {
@@ -219,6 +225,7 @@ public class Server {
 
     /**
      * This method opens up a private chat between wolves. This method only accepts the message parameter
+     *
      * @param message a String, the message you want to send to the other wolf
      */
     public void wolvesChat(String message) {
@@ -228,8 +235,8 @@ public class Server {
     }
 
     /**
-     *
      * This method returns the names of all the players present in the game
+     *
      * @return a String, with names
      */
     public String playersInGame() {
@@ -242,7 +249,8 @@ public class Server {
 
     /**
      * This method allows a player to send a private message to another player
-     * @param name a String, the name of the player you want to send the message to
+     *
+     * @param name    a String, the name of the player you want to send the message to
      * @param message a String, the message you want to send to the othe player
      */
     public void sendPrivateMessage(String name, String message) {
@@ -269,6 +277,10 @@ public class Server {
                 nonBots++;
                 playersList.add(player);
             }
+        }
+        putEnumColorInArrayList();
+        for (int i = 0; i < this.PLAYERS.values().size(); i++) {
+            playersList.get(i).textColor = colorList.get(i);
         }
         int playersInGame = Math.max(nonBots, 5);
         System.out.println(playersInGame);
@@ -301,6 +313,7 @@ public class Server {
 
     /**
      * This method displays the game's welcome message in ASCII Art, in the color CYAN
+     *
      * @return a String, the ASCII Art
      */
     private String displayVillageImage2() {
@@ -320,6 +333,7 @@ public class Server {
 
     /**
      * This method displays the game's night scenario in ASCII Art, in the color BLUE
+     *
      * @return a String, the ASCII Art
      */
     private String displayWolfImage() {
@@ -344,6 +358,7 @@ public class Server {
 
     /**
      * This method displays the game's "you have been killed" message, in ASCII Art, in the color BLACK
+     *
      * @return a String, the ASCII Art
      */
     private String displaySkullImage() {
@@ -385,7 +400,7 @@ public class Server {
                         stopTimer = true;
                     }
                     choosePlayerWhoDies();
-                    sendPrivateMessage(this.victim.name, (Colors.BLACK + "\n x.x You have been killed last night x.x") + Colors.RESET);
+                    sendPrivateMessage(this.victim.name, (Colors.RED + "\n x.x You have been killed last night x.x") + Colors.RESET);
                     sendPrivateMessage(this.victim.name, (displaySkullImage()));
                     //chat(Colors.WHITE + "The village has woken up with the terrible news that " + victimName.name.toUpperCase() + " was killed last night");
                     //chat(Colors.YELLOW + "\nTHIS IS DAY NUMBER " + ++numOfDays);
@@ -402,7 +417,7 @@ public class Server {
                     resetDefense();
                     this.night = false;
                 } else {
-                    chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====");
+                    chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players =====" + Colors.RESET);
                     Thread.sleep(20000);
                     stopTimer = false;
                     if (!stopTimer) {
@@ -551,6 +566,7 @@ public class Server {
 
     /**
      * This method verifies whether there are wolves alive in the game. It also verifies the condition of the count between wolves and regular players: If the number of wolves is higher of equals to the number of regular players, the game cannot procede
+     *
      * @return a boolean, if true, the game can continue. If false, the game cannot procede
      */
     private boolean verifyIfGameContinues() {
@@ -574,6 +590,7 @@ public class Server {
 
     /**
      * This method verifies whether there are sill wolves left in the game
+     *
      * @return a boolean, true if there are alive wolves. False, if all the wolves are dead
      */
     private boolean ifThereAreAliveWolves() {
@@ -607,6 +624,7 @@ public class Server {
 
     /**
      * This method retrieves the PlayerHandler player, by a given name
+     *
      * @param name a String, the name of the player we want to retrieve
      * @return an Optional, it either returns a PlayerHander of a null, without breaking the code
      */
@@ -694,6 +712,8 @@ public class Server {
         private boolean alive;
         private String textColor;
 
+        private int ID;
+
         private PlayerHandler defend;
 
         public PlayerHandler(Socket clientSocket, String name) {
@@ -738,7 +758,7 @@ public class Server {
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat(this.name, this.message);
+                        } else chat(this.textColor + this.name, this.message + Colors.RESET);
 
                     }
                 }
@@ -811,7 +831,13 @@ public class Server {
         public void setDefend(PlayerHandler defend) {
             this.defend = defend;
         }
+
+      /* public void setTextColor(String textColor) {
+            this.textColor = textColor;
+        } */
     }
+
+
 }
 
 
