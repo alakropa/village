@@ -6,7 +6,6 @@ public class Character {
 
     private EnumRole role;
     private int numberOfVotes;
-    private Character previousVote;
     private boolean defended;
     private Character previousDefend;
 
@@ -16,14 +15,6 @@ public class Character {
 
     public EnumRole getRole() {
         return role;
-    }
-
-    public Character getPreviousVote() {
-        return previousVote;
-    }
-
-    public void setPreviousVote(Character previousVote) {
-        this.previousVote = previousVote;
     }
 
     public void decreaseNumberOfVotes() {

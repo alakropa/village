@@ -19,7 +19,7 @@ public interface CommandHandler {
         } else if (!server.isNight()) {
             player.send("You can't use this command during day time");
             return false;
-        } else if (chosenPName == null) {
+        } else if (chosenPName == null || chosenPName.equals("")) {
             player.send("You need to write a name");
             return false;
         } else if (chosenPName.equalsIgnoreCase(player.getName())) {
@@ -42,7 +42,7 @@ public interface CommandHandler {
         } else if (server.isNight()) {
             player.send("You can't use this command at night");
             return false;
-        } else if (votedPName == null) {
+        } else if (votedPName == null || votedPName.equals("")) {
             player.send("You need to write a name");
             return false;
         } else if (votedPName.equals(player.getName())) {

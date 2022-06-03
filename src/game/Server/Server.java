@@ -326,7 +326,8 @@ public class Server {
      */
     private void dayShift() throws InterruptedException {
         if (this.numOfDays != 0) printBeginingOfTheDay();
-        chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n" + ColorsRef.RESET.getCode());
+        if (this.numOfDays == 0)
+            chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n" + ColorsRef.RESET.getCode());
         Thread.sleep(this.delay);
         chat(Colors.YELLOW + "10 seconds left until the end of the day..." + ColorsRef.RESET.getCode());
         Thread.sleep(10000);
@@ -389,7 +390,7 @@ public class Server {
      * Prints the wolves that are still alive.
      */
     private void printAliveWolves() {
-        if (this.PLAYERS.size() >= 7) {
+        if (this.PLAYERS.size() == 12) {
             String wolvesList = this.PLAYERS.values().stream()
                     .filter(x -> x.alive && x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .map(x -> x.name)
@@ -418,20 +419,24 @@ public class Server {
                 .map(x -> x.vote)
                 .collect(Collectors.toList());
 
-        //botsNightVotes();
         if (this.wolvesVotes.size() == 0) {
             List<PlayerHandler> players = this.PLAYERS.values().stream()
-                    .filter(x -> x.alive && !x.getCharacter().getRole().equals(EnumRole.WOLF))
+                    .filter(x -> x.alive && !x.character.isDefended()
+                            && !x.getCharacter().getRole().equals(EnumRole.WOLF))
                     .toList();
             this.victim = players.get((int) (Math.random() * players.size()));
 
         } else {
-            this.victim = this.wolvesVotes.get((int) (Math.random() * this.wolvesVotes.size()));
+            this.victim = this.wolvesVotes.stream()
+                    .filter(x -> !x.character.isDefended())
+                    .findAny()
+                    .orElse(null);
         }
-        this.victim.alive = false;
-        wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name + Colors.RESET);
-        Thread.sleep(1800);
-
+        if (this.victim != null) {
+            this.victim.alive = false;
+            wolvesChat(Colors.RED + "You have decided to kill... " + this.victim.name + Colors.RESET);
+            Thread.sleep(1800);
+        }
         printNightDayTransition();
     }
 
@@ -579,6 +584,7 @@ public class Server {
         private Socket playerSocket;
         private BufferedWriter out;
         private PlayerHandler vote;
+        private Character previousVote;
         private String message;
         private Character character;
         private boolean isBot;
@@ -699,6 +705,14 @@ public class Server {
 
         public boolean isAlive() {
             return alive;
+        }
+
+        public Character getPreviousVote() {
+            return previousVote;
+        }
+
+        public void setPreviousVote(Character previousVote) {
+            this.previousVote = previousVote;
         }
     }
 }

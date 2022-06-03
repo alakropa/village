@@ -9,15 +9,16 @@ import java.util.Optional;
 public class VoteHandler implements CommandHandler {
     public void command(Server server, Server.PlayerHandler player) {
         String votedPName = Helpers.removeCommand(player.getMessage());
-        Character playerCharacter = player.getCharacter();
+
         if (this.commandConditions(server, player, votedPName)) {
             Optional<Server.PlayerHandler> votedPlayer = server.getPlayerByName(votedPName);
+
             if (votedPlayer.isPresent()) {
-                if (playerCharacter.getPreviousVote() != null) {
-                    playerCharacter.getPreviousVote().decreaseNumberOfVotes();
+                if (player.getPreviousVote() != null) {
+                    player.getPreviousVote().decreaseNumberOfVotes();
                 }
                 Character votedPCharacter = votedPlayer.get().getCharacter();
-                playerCharacter.setPreviousVote(votedPCharacter);
+                player.setPreviousVote(votedPCharacter);
                 votedPCharacter.increaseNumberOfVotes();
 
                 player.setVote(votedPlayer.get());

@@ -19,11 +19,12 @@ public class DefendHandler implements CommandHandler {
             Optional<Server.PlayerHandler> defendedPlayer = server.getPlayerByName(defendedName);
             if (defendedPlayer.isPresent()) {
                 if (playerCharacter.getPreviousDefend() != null) {
-                    playerCharacter.getPreviousDefend().setDefended(true);
+                    playerCharacter.getPreviousDefend().setDefended(false);
                 }
                 Character defendedCharacter = defendedPlayer.get().getCharacter();
                 playerCharacter.setPreviousDefend(defendedCharacter);
                 defendedCharacter.setDefended(true);
+                player.send("You defend " + defendedPlayer.get().getName());
             } else {
                 player.send("Player is unavailable.");
             }
