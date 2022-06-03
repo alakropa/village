@@ -30,6 +30,7 @@ public class Server {
     private PlayerHandler victim;
     private int numOfDays;
     private ArrayList<String> colorList;
+    private int delay;
 
     public Server() {
         this.PLAYERS = new HashMap<>();
@@ -46,6 +47,12 @@ public class Server {
         }
     }
 
+    /**
+     * This method allows the player to connect to the server if the game hasn't already begun.
+     * If so, the player socket is turn off.
+     *
+     * @throws IOException
+     */
     public void acceptConnection() throws IOException {
         Socket playerSocket = this.serverSocket.accept();
         PlayerHandler newPlayer = new PlayerHandler(playerSocket);
@@ -75,11 +82,13 @@ public class Server {
     }
 
     /**
-     * This method allows the player to enter a name and check if that name is available or not. If not, the player can insert another name until he has chosen an available one
+     * This method allows the player to enter a name and check if that name is available or not.
+     * If not, the player can insert another name until he has chosen an available one.
      *
-     * @param newPlayer PlayerHandler - contains a PlayerHandler instance
-     * @param in        BufferedReader - reads from the console of the player
+     * @param newPlayer PlayerHandler - contains a PlayerHandler instance.
+     * @param in        BufferedReader - reads from the console of the player.
      * @return a String, the player name
+     * @throws IOException
      */
     private String verifyIfNameIsAvailable(PlayerHandler newPlayer, BufferedReader in) throws IOException {
         String playerName = in.readLine();
@@ -91,9 +100,9 @@ public class Server {
     }
 
     /**
-     * This method verifies if the given name is already in use or not
+     * This method verifies if the given name is already in use or not.
      *
-     * @param playerName a String, the player name
+     * @param playerName a String, the player name.
      * @return returns a boolean. If true, the name is available. If false, the name is taken.
      */
     private boolean checkIfNameIsAvailable(String playerName) {
@@ -106,21 +115,30 @@ public class Server {
     }
 
     /**
-     * This method adds the player to the XXXXX, and submits it into the Thread Pool. It also sends a message to all the other players informing them that this particular player joined the game.
+     * This method adds the player to the XXXXX, and submits it into the Thread Pool.
+     * It also sends a message to all the other players informing them that this particular player joined the game.
      *
-     * @param playerHandler receives a PlayerHander, an inner class from the Server, that deals with the players, and its attributes
+     * @param playerHandler receives a PlayerHander, an inner class from the Server, that deals with the players, and its attributes.
      */
     private void addPlayer(PlayerHandler playerHandler) {
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler);
         chat(playerHandler.name, "joined the chat");
-        giveAColorToEachPlayer();
     }
 
+    /**
+     * This method allows the game to start. It initializes night and numOfDays sends a message to the payers,
+     * deals the game roles and calls the play method.
+     *
+     * @throws InterruptedException
+     */
     public void startGame() throws InterruptedException {
         this.night = false;
         this.numOfDays = 0;
-        chat(Images.displayVillageImage2());
+        this.delay = PLAYERS.size() * 1000;
+
+        chat(Images.welcomeTo());
+        chat(Images.displaySpookyVillage());
         chat("\n===== Welcome to the Spooky Village! =====\n");
         Thread.sleep(1200);
 
@@ -129,12 +147,12 @@ public class Server {
         Thread.sleep(1500);
         chat(playersInGame());
         Thread.sleep(2000);
-
+        giveAColorToEachPlayer();
         play();
     }
 
     /**
-     * This method sends a private message to every player, except the one sending it
+     * This method sends a private message to every player, except the one sending it.
      *
      * @param name    a String, the name of the person you want to send the message to
      * @param message a String, the message you want to send to the other players
@@ -148,7 +166,7 @@ public class Server {
     }
 
     /**
-     * This method sends a private message to every player, except the one sending it
+     * This method sends a private message to every player, except the one sending it.
      *
      * @param message a String, the message you want to send to the other players
      */
@@ -158,6 +176,10 @@ public class Server {
         }
     }
 
+    /**
+     * Iterates throu the players HashMap, counting how many bots it's needed to play
+     * and dealing each player a role to play.
+     */
     private void getRoles() {
         List<PlayerHandler> playersList = new ArrayList<>();
 
@@ -195,29 +217,23 @@ public class Server {
     }
 
     /**
-     * This method assigns one of the 12 chat colors available to each player
+     * This method assigns one of the 12 chat colors available to each player.
      */
     private void giveAColorToEachPlayer() {
         putEnumColorInArrayList();
-        for (PlayerHandler player : this.PLAYERS.values()) {
-            for (int i = 0; i < this.PLAYERS.values().size(); i++) {
-                player.textColor = colorList.get(i);
-            }
+        List<PlayerHandler> playersList = new ArrayList<>();
+        playersList.addAll(this.PLAYERS.values());
+        for (int i = 0; i < this.PLAYERS.values().size(); i++) {
+            playersList.get(i).textColor = colorList.get(i);
         }
     }
 
     /**
-     * This method puts all 12 available chat colors, inside an Enum, into an ArrayList
+     * This method puts all 12 available chat colors, inside an Enum, into an ArrayList.
      */
     public void putEnumColorInArrayList() {
-//        private ArrayList<String> colorList;
-//        ArrayList<ColorsRef> colorEnumList = new ArrayList<>();
-//        colorEnumList.add(ColorsRef.BLUE);
-        //private ArrayList<String> colorList;
-        //private String textColor;
-
-        colorList = new ArrayList<>(PLAYERS.size());
-        for (int i = 0; i < this.playersInGame().length(); i++) {
+        colorList = new ArrayList<>();
+        for (int i = 0; i < this.PLAYERS.size(); i++) {
             switch (i) {
                 case 0 -> colorList.add(ColorsRef.RED.getCode());
                 case 1 -> colorList.add(ColorsRef.GREEN.getCode());
@@ -236,6 +252,12 @@ public class Server {
         }
     }
 
+    /**
+     * Iterates throu the players HashMap to get the players name and if
+     * their dead or alive.
+     *
+     * @return String, the list of players
+     */
     public String playersInGame() {
         return this.PLAYERS.values().stream()
                 .map(x -> x.name +
@@ -244,6 +266,14 @@ public class Server {
                 .reduce("Players list:", (a, b) -> a + "\n" + b);
     }
 
+    /**
+     * This method allows the whole game to work. It resumes the night and day
+     * turns, where the player votes and kills are chosen. It also checks the bot
+     * votes if necessary and checks when the game should end at each iteration.
+     * At the end of the game, it resets some variables.
+     *
+     * @throws InterruptedException
+     */
     private void play() throws InterruptedException {
         while (verifyIfGameContinues()) {
             try {
@@ -263,32 +293,44 @@ public class Server {
         resetGame();
     }
 
+    /**
+     * Prints the night stages of the game.
+     *
+     * @throws InterruptedException
+     */
+
     private void nightShift() throws InterruptedException {
-        chat("\n===== It's dark already. Time to sleep... =====");
+        chat(Colors.BLUE + "\n===== It's dark already. Time to sleep... =====" + ColorsRef.RESET.getCode());
         Thread.sleep(1800);
         chat(Images.displayWolfImage());
         Thread.sleep(1000);
 
-        wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n");
+        wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n" + ColorsRef.RESET.getCode());
         Thread.sleep(1000);
         printAliveWolves();
         new Thread(this::botsNightVotes);
+        Thread.sleep(this.delay);
+
+        chat(Colors.BLUE + "10 seconds left until the end of the night..." + ColorsRef.RESET.getCode());
         Thread.sleep(10000);
 
-        chat("10 seconds left until the end of the night...");
-        Thread.sleep(10000);
-
-        chat("The night is over...");
+        chat(Colors.BLUE + "The night is over..." + ColorsRef.RESET.getCode());
         Thread.sleep(1000);
     }
 
+    /**
+     * Prints the day stage of the game, checks the players votes and
+     * increases the numOfDays.
+     *
+     * @throws InterruptedException
+     */
     private void dayShift() throws InterruptedException {
         if (this.numOfDays != 0) printBeginingOfTheDay();
-        chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n");
+        chat(Colors.YELLOW + "\n===== It's day time. Chat with the other players! =====\n" + ColorsRef.RESET.getCode());
+        Thread.sleep(this.delay);
+        chat(Colors.YELLOW + "10 seconds left until the end of the day..." + ColorsRef.RESET.getCode());
         Thread.sleep(10000);
-        chat("10 seconds left until the end of the day...");
-        Thread.sleep(10000);
-        chat("The day is over...");
+        chat(Colors.YELLOW + "The day is over..." + ColorsRef.RESET.getCode());
         Thread.sleep(1600);
 
         if (numOfDays != 0) {
@@ -299,18 +341,33 @@ public class Server {
         this.numOfDays++;
     }
 
+    /**
+     * Prints the begging of the day after the day 0.
+     *
+     * @throws InterruptedException
+     */
     private void printBeginingOfTheDay() throws InterruptedException {
-        chat("\n===== THIS IS DAY NUMBER " + numOfDays + " =====\n");
+        chat(Colors.YELLOW + "\n===== THIS IS DAY NUMBER " + numOfDays + " =====\n" + ColorsRef.RESET.getCode());
         Thread.sleep(2200);
         chat("Unfortunately, " + this.victim.textColor + this.victim.name + ColorsRef.RESET.getCode() +
                 " was killed by hungry wolves... Rest in peace, " + this.victim.textColor + this.victim.name + ColorsRef.RESET.getCode());
         Thread.sleep(3000);
-        chat("(Type /list to check out the latest update)");
+        chat("(Type " + Colors.RED + "/list " + ColorsRef.RESET.getCode() + "to check out the latest update)" + ColorsRef.RESET.getCode());
         Thread.sleep(2200);
-        chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+        chat(Colors.RED + "\n===== Watch out! There are still wolves walking around. No one is safe! =====" + ColorsRef.RESET.getCode());
         Thread.sleep(2400);
+        chat(Colors.YELLOW + "\n===== Time to vote and kill the wolf! =====" + ColorsRef.RESET.getCode());
+        Thread.sleep(2000);
+        chat("\n(Type " + Colors.RED + "/vote name " + ColorsRef.RESET.getCode() + "to choose a player)");
+        Thread.sleep(2200);
     }
 
+    /**
+     * This method allows sending messages to the wolves only.
+     *
+     * @param name    a String, which contains the name of the player sending the message.
+     * @param message a String, which contains the message to be sent.
+     */
     public void wolvesChat(String name, String message) {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
@@ -318,12 +375,20 @@ public class Server {
                 .forEach(x -> x.send(name + ": " + message));
     }
 
+    /**
+     * This method allows sending messages to the wolves only.
+     *
+     * @param message a String, which contains the message to be sent.
+     */
     public void wolvesChat(String message) {
         this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF) && !x.isBot)
                 .forEach(x -> x.send(message));
     }
 
+    /**
+     * Iterates throu the players to get only the bot votes if their wolves.
+     */
     private void botsNightVotes() {
         List<PlayerHandler> wolfBots = this.PLAYERS.values().stream()
                 .filter(x -> x.isBot && x.alive
@@ -339,14 +404,13 @@ public class Server {
         }
     }
 
+    /**
+     * Iterates throu the players to get only the bot votes.
+     */
     private void botsDayVotes() {
         List<PlayerHandler> aliveBots = this.PLAYERS.values().stream()
                 .filter(x -> x.isBot && x.alive)
                 .toList();
-
-        for (PlayerHandler aliveBot : aliveBots) {
-            System.out.println(aliveBot.getCharacter().toString());
-        }
 
         if (aliveBots.size() > 0) {
             Optional<PlayerHandler> botVote;
@@ -357,6 +421,9 @@ public class Server {
         }
     }
 
+    /**
+     * Prints the wolves that are still alive.
+     */
     private void printAliveWolves() {
         if (this.PLAYERS.size() >= 7) {
             String wolvesList = this.PLAYERS.values().stream()
@@ -367,11 +434,19 @@ public class Server {
         }
     }
 
+    /**
+     * Resets the gameInProgress and the botNumber.
+     */
     private void resetGame() {
         this.gameInProgress = false;
         Bot.resetBotNumber();
     }
 
+    /**
+     * Iterates throu the wolvesVotes
+     *
+     * @throws InterruptedException
+     */
     private void choosePlayerWhoDies() throws InterruptedException {
         this.wolvesVotes = this.PLAYERS.values().stream()
                 .filter(x -> x.getCharacter().getRole().equals(EnumRole.WOLF)
@@ -401,17 +476,17 @@ public class Server {
             this.victim.alive = false;
             this.victim.send(Images.displaySkullImage());
             Thread.sleep(500);
-            this.victim.send((Colors.WHITE + "\n x.x You have been killed last night x.x") + Colors.RESET);
+            this.victim.send((Colors.RED + "\n x.x You have been killed last night x.x") + Colors.RESET);
             Thread.sleep(2200);
         } else {
             wolvesChat("... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
             Thread.sleep(1800);
             chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
-            Thread.sleep(2200);
+            Thread.sleep(2000);
             chat("===== HURRAYYYY! The guard bravely protected the village, so everyone survived the last night! =====");
-            Thread.sleep(2400);
+            Thread.sleep(2200);
             chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
-            Thread.sleep(2400);
+            Thread.sleep(2000);
         }
     }
 
@@ -431,20 +506,20 @@ public class Server {
         if (wolfCount >= nonWolfCount) {
             chat(Colors.RED + "\nWolves took over the village... Anyone who's letf alive, will be eaten tonight... MUAHAHAHAHAHAH\n" + Colors.RESET);
             Thread.sleep(2400);
+            chat(Images.displayGameOver(Colors.RED));
+            Thread.sleep(500);
             chat("===== GAME OVER =====");
             Thread.sleep(500);
             resetGame();
-            this.PLAYERS.values().forEach(System.out::println);
-            System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         } else if (wolfCount == 0) {
             chat(Colors.GREEN + "\nThere are no wolves left alive! Villagers can now sleep deeply...\n" + Colors.RESET);
             Thread.sleep(2400);
+            chat(Images.displayGameOver(Colors.GREEN));
+            Thread.sleep(500);
             chat("===== GAME OVER =====");
             Thread.sleep(500);
             resetGame();
-            this.PLAYERS.values().forEach(System.out::println);
-            System.out.println(wolfCount + " " + nonWolfCount);
             return false;
         }
         return true;
@@ -470,7 +545,8 @@ public class Server {
 
         if (highestVote.isPresent() && this.numOfDays != 0) {
             highestVote.get().alive = false;
-            chat("\n" + highestVote.get().name + " was tragically killed by the Villagers, thinking it was a wolf");
+            chat(highestVote.get().textColor + "\n" + highestVote.get().name + ColorsRef.RESET.getCode() +
+                    " was tragically killed by the Villagers as they thought it was a wolf...");
             Thread.sleep(2500);
         }
         resetNumberOfVotes();
@@ -534,7 +610,7 @@ public class Server {
         private Character character;
         private boolean isBot;
         private boolean alive;
-        private String textColor;
+        private String textColor = ColorsRef.RESET.getCode();
 
         public PlayerHandler(Socket clientSocket) {
             try {
@@ -588,7 +664,8 @@ public class Server {
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat(this.name, this.message);
+                        } else if (gameInProgress && this.alive)
+                            chat(this.textColor + this.name, this.message + Colors.RESET);
                     }
                 }
             } catch (IOException e) {

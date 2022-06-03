@@ -46,7 +46,7 @@ public class Player {
                             this.SOCKET.close();
                             break;
                         }
-                        System.out.println(message); //imprime a msg que escreve na consola
+                        System.out.println(message);
                     } catch (IOException e) {
                         try {
                             System.out.println("You were disconnected from chat");

@@ -16,9 +16,9 @@ public class VoteHandler implements CommandHandler {
                 if (playerCharacter.getPreviousVote() != null) {
                     playerCharacter.getPreviousVote().decreaseNumberOfVotes();
                 }
-                Character votedPCharaceter = votedPlayer.get().getCharacter();
-                playerCharacter.setPreviousVote(votedPCharaceter);
-                votedPCharaceter.increaseNumberOfVotes();
+                Character votedPCharacter = votedPlayer.get().getCharacter();
+                playerCharacter.setPreviousVote(votedPCharacter);
+                votedPCharacter.increaseNumberOfVotes();
 
                 player.setVote(votedPlayer.get());
                 server.chat(player.getName(), " voted for " + votedPName);

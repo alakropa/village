@@ -35,13 +35,6 @@ public class Bot extends Character {
                 .findAny();
     }
 
-    @Override
-    public String toString() {
-        return "Bot{" +
-                "NAME='" + NAME + '\'' + super.getRole() +
-                '}';
-    }
-
     public static void resetBotNumber() {
         botNumber = 0;
     }

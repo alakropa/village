@@ -16,9 +16,7 @@ public enum ColorsRef {
     GREEN_UNDERLINED(9, "\033[4;32m"),//8
     YELLOW_UNDERLINED(10, "\033[4;33m"),//9
     BLUE_UNDERLINED(11, "\033[4;34m"),//10
-    MAGENTA_UNDERLINED(12,"\033[4;35m");//11
-
-
+    MAGENTA_UNDERLINED(12, "\033[4;35m");//11
 
     private final int REF;
     private final String code;
@@ -37,4 +35,4 @@ public enum ColorsRef {
         return super.toString();
     }
 
-    }
+}

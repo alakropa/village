@@ -16,7 +16,7 @@ public class VisionHandler implements CommandHandler {
             Optional<Server.PlayerHandler> chosenPlayer = server.getPlayerByName(chosenPName);
             FortuneTeller playerCharacter = ((FortuneTeller) player.getCharacter());
 
-            if (playerCharacter.hasUsedVision()) player.send("You have already used this hability");
+            if (playerCharacter.hasUsedVision()) player.send("You have already used this ability");
             else if (chosenPlayer.isPresent()) {
                 EnumRole chosenPRole = chosenPlayer.get().getCharacter().getRole();
                 boolean isChosenPlayerWolf = chosenPRole.equals(EnumRole.WOLF);

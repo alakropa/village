@@ -43,13 +43,6 @@ public class Character {
         this.role = role;
     }
 
-    @Override
-    public String toString() {
-        return "Character{" +
-                "role=" + role +
-                '}';
-    }
-
     public boolean isDefended() {
         return defended;
     }

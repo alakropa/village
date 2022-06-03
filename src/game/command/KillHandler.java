@@ -3,6 +3,8 @@ package game.command;
 import game.EnumRole;
 import game.Helpers;
 import game.Server.Server;
+import game.colors.Colors;
+import game.colors.ColorsRef;
 
 import java.util.Optional;
 
@@ -16,14 +18,14 @@ public class KillHandler implements CommandHandler {
             if (playerWhoDies.isPresent()) {
                 EnumRole chosenPRole = playerWhoDies.get().getCharacter().getRole();
                 if (chosenPRole.equals(EnumRole.WOLF))
-                    player.send("You can't target a Wolf");
+                    player.send(Colors.RED + "You can't target a Wolf" + ColorsRef.RESET.getCode());
                 else if (!playerWhoDies.get().isAlive())
-                    player.send("This player is already dead");
+                    player.send(Colors.RED + "This player is already dead" + ColorsRef.RESET.getCode());
                 else {
                     player.setVote(playerWhoDies.get());
-                    player.send("You voted to kill " + playerWhoDies.get().getName());
+                    player.send(Colors.RED + "You voted to kill " + playerWhoDies.get().getName() + ColorsRef.RESET.getCode());
                 }
-            } else player.send(chosenPName + " is unavailable");
+            } else player.send(Colors.RED + chosenPName + " is unavailable" + ColorsRef.RESET.getCode());
         }
     }
 }

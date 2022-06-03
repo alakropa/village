@@ -24,11 +24,6 @@ public class DefendHandler implements CommandHandler {
                 Character defendedCharacter = defendedPlayer.get().getCharacter();
                 playerCharacter.setPreviousDefend(defendedCharacter);
                 defendedCharacter.setDefended(true);
-                //player.setDefend(defendedPlayer.get());
-
-                // server.chat(player.getName(), " voted for " + defendedName);
-                //  server.sendUpdateOfVotes();
-
             } else {
                 player.send("Player is unavailable.");
             }
