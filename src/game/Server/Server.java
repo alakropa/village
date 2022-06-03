@@ -633,7 +633,7 @@ public class Server {
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat( this.name, this.message);
+                        } else chat(this.name, this.message);
 
                     }
                 }

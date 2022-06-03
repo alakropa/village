@@ -47,88 +47,12 @@ public class Main {
 
 
          */
-        String image2 = ".-.   .-.      .-.                                         .-.         .-. .-.         \n" +
-                ": :.-.: :      : :                                        .' `.       .' `.: :         \n" +
-                ": :: :: : .--. : :   .--.  .--. ,-.,-.,-. .--.            `. .'.--.   `. .': `-.  .--. \n" +
-                ": `' `' ;' '_.': :_ '  ..'' .; :: ,. ,. :' '_.' _  _  _    : :' .; :   : : : .. :' '_.'\n" +
-                " `.,`.,' `.__.'`.__;`.__.'`.__.':_;:_;:_;`.__.':_;:_;:_;   :_;`.__.'   :_; :_;:_;`.__.'\n" +
-                "                                                                                       \n" +
-                "                                                                                       \n" +
-                " .--.                   .-.           .-..-. _ .-.  .-.                     .-.        \n" +
-                ": .--'                  : :.-.        : :: ::_;: :  : :                     : :        \n" +
-                "`. `. .---.  .--.  .--. : `'.'.-..-.  : :: :.-.: :  : :   .--.   .--.  .--. : :        \n" +
-                " _`, :: .; `' .; :' .; :: . `.: :; :  : `' ;: :: :_ : :_ ' .; ; ' .; :' '_.':_;        \n" +
-                "`.__.': ._.'`.__.'`.__.':_;:_;`._. ;   `.,' :_;`.__;`.__;`.__,_;`._. ;`.__.':_;        \n" +
-                "      : :                      .-. :                             .-. :                 \n" +
-                "      :_;                      `._.'                             `._.'                 ";
-        String image = " _ _ _       _                                    _           _    _        \n" +
-                "| | | | ___ | | ___  ___ ._ _ _  ___            _| |_ ___   _| |_ | |_  ___ \n" +
-                "| | | |/ ._>| |/ | '/ . \\| ' ' |/ ._> _  _  _    | | / . \\   | |  | . |/ ._>\n" +
-                "|__/_/ \\___.|_|\\_|_.\\___/|_|_|_|\\___.<_><_><_>   |_| \\___/   |_|  |_|_|\\___.\n" +
-                "                                                                            \n" +
-                " ___                 _          _ _  _  _  _                 _              \n" +
-                "/ __> ___  ___  ___ | |__ _ _  | | |<_>| || | ___  ___  ___ | |             \n" +
-                "\\__ \\| . \\/ . \\/ . \\| / /| | | | ' || || || |<_> |/ . |/ ._>|_/             \n" +
-                "<___/|  _/\\___/\\___/|_\\_\\`_. | |__/ |_||_||_|<___|\\_. |\\___.<_>             \n" +
-                "     |_|                 <___'                    <___'                     ";
 
-        //System.out.println(image2);
-
-
-//                switch (temp) {
-//                    case 0:
-//                        player.send((Colors.RED + name + ": " + message + ColorsRef.RESET));
-//                    case 1:
-//                        player.send(ColorsRef.GREEN + name + ": " + message + ColorsRef.RESET);
-//                    case 2:
-//                        player.send(ColorsRef.YELLOW + name + ": " + message + ColorsRef.RESET);
-//                    case 3:
-//                        player.send(ColorsRef.BLUE + name + ": " + message + ColorsRef.RESET);
-//                    case 4:
-//                        player.send(ColorsRef.MAGENTA + name + ": " + message + ColorsRef.RESET);
-//                    case 5:
-//                        player.send(ColorsRef.CYAN + name + ": " + message + ColorsRef.RESET);
-//                    case 6:
-//                        player.send(ColorsRef.WHITE + name + ": " + message + ColorsRef.RESET);
-//                    case 7:
-//                        player.send(ColorsRef.RED_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 8:
-//                        player.send(ColorsRef.GREEN_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 9:
-//                        player.send(ColorsRef.YELLOW_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 10:
-//                        player.send(ColorsRef.BLUE_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 11:
-//                        player.send(ColorsRef.MAGENTA_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                }
-
-
-//
-//        for (int i = 0; i < this.PLAYERS.size(); i++) {
-//                switch (i) {
-//                    case 0:
-//                        this.PLAYERS.get(i).send(Colors.RED + name + ": " + message + ColorsRef.RESET);
-//                    case 1:
-//                        this.PLAYERS.get(i).send(ColorsRef.GREEN + name + ": " + message + ColorsRef.RESET);
-//                    case 2:
-//                        this.PLAYERS.get(i).send(ColorsRef.YELLOW + name + ": " + message + ColorsRef.RESET);
-//                    case 3:
-//                        this.PLAYERS.get(i).send(ColorsRef.BLUE + name + ": " + message + ColorsRef.RESET);
-//                    case 4:
-//                        this.PLAYERS.get(i).send(ColorsRef.MAGENTA + name + ": " + message + ColorsRef.RESET);
-//                    case 5:
-//                        this.PLAYERS.get(i).send(ColorsRef.CYAN + name + ": " + message + ColorsRef.RESET);
-//                    case 6:
-//                        this.PLAYERS.get(i).send(ColorsRef.WHITE + name + ": " + message + ColorsRef.RESET);
-//                    case 7:
-//                        this.PLAYERS.get(i).send(ColorsRef.RED_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 8:
-//                        this.PLAYERS.get(i).send(ColorsRef.GREEN_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 9:
-//                        this.PLAYERS.get(i).send(ColorsRef.YELLOW_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 10:
-//                        this.PLAYERS.get(i).send(ColorsRef.BLUE_UNDERLINED + name + ": " + message + ColorsRef.RESET);
-//                    case 11:
-//                        this.PLAYERS.get(i).send(ColorsRef.MAGENTA_UNDERLINED + name + ": " + message + ColorsRef.RESET);
+        System.out.println(Images.displayVillager());
+        System.out.println(Images.displayGuard());
+        System.out.println(Images.displayFortuneTeller());
+        System.out.println(Images.displayWolf());
+        System.out.println(Images.displayDeath());
+        System.out.println(Images.displayDay());
     }
 }
