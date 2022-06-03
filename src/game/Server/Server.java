@@ -114,13 +114,18 @@ public class Server {
         this.PLAYERS.put(playerHandler.name, playerHandler);
         this.service.submit(playerHandler);
         chat(playerHandler.name, "joined the chat");
-        giveAColorToEachPlayer();
+
+       // giveAColorToEachPlayer();
     }
 
     public void startGame() throws InterruptedException {
+        putEnumColorInArrayList();
+        giveColorToEachPlayer();
         this.night = false;
         this.numOfDays = 0;
-        chat(Images.displayVillageImage2());
+        chat(Images.welcomeTo());
+        chat(Images.displaySpookyVillage());
+
         chat("\n===== Welcome to the Spooky Village! =====\n");
         Thread.sleep(1200);
 
@@ -154,7 +159,7 @@ public class Server {
      */
     public void chat(String message) {
         for (PlayerHandler player : this.PLAYERS.values()) {
-            if (!player.isBot) player.send(message);
+            if (!player.isBot) player.send(player.textColor + message + ColorsRef.RESET.getCode() );
         }
     }
 
@@ -168,6 +173,7 @@ public class Server {
                 playersList.add(player);
             }
         }
+
         int playersInGame = Math.max(nonBots, 5);
         System.out.println(playersInGame);
 
@@ -188,34 +194,37 @@ public class Server {
                 playersList.get(i).character.setRole(newRole);
             }
         }
+
+
         this.PLAYERS = new HashMap<>();
         for (PlayerHandler player : playersList) {
             this.PLAYERS.put(player.name, player);
         }
     }
 
+    private void giveColorToEachPlayer() {
+        List<PlayerHandler> playersList = new ArrayList<>();
+        for (int i = 0; i < playersList.size(); i++) {
+            playersList.get(i).textColor = colorList.get(i);
+        }
+    }
+
     /**
      * This method assigns one of the 12 chat colors available to each player
      */
-    private void giveAColorToEachPlayer() {
+/*    private void giveAColorToEachPlayer() {
         putEnumColorInArrayList();
         for (PlayerHandler player : this.PLAYERS.values()) {
             for (int i = 0; i < this.PLAYERS.values().size(); i++) {
                 player.textColor = colorList.get(i);
             }
         }
-    }
+    } */
 
     /**
      * This method puts all 12 available chat colors, inside an Enum, into an ArrayList
      */
     public void putEnumColorInArrayList() {
-//        private ArrayList<String> colorList;
-//        ArrayList<ColorsRef> colorEnumList = new ArrayList<>();
-//        colorEnumList.add(ColorsRef.BLUE);
-        //private ArrayList<String> colorList;
-        //private String textColor;
-
         colorList = new ArrayList<>(PLAYERS.size());
         for (int i = 0; i < this.playersInGame().length(); i++) {
             switch (i) {
@@ -570,7 +579,7 @@ public class Server {
         private Character character;
         private boolean isBot;
         private boolean alive;
-        private String textColor;
+        private String textColor = ColorsRef.RESET.getCode();
 
         public PlayerHandler(Socket clientSocket) {
             try {
@@ -624,7 +633,7 @@ public class Server {
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat(this.textColor + this.name, this.message + Colors.RESET);
+                        } else chat( this.name, this.message);
 
                     }
                 }
