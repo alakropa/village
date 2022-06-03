@@ -32,6 +32,11 @@ public class Images {
                 "                     |_|             |___|               |___|    " + Colors.RESET;
     }
 
+    /**
+     * This method displays the game's night scenario in ASCII Art, in the color BLUE
+     *
+     * @return a String, the ASCII Art
+     */
     public static String displayWolfImage() {
         return Colors.BLUE + "                                                                                                       \n" +
                 " .         _  .          .          .    +     .          .          .      .                           \n" +
@@ -52,6 +57,11 @@ public class Images {
                 "  _/\\.-'                                                                                    __/~\\/\\-.__." + Colors.RESET + "\n";
     }
 
+    /**
+     * This method displays the game's "you have been killed" message, in ASCII Art, in the color BLACK
+     *
+     * @return a String, the ASCII Art
+     */
     public static String displaySkullImage() {
         return Colors.WHITE +
                 "        _;~)                    (~;_   \n" +
@@ -67,4 +77,57 @@ public class Images {
                 "         (~  ;               ;  ~)     \n" +
                 "          -;_)               (_;-      \n" + Colors.RESET;
     }
+
+    private String displayGameOver() {
+        return Colors.RED +
+                "' \n" +
+                "\n" +
+                "'    ▄████ ▄▄▄      ███▄ ▄███ █████     ▒█████  ██▒   █ █████ ██▀███  \n" +
+                "'   ██▒ ▀█ ████▄    ██▒▀█▀ ██ █   ▀    ▒██▒  ██ ██░   █ █   ▀ ██   ██▒\n" +
+                "'  ▒██░▄▄▄ ██  ▀█▄ ▓██    ▓██ ███      ▒██░  ██ ▓██  █▒ ███   ██ ░▄█  \n" +
+                "'  ░▓█  ██ ██▄▄▄▄██ ██    ▒██ ▓█  ▄    ▒██   ██░ ▒██ █░ ▓█  ▄ ██▀▀█▄  \n" +
+                "'  ░▒▓███▀ ▓█   ▓██ ██▒   ░██░▒████▒   ░ ████▓▒░  ▒▀█░  ▒████ ██▓  ██▒\n" +
+                "'   ░▒   ▒ ▒▒   ▓▒█░ ▒░   ░  ░░ ▒░ ░   ░ ▒░▒░▒░   ░ ▐░ ░░ ▒░ ░ ▒▓ ░▒▓░\n" +
+                "'    ░   ░  ▒   ▒▒ ░  ░      ░░ ░  ░     ░ ▒ ▒░   ░ ░░  ░ ░  ░ ░▒ ░ ▒░\n" +
+                "'  ░ ░   ░  ░   ▒  ░      ░     ░      ░ ░ ░ ▒      ░░    ░    ░░   ░ \n" +
+                "'        ░      ░  ░      ░     ░  ░       ░ ░       ░    ░  ░  ░     \n" +
+                "'                                                   ░                 \n" +
+                "\n  \n"
+
+                + Colors.RESET + "\n";
+    }
+    /**
+     * This method displays the game's welcome message in ASCII Art, in the color CYAN
+     *
+     * @return a String, the ASCII Art
+     */
+    public static String welcomeTo() {
+        return Colors.WHITE +
+                "\n" +
+                "'  ██╗    █╗███████║██╗     █████═╗██████╗███╗   ██║███████╗    ████████╗██████╗ \n" +
+                "'  ██║    █║███╔════██║    ██╔════██╔═══█║████╗ ███║██╔════╝    ╚══██╔══██╔═══██╗\n" +
+                "'  ██║ █╗ █║██████╗ ██║    ██║    ██║   █║██╔████╔█║█████╗         ██║  ██║   ██║\n" +
+                "'  ██║███╗█║███╔══╝ ██║    ██║    ██║   █║██║╚██╔╝█║██╔══╝         ██║  ██║   ██║\n" +
+                "'   ╚███╔███╔███████║██████╚██████╚██████╔██║ ╚═ ██║██████╗        ██║  ╚██████╔╝\n" +
+                "'    ╚══╝╚══╝╚══════╚══════╝╚═════╝╚═════╝╚═╝     ╚═╚══════╝       ╚═╝   ╚═════╝ \n" +
+                Colors.RESET;
+    }
+
+    public static String displaySpookyVillage() {
+        return Colors.RED +
+                "'    ██████ ██▓███  ▒█████  ▒█████  ██ ▄█ ██   ██▓    ██▒   █ ██ ██▓    ██▓   ▄▄▄       ▄████ █████ \n" +
+                "'  ▒██    ▒ ██░  ██ ██▒  ██ ██▒  ██ ██▄█   ██  ██▒    ██░   █ ██ ██▒   ▓██▒  ▒████▄    ██▒ ▀█ █   ▀ \n" +
+                "'  ░ ▓██▄   ██░ ██▓ ██░  ██ ██░  ██ ███▄    ██ ██░     ██  █▒ ██ ██░   ▒██░  ▒██  ▀█▄  ██░▄▄▄ ███   \n" +
+                "'        ██ ██▄█▓▒  ██   ██ ██   ██ ██ █▄    ▐██▓░      ██ █░ ██ ██░   ▒██░  ░██▄▄▄▄██ ▓█  ██ ▓█  ▄ \n" +
+                "'  ▒██████▒ ██▒ ░  ░ ████▓▒  ████▓▒ ██  █▄   ██▒▓░       ▀█░  ██░██████░██████▓█   ▓██░▒▓███▀ ▒████▒\n" +
+                "'  ▒ ▒▓▒ ▒  ▓▒░ ░  ░ ▒░▒░▒░  ▒░▒░▒░  ▒▒ ▓▒  ██▒▒▒       ░ ▐░ ░▓ ░ ▒░▓  ░ ▒░▓  ▒▒   ▓▒█░░▒   ▒ ░ ▒░ ░\n" +
+                "'  ░ ░▒  ░  ▒ ░      ░ ▒ ▒░  ░ ▒ ▒░  ░▒ ▒░▓██ ░▒░       ░ ░░  ▒ ░ ░ ▒  ░ ░ ▒  ░▒   ▒▒ ░ ░   ░ ░ ░  ░\n" +
+                "'  ░  ░  ░  ░      ░ ░ ░ ▒   ░ ░ ▒   ░░ ░ ▒ ▒ ░░          ░░  ▒ ░ ░ ░    ░ ░   ░   ▒  ░ ░   ░   ░   \n" +
+                "'        ░             ░ ░     ░ ░    ░   ░ ░              ░  ░     ░  ░   ░  ░    ░  ░     ░   ░  ░\n" +
+                "'                                         ░ ░             ░                                         \n"
+
+                + Colors.RESET + "\n";
+    }
+
+
 }

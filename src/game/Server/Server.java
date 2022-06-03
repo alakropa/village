@@ -367,6 +367,9 @@ public class Server {
         }
     }
 
+    /**
+     * This method resets the game, so when the game is over, players can restart it
+     */
     private void resetGame() {
         this.gameInProgress = false;
         Bot.resetBotNumber();
@@ -403,6 +406,17 @@ public class Server {
             Thread.sleep(500);
             this.victim.send((Colors.WHITE + "\n x.x You have been killed last night x.x") + Colors.RESET);
             Thread.sleep(2200);
+
+            if (verifyIfGameContinues()) {
+                chat("\n===== THIS IS DAY NUMBER " + ++numOfDays + " =====\n");
+                Thread.sleep(2200);
+                chat("Unfortunately, " + this.victim.name + " was killed by hungry wolves... Rest in peace, " + this.victim.name);
+                Thread.sleep(3000);
+                chat("(Type /list to check out the latest update)");
+                Thread.sleep(2200);
+                chat("\n===== Watch out! There are still wolves walking around. No one is safe! =====");
+                Thread.sleep(2400);
+            }
         } else {
             wolvesChat("... But he got protected by the guard! You'll stay hungry tonight!" + Colors.RESET + "\n");
             Thread.sleep(1800);
@@ -425,6 +439,19 @@ public class Server {
             }
         }
         return checkWinner(wolfCount, nonWolfCount);
+    }
+
+    /**
+     * This method verifies whether there are sill wolves left in the game
+     *
+     * @return a boolean, true if there are alive wolves. False, if all the wolves are dead
+     */
+    private boolean ifThereAreAliveWolves() {
+        for (PlayerHandler player : this.PLAYERS.values()) {
+            if (player.alive && player.getCharacter().getRole().equals(EnumRole.WOLF))
+                return true;
+        }
+        return false;
     }
 
     private boolean checkWinner(int wolfCount, int nonWolfCount) throws InterruptedException {
@@ -450,6 +477,12 @@ public class Server {
         return true;
     }
 
+    /**
+     * This method retrieves the PlayerHandler player, by a given name
+     *
+     * @param name a String, the name of the player we want to retrieve
+     * @return an Optional, it either returns a PlayerHander of a null, without breaking the code
+     */
     public Optional<PlayerHandler> getPlayerByName(String name) {
         return this.PLAYERS.values().stream()
                 .filter(x -> Helpers.compareIfNamesMatch(x.getName(), name))
@@ -476,6 +509,9 @@ public class Server {
         resetNumberOfVotes();
     }
 
+    /**
+     * This method checks whether all the players have voted, or not. If not, the vote goes to itself. This prevents the game from stopping, while waiting for a vote from all the players
+     */
     private void checkIfAllPlayersVoted() {
         this.PLAYERS.values().stream()
                 .filter(x -> x.vote == null)
@@ -588,7 +624,8 @@ public class Server {
                     } else {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
-                        } else chat(this.name, this.message);
+                        } else chat(this.textColor + this.name, this.message + Colors.RESET);
+
                     }
                 }
             } catch (IOException e) {
