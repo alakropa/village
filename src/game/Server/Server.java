@@ -135,10 +135,7 @@ public class Server {
     public void startGame() throws InterruptedException {
         this.night = false;
         this.numOfDays = 0;
-        this.delay = PLAYERS.size() * 20000;
-        chat(Images.welcomeTo());
-        chat(Images.displaySpookyVillage());
-
+        this.delay = PLAYERS.size() * 1000;
         chat(Images.welcomeTo());
         chat(Images.displaySpookyVillage());
         chat("\n===== Welcome to the Spooky Village! =====\n");
@@ -312,7 +309,6 @@ public class Server {
         wolvesChat(Colors.RED + "===== Wolves chat is open! =====\n" + ColorsRef.RESET.getCode());
         Thread.sleep(1000);
         printAliveWolves();
-        new Thread(this::botsNightVotes);
         Thread.sleep(this.delay);
 
         chat(Colors.BLUE + "10 seconds left until the end of the night..." + ColorsRef.RESET.getCode());
@@ -338,7 +334,6 @@ public class Server {
         Thread.sleep(1600);
 
         if (numOfDays != 0) {
-            botsDayVotes();
             checkVotes();
         }
         this.night = true;
@@ -391,41 +386,6 @@ public class Server {
     }
 
     /**
-     * Iterates throu the players to get only the bot votes if their wolves.
-     */
-    private void botsNightVotes() {
-        List<PlayerHandler> wolfBots = this.PLAYERS.values().stream()
-                .filter(x -> x.isBot && x.alive
-                        && x.getCharacter().getRole().equals(EnumRole.WOLF))
-                .toList();
-
-        if (wolfBots.size() > 0) {
-            Optional<PlayerHandler> botVote;
-            for (PlayerHandler wolfBot : wolfBots) {
-                botVote = ((Bot) wolfBot.getCharacter()).getNightVote(this);
-                botVote.ifPresent(x -> this.wolvesVotes.add(x));
-            }
-        }
-    }
-
-    /**
-     * Iterates throu the players to get only the bot votes.
-     */
-    private void botsDayVotes() {
-        List<PlayerHandler> aliveBots = this.PLAYERS.values().stream()
-                .filter(x -> x.isBot && x.alive)
-                .toList();
-
-        if (aliveBots.size() > 0) {
-            Optional<PlayerHandler> botVote;
-            for (PlayerHandler aliveBot : aliveBots) {
-                botVote = ((Bot) aliveBot.getCharacter()).getDayVote(this);
-                botVote.ifPresent(playerHandler -> aliveBot.vote = playerHandler);
-            }
-        }
-    }
-
-    /**
      * Prints the wolves that are still alive.
      */
     private void printAliveWolves() {
@@ -458,7 +418,7 @@ public class Server {
                 .map(x -> x.vote)
                 .collect(Collectors.toList());
 
-        botsNightVotes();
+        //botsNightVotes();
         if (this.wolvesVotes.size() == 0) {
             List<PlayerHandler> players = this.PLAYERS.values().stream()
                     .filter(x -> x.alive && !x.getCharacter().getRole().equals(EnumRole.WOLF))
@@ -678,7 +638,7 @@ public class Server {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
                         } else if (gameInProgress && this.alive)
-                            chat(this.textColor + this.name, this.message + Colors.RESET);
+                            chat(this.name, this.message);
                     }
                 }
             } catch (IOException e) {

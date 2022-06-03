@@ -12,7 +12,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-
 public class VUClient extends JFrame {
 
     boolean stopaudioCapture = false;
