@@ -264,8 +264,10 @@ public class Server {
     public void startGame() {
         this.night = false;
         //chat(displayVillageImage());
-        chat(displayVillageImage2());
+       // chat(displayVillageImage2());
         //chat(displayWolfImage());
+        chat(displayeVillage2());
+        chat(displayeVillage());
 
         chat("\n===== Welcome to the Spooky Village! =====\n");
         List<PlayerHandler> playersList = new ArrayList<>();
@@ -356,6 +358,36 @@ public class Server {
                 "  _/\\.-'                                                                                    __/~\\/\\-.__." + Colors.RESET + "\n";
     }
 
+
+    private String displayeVillage2() {
+        return Colors.WHITE +
+                "\n" +
+                "'  ██╗    █╗███████║██╗     █████═╗██████╗███╗   ██║███████╗    ████████╗██████╗ \n" +
+                "'  ██║    █║███╔════██║    ██╔════██╔═══█║████╗ ███║██╔════╝    ╚══██╔══██╔═══██╗\n" +
+                "'  ██║ █╗ █║██████╗ ██║    ██║    ██║   █║██╔████╔█║█████╗         ██║  ██║   ██║\n" +
+                "'  ██║███╗█║███╔══╝ ██║    ██║    ██║   █║██║╚██╔╝█║██╔══╝         ██║  ██║   ██║\n" +
+                "'   ╚███╔███╔███████║██████╚██████╚██████╔██║ ╚═ ██║██████╗        ██║  ╚██████╔╝\n" +
+                "'    ╚══╝╚══╝╚══════╚══════╝╚═════╝╚═════╝╚═╝     ╚═╚══════╝       ╚═╝   ╚═════╝ \n" +
+                Colors.RESET;
+    }
+
+
+
+    private String displayeVillage() {
+        return Colors.RED +
+                "'    ██████ ██▓███  ▒█████  ▒█████  ██ ▄█ ██   ██▓    ██▒   █ ██ ██▓    ██▓   ▄▄▄       ▄████ █████ \n" +
+                "'  ▒██    ▒ ██░  ██ ██▒  ██ ██▒  ██ ██▄█   ██  ██▒    ██░   █ ██ ██▒   ▓██▒  ▒████▄    ██▒ ▀█ █   ▀ \n" +
+                "'  ░ ▓██▄   ██░ ██▓ ██░  ██ ██░  ██ ███▄    ██ ██░     ██  █▒ ██ ██░   ▒██░  ▒██  ▀█▄  ██░▄▄▄ ███   \n" +
+                "'        ██ ██▄█▓▒  ██   ██ ██   ██ ██ █▄    ▐██▓░      ██ █░ ██ ██░   ▒██░  ░██▄▄▄▄██ ▓█  ██ ▓█  ▄ \n" +
+                "'  ▒██████▒ ██▒ ░  ░ ████▓▒  ████▓▒ ██  █▄   ██▒▓░       ▀█░  ██░██████░██████▓█   ▓██░▒▓███▀ ▒████▒\n" +
+                "'  ▒ ▒▓▒ ▒  ▓▒░ ░  ░ ▒░▒░▒░  ▒░▒░▒░  ▒▒ ▓▒  ██▒▒▒       ░ ▐░ ░▓ ░ ▒░▓  ░ ▒░▓  ▒▒   ▓▒█░░▒   ▒ ░ ▒░ ░\n" +
+                "'  ░ ░▒  ░  ▒ ░      ░ ▒ ▒░  ░ ▒ ▒░  ░▒ ▒░▓██ ░▒░       ░ ░░  ▒ ░ ░ ▒  ░ ░ ▒  ░▒   ▒▒ ░ ░   ░ ░ ░  ░\n" +
+                "'  ░  ░  ░  ░      ░ ░ ░ ▒   ░ ░ ▒   ░░ ░ ▒ ▒ ░░          ░░  ▒ ░ ░ ░    ░ ░   ░   ▒  ░ ░   ░   ░   \n" +
+                "'        ░             ░ ░     ░ ░    ░   ░ ░              ░  ░     ░  ░   ░  ░    ░  ░     ░   ░  ░\n" +
+                "'                                         ░ ░             ░                                         \n"
+
+                + Colors.RESET + "\n";
+    }
     /**
      * This method displays the game's "you have been killed" message, in ASCII Art, in the color BLACK
      *
