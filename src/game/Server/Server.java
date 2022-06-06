@@ -645,7 +645,7 @@ public class Server {
                         if (isCommand(this.message.trim())) {
                             dealWithCommand(this.message);
                         } else if (gameInProgress && this.alive)
-                            chat(this.name, this.message);
+                            chat(this.textColor + this.name, this.message+Colors.RESET);
                     }
                 }
             } catch (IOException e) {

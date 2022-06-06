@@ -8,7 +8,7 @@ public class Player {
     public static void main(String[] args) {
         Player player = new Player();
         try {
-            player.start("localhost", 8082);
+            player.start("localhost", 8080);
         } catch (IOException e) {
             System.out.println("The server is down");
         }
